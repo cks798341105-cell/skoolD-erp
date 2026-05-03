@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>스쿨디 업무관리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#0d3f7a;--blue:#1a5fa8;--blue-lt:#e8f2fc;
+  --green:#059669;--green-lt:#d1fae5;
+  --red:#dc2626;--red-lt:#fee2e2;
+  --amber:#d97706;--amber-lt:#fef3c7;
+  --border:#e2e5ea;--bg:#f0f2f6;--white:#fff;--text:#111827;--sub:#6b7280;
+  --s0:#9ca3af;--s1:#3b82f6;--s2:#f59e0b;--s3:#8b5cf6;--s4:#10b981;--s5:#ef4444;--s6:#06b6d4;
+  --c인쇄:#1a5fa8;--c인테리어:#059669;--c사인물:#d97706;--c행사:#dc2626;
+  --bg인쇄:#e8f2fc;--bg인테리어:#d1fae5;--bg사인물:#fef3c7;--bg행사:#fee2e2;
+}
+html,body{height:100%;font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow:hidden}
+
+/* ── 상단 탭바 ── */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:60;height:54px;background:#0a2236;display:flex;align-items:center;padding:0 4px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.topbar-logo{padding:0 12px 0 8px;color:#fff;font-size:15px;font-weight:700;letter-spacing:.5px;white-space:nowrap;flex-shrink:0;border-right:1px solid rgba(255,255,255,.12);margin-right:4px}
+.tb{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:inherit;position:relative}
+.tb-icon{font-size:18px;line-height:1;filter:grayscale(1) brightness(2) opacity(.28);transition:filter .2s,transform .15s}
+.tb-label{font-size:9px;color:rgba(255,255,255,.22);font-weight:400;letter-spacing:.2px;transition:color .2s}
+.tb.on .tb-icon{filter:none;transform:translateY(-1px)}
+.tb.on .tb-label{color:rgba(255,255,255,.9);font-weight:600}
+.tb.on::after{content:'';position:absolute;bottom:0;left:18%;right:18%;height:2.5px;background:#5ba3f5;border-radius:3px 3px 0 0}
+
+/* ── BODY ── */
+.body{padding-top:54px;height:100vh;overflow:hidden}
+.view{display:none;height:100%;flex-direction:column;overflow:hidden}
+.view.on{display:flex}
+
+/* ── 칸반 툴바 ── */
+.kb-toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:7px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tv-wrap{display:flex;gap:3px}
+.tv{padding:5px 12px;border-radius:6px;font-size:12px;color:var(--sub);cursor:pointer;background:none;border:none;font-family:inherit}
+.tv.on{background:var(--bg);color:var(--text);font-weight:600}
+
+/* ── 담당자 버튼 ── */
+.pf-bar{background:var(--white);border-bottom:1px solid var(--border);padding:0 12px;height:38px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.pf-btn{display:flex;align-items:center;gap:6px;padding:5px 12px 5px 8px;border:1px solid var(--border);border-radius:20px;background:var(--white);cursor:pointer;font-family:inherit;font-size:12px;color:var(--text);transition:all .15s}
+.pf-btn:hover{border-color:var(--blue)}
+.pf-btn.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pf-avatar{width:20px;height:20px;border-radius:50%;background:var(--blue-lt);color:var(--blue);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pf-btn.on .pf-avatar{background:rgba(255,255,255,.2);color:#fff}
+
+/* ── 조직도 모달 ── */
+.org-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;display:none}
+.org-bg.on{display:block}
+.org-panel{position:fixed;top:0;left:0;bottom:0;width:280px;background:var(--white);z-index:91;overflow-y:auto;box-shadow:4px 0 20px rgba(0,0,0,.15);transform:translateX(-100%);transition:transform .25s}
+.org-panel.on{transform:translateX(0)}
+.org-head{padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1}
+.org-title{font-size:14px;font-weight:700}
+.org-close{font-size:22px;cursor:pointer;color:var(--sub);background:none;border:none;font-family:inherit;line-height:1}
+.org-body{padding:12px}
+.org-all{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--white);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;color:var(--sub);margin-bottom:12px;transition:all .15s;text-align:left;display:flex;align-items:center;gap:8px}
+.org-all:hover{border-color:var(--blue)}
+.org-all.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.org-team{margin-bottom:14px}
+.org-team-label{font-size:10px;font-weight:700;letter-spacing:.8px;margin-bottom:7px;padding:0 2px}
+.org-members{display:flex;flex-wrap:wrap;gap:5px}
+.org-mbtn{display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:9px;cursor:pointer;background:var(--white);font-family:inherit;transition:all .15s}
+.org-mbtn:hover{border-color:var(--blue);background:var(--blue-lt)}
+.org-mbtn.on{background:var(--navy);border-color:var(--navy)}
+.org-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.org-mname{font-size:12px;font-weight:500;color:var(--text)}
+.org-mrole{font-size:10px;color:var(--sub)}
+.org-mbtn.on .org-mname,.org-mbtn.on .org-mrole{color:#fff}
+
+/* ── 분류 사이드바 ── */
+.kb-wrap{flex:1;display:flex;overflow:hidden;min-height:0}
+.cat-sidebar{width:50px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:6px 0;gap:3px}
+.csb{width:44px;padding:7px 3px;border:none;border-radius:8px;background:transparent;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;transition:background .15s}
+.csb:hover{background:var(--bg)}
+.csb.on{background:#eef4fd}
+.csb.on::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 2px 2px 0;background:var(--blue)}
+.csb[data-c="인쇄"].on::before{background:var(--c인쇄)}
+.csb[data-c="인테리어"].on::before{background:var(--c인테리어)}
+.csb[data-c="사인물"].on::before{background:var(--c사인물)}
+.csb[data-c="행사"].on::before{background:var(--c행사)}
+.csb-icon{font-size:15px;line-height:1}
+.csb-label{font-size:8px;color:var(--sub);text-align:center;font-weight:400}
+.csb.on .csb-label{font-weight:700;color:var(--navy)}
+.csb[data-c="인쇄"].on .csb-label{color:var(--c인쇄)}
+.csb[data-c="인테리어"].on .csb-label{color:var(--c인테리어)}
+.csb[data-c="사인물"].on .csb-label{color:var(--c사인물)}
+.csb[data-c="행사"].on .csb-label{color:var(--c행사)}
+.csb-cnt{font-size:9px;font-weight:600;padding:1px 4px;border-radius:8px;background:var(--bg);color:var(--sub);min-width:16px;text-align:center}
+.csb-div{width:28px;height:1px;background:var(--border);flex-shrink:0;margin:2px 0}
+
+/* ── 칸반 보드 ── */
+.kanban{flex:1;overflow-x:auto;overflow-y:hidden;display:flex;align-items:flex-start;padding:10px 10px 16px;gap:8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.kanban::-webkit-scrollbar{height:4px}
+.kanban::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.kb-col{flex:0 0 192px;display:flex;flex-direction:column;background:#eeeeed;border-radius:10px;overflow:hidden;max-height:calc(100vh - 170px)}
+.kb-head{padding:8px 10px 7px;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.kb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kb-title{font-size:12px;font-weight:700;color:var(--text)}
+.kb-cnt{font-size:11px;color:var(--sub);margin-left:auto;background:rgba(0,0,0,.07);padding:1px 7px;border-radius:10px}
+.kb-body{flex:1;overflow-y:auto;padding:3px 6px 6px;display:flex;flex-direction:column;gap:5px;scrollbar-width:none}
+.kb-body::-webkit-scrollbar{display:none}
+.kb-add{flex-shrink:0;padding:7px 10px;margin:0 6px 6px;border-radius:6px;font-size:11px;color:var(--sub);cursor:pointer;background:none;border:none;font-family:inherit;text-align:left}
+.kb-add:hover{background:rgba(0,0,0,.05);color:var(--text)}
+
+/* 분류 그룹 헤더 */
+.cat-grp{display:flex;align-items:center;gap:5px;padding:6px 4px 2px;flex-shrink:0}
+.cat-grp:first-child{padding-top:2px}
+.cat-grp-label{font-size:9px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+.cat-grp-line{flex:1;height:1.5px;border-radius:1px;opacity:.35}
+
+/* 칸반 카드 */
+.kb-card{background:var(--white);border-radius:8px;padding:9px 10px;border:1px solid var(--border);cursor:pointer;transition:box-shadow .15s,transform .1s}
+.kb-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.1);transform:translateY(-1px)}
+.kb-catbar{height:3px;border-radius:2px;margin-bottom:6px}
+.kb-school{font-size:9px;color:var(--sub);margin-bottom:2px}
+.kb-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:3px;word-break:keep-all}
+.kb-subitems{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px}
+.kb-sub-chip{font-size:9px;padding:2px 6px;border-radius:6px;background:#f3f4f6;color:var(--sub);font-weight:500}
+.kb-sub-chip.done{background:var(--green-lt);color:var(--green);text-decoration:line-through;opacity:.65}
+.kb-memo{font-size:10px;color:var(--sub);line-height:1.5;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.kb-foot{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.kb-owner{font-size:9px;padding:2px 6px;border-radius:8px;font-weight:500;white-space:nowrap}
+.kb-due{font-size:9px;padding:2px 6px;border-radius:8px;font-weight:500;white-space:nowrap}
+
+/* ── 목록 뷰 ── */
+.list-scroll{flex:1;overflow-y:auto;padding:10px 12px}
+.lv-item{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;gap:10px;align-items:flex-start}
+.lv-bar{width:4px;min-height:28px;border-radius:2px;flex-shrink:0;margin-top:2px}
+.lv-body{flex:1;min-width:0}
+.lv-school{font-size:10px;color:var(--sub);margin-bottom:2px}
+.lv-top{display:flex;gap:5px;margin-bottom:3px;flex-wrap:wrap;align-items:center}
+.lv-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.lv-subitems{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.lv-memo{font-size:11px;color:var(--sub);margin-top:2px;line-height:1.5}
+.lv-meta{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;align-items:center}
+.lv-right{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.st-sel{font-size:10px;padding:4px 5px;border:1px solid var(--border);border-radius:6px;font-family:inherit;background:var(--white);outline:none;max-width:82px;cursor:pointer;color:var(--text)}
+.act-row{display:flex;gap:3px}
+
+/* ── STATUS ── */
+.st-chip{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.st-chip::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.st-0{background:#f3f4f6;color:#6b7280}.st-0::before{background:#9ca3af}
+.st-1{background:#dbeafe;color:#1d4ed8}.st-1::before{background:#3b82f6}
+.st-2{background:#fef3c7;color:#b45309}.st-2::before{background:#f59e0b}
+.st-3{background:#ede9fe;color:#6d28d9}.st-3::before{background:#8b5cf6}
+.st-4{background:#d1fae5;color:#065f46}.st-4::before{background:#10b981}
+.st-5{background:#fee2e2;color:#991b1b}.st-5::before{background:#ef4444}
+.st-6{background:#cffafe;color:#0e7490}.st-6::before{background:#06b6d4}
+
+/* 분류 뱃지 */
+.cat-badge{display:inline-flex;font-size:9px;font-weight:600;padding:2px 7px;border-radius:8px;white-space:nowrap}
+.cb-인쇄{background:var(--bg인쇄);color:var(--c인쇄)}
+.cb-인테리어{background:var(--bg인테리어);color:var(--c인테리어)}
+.cb-사인물{background:var(--bg사인물);color:var(--c사인물)}
+.cb-행사{background:var(--bg행사);color:var(--c행사)}
+
+/* ── 캘린더 ── */
+#v-cal{overflow-y:auto;padding:14px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav-title{font-size:17px;font-weight:700}
+.cal-nav-btn{width:30px;height:30px;border:1px solid var(--border);border-radius:7px;background:var(--white);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-dh{text-align:center;font-size:10px;color:var(--sub);padding:3px 0;font-weight:500}
+.cal-dh:first-child{color:#ef4444}.cal-dh:last-child{color:#3b82f6}
+.cal-cell{min-height:62px;border-radius:7px;padding:4px;cursor:pointer;background:var(--white);border:1px solid var(--border)}
+.cal-cell:hover{background:var(--blue-lt)}
+.cal-cell.today{border:2px solid var(--blue)}
+.cal-cell.selected{background:#EBF5FF;border:2px solid var(--blue)}
+.cal-cell.other{opacity:.3}
+.cal-cell.sunday .cal-num{color:#ef4444}
+.cal-cell.saturday .cal-num{color:#3b82f6}
+.cal-num{font-size:12px;font-weight:600;line-height:1;margin-bottom:3px}
+.cal-chip{font-size:9px;padding:1px 4px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;line-height:1.4}
+.cal-detail{margin-top:12px}
+.cal-detail-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-detail-title{font-size:14px;font-weight:700}
+.cal-work-item{background:var(--white);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:8px;padding:10px 12px;margin-bottom:5px;cursor:pointer}
+.cal-work-item:hover{box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.cwi-school{font-size:10px;color:var(--sub);margin-bottom:2px}
+.cwi-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.cwi-foot{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.di{background:var(--white);border:1px solid var(--border);border-radius:9px;padding:9px 11px;margin-bottom:5px;display:flex;align-items:flex-start;gap:8px}
+.di.done{opacity:.4}
+.dchk{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;background:var(--white)}
+.dchk.on{background:var(--blue);border-color:var(--blue)}
+.dbody{flex:1;min-width:0}
+.dtop{display:flex;gap:5px;margin-bottom:3px;flex-wrap:wrap;align-items:center}
+.dperson{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500;white-space:nowrap}
+.dname{font-size:12px;font-weight:600}
+.ddetail{font-size:11px;color:var(--sub);line-height:1.6}
+.ddel{padding:3px 7px;border:1px solid var(--border);border-radius:5px;font-size:10px;color:var(--sub);cursor:pointer;background:none;font-family:inherit;flex-shrink:0}
+
+/* ── 대시보드 ── */
+#v-dash{overflow-y:auto;padding:14px}
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.dg{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.dg-n{font-size:26px;font-weight:700;color:var(--blue);line-height:1}
+.dg-l{font-size:10px;color:var(--sub);margin-top:3px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.card-title{font-size:13px;font-weight:600;margin-bottom:10px}
+.prog-wrap{margin-bottom:8px}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;color:var(--sub)}
+.prog-bar{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .5s}
+.slabel{font-size:11px;color:var(--sub);letter-spacing:.5px;margin:12px 0 7px;font-weight:500}
+.dash-mini{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 11px;margin-bottom:5px;cursor:pointer}
+.dash-mini-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* ── 공지문 ── */
+#v-notice{overflow-y:auto;padding:14px}
+.notice-box{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:13px;line-height:2.1;white-space:pre-wrap;color:var(--text);min-height:120px;font-family:inherit;word-break:break-all}
+.copy-btn{padding:9px 22px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.copy-btn.done{background:var(--green)}
+
+/* ── 공통 ── */
+.btn{padding:9px 16px;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-outline{background:var(--white);color:var(--text);border:1px solid var(--border)}
+.btn-danger{background:var(--red-lt);color:var(--red);border:1px solid #fca5a5}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.btn-full{width:100%}
+.empty{text-align:center;padding:28px 16px;color:var(--sub);font-size:12px;line-height:2}
+
+/* ── 모달 ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;display:none;align-items:flex-end;justify-content:center}
+.modal-bg.on{display:flex}
+.modal{background:var(--white);border-radius:20px 20px 0 0;padding:0;width:100%;max-width:560px;max-height:94vh;overflow-y:auto}
+.modal-head{position:sticky;top:0;z-index:2;background:var(--white);padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-head-title{font-size:16px;font-weight:700}
+.modal-close{font-size:22px;cursor:pointer;color:var(--sub);background:none;border:none;font-family:inherit;line-height:1;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.modal-close:hover{background:var(--bg)}
+.form-wrap{padding:0 18px}
+.fsec{margin-top:20px}
+.fsec-title{font-size:10px;font-weight:600;color:var(--sub);letter-spacing:1.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.ff{display:flex;flex-direction:column;gap:4px;margin-bottom:13px}
+.ff label{font-size:12px;color:var(--text);font-weight:500}
+.ff input,.ff select,.ff textarea{padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none;-webkit-appearance:none;transition:border-color .15s}
+.ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--blue)}
+.ff textarea{resize:vertical;min-height:72px;line-height:1.7}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-foot{padding:14px 18px 0;display:flex;gap:10px}
+
+/* 분류 선택 */
+.cat-selector{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
+.cat-opt{padding:9px 4px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;font-size:11px;font-weight:500;color:var(--sub);transition:all .15s;background:var(--white)}
+.cat-opt:hover{background:var(--bg)}
+.cat-opt.sel-인쇄{border-color:var(--c인쇄);background:var(--bg인쇄);color:var(--c인쇄)}
+.cat-opt.sel-인테리어{border-color:var(--c인테리어);background:var(--bg인테리어);color:var(--c인테리어)}
+.cat-opt.sel-사인물{border-color:var(--c사인물);background:var(--bg사인물);color:var(--c사인물)}
+.cat-opt.sel-행사{border-color:var(--c행사);background:var(--bg행사);color:var(--c행사)}
+
+/* 행사 하위품목 */
+.sub-quick{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.sub-qbtn{padding:4px 10px;border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;background:var(--white);color:var(--sub);font-family:inherit}
+.sub-qbtn:hover{border-color:var(--c행사);color:var(--c행사)}
+.sub-list{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.sub-row{display:flex;align-items:center;gap:7px;background:var(--bg);border-radius:8px;padding:6px 10px}
+.sub-chk{width:18px;height:18px;border:2px solid var(--border);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--white)}
+.sub-chk.on{background:var(--green);border-color:var(--green)}
+.sub-nm{flex:1;font-size:12px;font-weight:500;color:var(--text)}
+.sub-st{font-size:10px;padding:3px 5px;border:1px solid var(--border);border-radius:6px;font-family:inherit;background:var(--white);cursor:pointer;color:var(--sub);max-width:76px}
+.sub-del{font-size:18px;color:var(--sub);cursor:pointer;background:none;border:none;padding:0;line-height:1;flex-shrink:0}
+.sub-add-row{display:flex;gap:6px}
+.sub-add-input{flex:1;padding:8px 11px;border:1.5px dashed var(--border);border-radius:8px;font-size:12px;font-family:inherit;color:var(--text);background:var(--white);outline:none}
+.sub-add-input:focus{border-color:var(--c행사);border-style:solid}
+.sub-add-btn{padding:8px 14px;background:var(--c행사);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+
+/* 배송 추가 모달 */
+.del-modal .form-wrap{padding:0 18px}
+
+/* PERSON COLORS */
+.pc0{background:#dbeafe;color:#1d4ed8}.pc1{background:#d1fae5;color:#065f46}
+.pc2{background:#fef3c7;color:#b45309}.pc3{background:#ede9fe;color:#7c3aed}
+.pc4{background:#fee2e2;color:#991b1b}.pc5{background:#cffafe;color:#0e7490}
+.pc6{background:#fce7f3;color:#9d174d}.pc7{background:#fef9c3;color:#854d0e}
+
+/* ── 상담기록 ── */
+#v-crm{overflow-y:auto;padding:12px}
+.crm-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.crm-search{flex:1;padding:9px 13px 9px 36px;border:1px solid var(--border);border-radius:20px;font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none}
+.crm-search-wrap{position:relative;flex:1}
+.crm-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+/* 거래처 카드 */
+.client-card{background:var(--white);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;cursor:pointer;transition:box-shadow .15s}
+.client-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.client-head{padding:12px 14px;display:flex;align-items:center;gap:10px}
+.client-avatar{width:38px;height:38px;border-radius:10px;background:var(--blue-lt);color:var(--blue);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.client-info{flex:1;min-width:0}
+.client-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.client-meta{font-size:11px;color:var(--sub)}
+.client-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.client-badge{font-size:9px;padding:2px 7px;border-radius:8px;font-weight:500}
+.client-actions{display:flex;gap:6px;flex-shrink:0}
+/* 상담 기록 리스트 */
+.consult-list{border-top:1px solid var(--border);padding:0 14px 8px}
+.consult-item{padding:10px 0;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
+.consult-item:last-child{border-bottom:none}
+.consult-date{font-size:10px;color:var(--sub);white-space:nowrap;margin-top:2px;min-width:56px}
+.consult-body{flex:1;min-width:0}
+.consult-content{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:4px}
+.consult-tags{display:flex;gap:4px;flex-wrap:wrap}
+.consult-tag{font-size:9px;padding:2px 7px;border-radius:8px;background:var(--bg);color:var(--sub);font-weight:500}
+.consult-tag.assigned{background:var(--green-lt);color:var(--green)}
+.consult-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+/* 상담 입력 폼 */
+.consult-quick{background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.consult-quick-title{font-size:11px;font-weight:600;color:var(--sub);margin-bottom:8px;letter-spacing:.5px}
+.consult-quick-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none;resize:none;line-height:1.6}
+.consult-quick-input:focus{border-color:var(--blue)}
+.consult-quick-foot{display:flex;align-items:center;gap:8px;margin-top:8px}
+/* 거래처 상세 모달 */
+.client-detail-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.client-detail-avatar{width:44px;height:44px;border-radius:12px;background:var(--blue-lt);color:var(--blue);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* 배정 버튼 */
+.assign-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:var(--blue-lt);color:var(--blue);border:1px solid #bfdbfe;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap}
+.assign-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+</style>
+</head>
+<body>
+
+<!-- 상단 탭바 -->
+<div class="topbar">
+  <div class="topbar-logo">S;D</div>
+  <button class="tb on" onclick="sw('kanban',this)"><span class="tb-icon">📋</span><span class="tb-label">작업</span></button>
+  <button class="tb" onclick="sw('cal',this)"><span class="tb-icon">📅</span><span class="tb-label">배송달력</span></button>
+  <button class="tb" onclick="sw('dash',this)"><span class="tb-icon">📊</span><span class="tb-label">대시보드</span></button>
+  <button class="tb" onclick="sw('notice',this);renderNotice()"><span class="tb-icon">💬</span><span class="tb-label">공지문</span></button>
+  <button class="tb" onclick="sw('crm',this)"><span class="tb-icon">🤝</span><span class="tb-label">상담기록</span></button>
+</div>
+
+<div class="body">
+
+  <!-- 작업 칸반 -->
+  <div class="view on" id="v-kanban">
+    <div class="kb-toolbar">
+      <div class="tv-wrap">
+        <button class="tv on" id="tv-k" onclick="setWV('kanban',this)">⊞ 칸반</button>
+        <button class="tv" id="tv-l" onclick="setWV('list',this)">≡ 목록</button>
+      </div>
+      <div style="margin-left:auto"><button class="btn btn-primary btn-sm" onclick="openAddWork(0)">+ 작업</button></div>
+    </div>
+    <!-- 담당자 필터 -->
+    <div class="pf-bar">
+      <button class="pf-btn on" id="pf-btn" onclick="openOrg()">
+        <span class="pf-avatar" id="pf-av">전</span>
+        <span id="pf-lbl">전체 담당자</span>
+        <span style="font-size:10px;opacity:.5">▾</span>
+      </button>
+    </div>
+    <!-- 칸반 영역 -->
+    <div class="kb-wrap">
+      <!-- 분류 사이드바 -->
+      <div class="cat-sidebar">
+        <button class="csb on" data-c="전체" onclick="selCat(this)"><span class="csb-icon">☰</span><span class="csb-label">전체</span><span class="csb-cnt" id="cc-전체">0</span></button>
+        <div class="csb-div"></div>
+        <button class="csb" data-c="인쇄" onclick="selCat(this)"><span class="csb-icon">🖨</span><span class="csb-label">인쇄</span><span class="csb-cnt" id="cc-인쇄">0</span></button>
+        <button class="csb" data-c="인테리어" onclick="selCat(this)"><span class="csb-icon">🏫</span><span class="csb-label">인테리어</span><span class="csb-cnt" id="cc-인테리어">0</span></button>
+        <button class="csb" data-c="사인물" onclick="selCat(this)"><span class="csb-icon">🪧</span><span class="csb-label">사인물</span><span class="csb-cnt" id="cc-사인물">0</span></button>
+        <button class="csb" data-c="행사" onclick="selCat(this)"><span class="csb-icon">🎪</span><span class="csb-label">행사</span><span class="csb-cnt" id="cc-행사">0</span></button>
+      </div>
+      <div class="kanban" id="kanban-board"></div>
+      <div class="list-scroll" id="list-body" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- 배송달력 -->
+  <div class="view" id="v-cal">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="moveMonth(-1)">‹</button>
+      <span class="cal-nav-title" id="cal-title"></span>
+      <button class="cal-nav-btn" onclick="moveMonth(1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-hdrs"></div>
+    <div class="cal-grid" id="cal-cells" style="margin-top:2px"></div>
+    <div class="cal-detail" id="cal-detail"></div>
+  </div>
+
+  <!-- 대시보드 -->
+  <div class="view" id="v-dash">
+    <div class="dash-grid">
+      <div class="dg"><div class="dg-n" id="d-total">0</div><div class="dg-l">전체</div></div>
+      <div class="dg"><div class="dg-n" id="d-ing" style="color:var(--amber)">0</div><div class="dg-l">진행중</div></div>
+      <div class="dg"><div class="dg-n" id="d-done" style="color:var(--green)">0</div><div class="dg-l">완료</div></div>
+    </div>
+    <div class="card"><div class="card-title">📊 팀별 진행 현황</div><div id="team-prog"></div></div>
+    <div class="slabel">📦 오늘 배송</div><div id="dash-del"></div>
+    <div class="slabel" style="color:var(--amber)">⚠ 배송일 미지정</div><div id="dash-unsched"></div>
+  </div>
+
+  <!-- 공지문 -->
+  <div class="view" id="v-notice">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:15px;font-weight:600" id="notice-title">배송 공지문</span>
+      <button class="copy-btn" id="copy-btn" onclick="copyNotice()">복사</button>
+    </div>
+    <div class="notice-box" id="notice-box">배송 달력에서 날짜를 선택하면 자동 생성됩니다.</div>
+    <div style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center">복사 후 카카오톡에 바로 붙여넣기</div>
+  </div>
+
+
+  <!-- 상담기록 -->
+  <div class="view" id="v-crm">
+    <div class="crm-toolbar">
+      <div class="crm-search-wrap">
+        <span class="crm-search-icon">🔍</span>
+        <input class="crm-search" id="crm-search" placeholder="거래처명 검색..." oninput="renderCrm()">
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openAddClient()">+ 거래처</button>
+    </div>
+    <div id="crm-list"></div>
+  </div>
+
+</div>
+
+<!-- 조직도 모달 -->
+<div class="org-bg" id="org-bg" onclick="closeOrg()"></div>
+<div class="org-panel" id="org-panel">
+  <div class="org-head">
+    <span class="org-title">담당자 선택</span>
+    <button class="org-close" onclick="closeOrg()">×</button>
+  </div>
+  <div class="org-body" id="org-body"></div>
+</div>
+
+<!-- 제작사양서 모달 -->
+<div class="modal-bg" id="modal-work"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="mw-title">제작사양서</span>
+    <button class="modal-close" onclick="closeModal('modal-work')">×</button>
+  </div>
+  <div class="form-wrap">
+    <div class="fsec">
+      <div class="fsec-title">기본 정보</div>
+      <div class="ff">
+        <label>분류</label>
+        <div class="cat-selector">
+          <div class="cat-opt" data-cat="인쇄" onclick="pickCat(this)">🖨 인쇄</div>
+          <div class="cat-opt" data-cat="인테리어" onclick="pickCat(this)">🏫 인테리어</div>
+          <div class="cat-opt" data-cat="사인물" onclick="pickCat(this)">🪧 사인물</div>
+          <div class="cat-opt" data-cat="행사" onclick="pickCat(this)">🎪 행사</div>
+        </div>
+      </div>
+      <div class="ff"><label>학교명</label><input id="wf-school" placeholder="예: 검단호수초등학교"></div>
+      <div class="ff"><label>작업명 *</label><input id="wf-n" placeholder="예: 어린이날 행사 / 교육계획서"></div>
+      <div class="fg2">
+        <div class="ff"><label>담당자</label><select id="wf-p"></select></div>
+        <div class="ff"><label>상태</label>
+          <select id="wf-s">
+            <option value="0">접수</option><option value="1">톡방개설</option>
+            <option value="2">초안</option><option value="3">수정중</option>
+            <option value="4">제작완료</option><option value="5">배송완료</option><option value="6">서류</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="fsec" id="sec-sub" style="display:none">
+      <div class="fsec-title">행사 품목 구성</div>
+      <div class="sub-quick">
+        <button class="sub-qbtn" onclick="addQ('포스터')">+ 포스터</button>
+        <button class="sub-qbtn" onclick="addQ('초대장')">+ 초대장</button>
+        <button class="sub-qbtn" onclick="addQ('자이언트배너')">+ 자이언트배너</button>
+        <button class="sub-qbtn" onclick="addQ('현수막')">+ 현수막</button>
+        <button class="sub-qbtn" onclick="addQ('음향')">+ 음향</button>
+        <button class="sub-qbtn" onclick="addQ('포토월')">+ 포토월</button>
+        <button class="sub-qbtn" onclick="addQ('X배너')">+ X배너</button>
+      </div>
+      <div class="sub-list" id="sub-list"></div>
+      <div class="sub-add-row">
+        <input class="sub-add-input" id="sub-inp" placeholder="품목 직접 입력..." onkeydown="if(event.key==='Enter')addSubInp()">
+        <button class="sub-add-btn" onclick="addSubInp()">추가</button>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">거래처 정보</div>
+      <div class="fg2">
+        <div class="ff"><label>거래처 담당자</label><input id="wf-contact" placeholder="예: 홍길동 선생님"></div>
+        <div class="ff"><label>연락처</label><input id="wf-tel" type="tel" placeholder="032-000-0000"></div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">제작 사양</div>
+      <div class="fg2">
+        <div class="ff"><label>사이즈</label><input id="wf-size" placeholder="예: A4 / 297×420mm"></div>
+        <div class="ff"><label>페이지</label><input id="wf-page" placeholder="예: 32p"></div>
+      </div>
+      <div class="ff"><label>표지 사양</label><input id="wf-cover" placeholder="예: 스노우지 250g / 무광코팅"></div>
+      <div class="ff"><label>내지 사양</label><input id="wf-inner" placeholder="예: 스노우지 120g / 4도"></div>
+      <div class="ff"><label>기타 후가공</label><input id="wf-finish" placeholder="예: 무선제본 / 에폭시 / 형압"></div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">일정 & 메모</div>
+      <div class="ff"><label>배송 예정일</label><input type="date" id="wf-due"></div>
+      <div class="ff"><label>세부 내용 / 메모</label><textarea id="wf-m" placeholder="진행 노트, 특이사항 등"></textarea></div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-primary" style="flex:1" id="mw-btn" onclick="saveWork()">추가하기</button>
+    <button class="btn btn-danger btn-sm" id="mw-del" style="display:none" onclick="delWorkCur()">삭제</button>
+  </div>
+</div></div>
+
+<!-- 거래처 추가 모달 -->
+<div class="modal-bg" id="modal-client"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="mc-title">거래처 추가</span>
+    <button class="modal-close" onclick="closeModal('modal-client')">×</button>
+  </div>
+  <div class="form-wrap">
+    <div class="fsec">
+      <div class="fsec-title">기본 정보</div>
+      <div class="ff"><label>거래처명 *</label><input id="cf-name" placeholder="예: 인천검단호수초등학교"></div>
+      <div class="fg2">
+        <div class="ff"><label>담당자명</label><input id="cf-contact" placeholder="예: 홍길동 선생님"></div>
+        <div class="ff"><label>연락처</label><input id="cf-tel" type="tel" placeholder="032-000-0000"></div>
+      </div>
+      <div class="ff"><label>이메일</label><input id="cf-email" type="email" placeholder="example@school.kr"></div>
+      <div class="ff"><label>주소</label><input id="cf-addr" placeholder="예: 인천광역시 서구 검단로 123"></div>
+      <div class="ff"><label>분류</label>
+        <select id="cf-type">
+          <option value="">선택</option>
+          <option value="초등학교">초등학교</option>
+          <option value="중학교">중학교</option>
+          <option value="고등학교">고등학교</option>
+          <option value="유치원">유치원</option>
+          <option value="교육청">교육청</option>
+          <option value="기관">기관</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+      <div class="ff"><label>메모</label><textarea id="cf-memo" placeholder="특이사항, 선호사항 등"></textarea></div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-primary" style="flex:1" id="mc-btn" onclick="saveClient()">추가하기</button>
+    <button class="btn btn-danger btn-sm" id="mc-del" style="display:none" onclick="delClientCur()">삭제</button>
+  </div>
+</div></div>
+
+<!-- 상담기록 상세 모달 -->
+<div class="modal-bg" id="modal-crm-detail"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="cd-title">상담 기록</span>
+    <button class="modal-close" onclick="closeModal('modal-crm-detail')">×</button>
+  </div>
+  <div id="cd-body" style="padding:0 18px 16px"></div>
+</div></div>
+
+<!-- 배송 추가 모달 -->
+<div class="modal-bg del-modal" id="modal-del"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="md-title">배송 추가</span>
+    <button class="modal-close" onclick="closeModal('modal-del')">×</button>
+  </div>
+  <div class="form-wrap">
+    <div class="fsec">
+      <div class="fsec-title">배송 정보</div>
+      <div class="fg2">
+        <div class="ff"><label>거래처 *</label><input id="df-c" placeholder="예: 멘토사이언스"></div>
+        <div class="ff"><label>품목 *</label><input id="df-i" placeholder="예: 리플렛"></div>
+      </div>
+      <div class="fg2">
+        <div class="ff"><label>수량</label><input id="df-q" placeholder="500매"></div>
+        <div class="ff"><label>담당자</label><select id="df-p"></select></div>
+      </div>
+      <div class="ff"><label>연락처</label><input id="df-t" placeholder="010-0000-0000" type="tel"></div>
+      <div class="ff"><label>메모</label><input id="df-m" placeholder="오전동선, 부재시 연락 등"></div>
+    </div>
+  </div>
+  <div class="modal-foot"><button class="btn btn-primary btn-full" onclick="addDelivery()">추가하기</button></div>
+</div></div>
+
+<script>
+// ══ 상수 ══
+var STAGES=['접수','톡방개설','초안','수정중','제작완료','배송완료','서류'];
+var SDOTS=['#9ca3af','#3b82f6','#f59e0b','#8b5cf6','#10b981','#ef4444','#06b6d4'];
+var SCLS=['st-0','st-1','st-2','st-3','st-4','st-5','st-6'];
+var CAT_COLOR={인쇄:'#1a5fa8',인테리어:'#059669',사인물:'#d97706',행사:'#dc2626'};
+var CAT_BG={인쇄:'#e8f2fc',인테리어:'#d1fae5',사인물:'#fef3c7',행사:'#fee2e2'};
+var CAT_LIST=[{k:'인쇄',c:'#1a5fa8',i:'🖨'},{k:'인테리어',c:'#059669',i:'🏫'},{k:'사인물',c:'#d97706',i:'🪧'},{k:'행사',c:'#dc2626',i:'🎪'}];
+
+var MEMBERS=[
+  {n:'최기수',r:'대표',t:'경영'},{n:'김종근',r:'부사장',t:'경영'},{n:'강인걸',r:'전무',t:'경영'},
+  {n:'이다솔',r:'팀장',t:'경영관리팀'},{n:'이미금',r:'주임',t:'경영관리팀'},
+  {n:'김영애',r:'팀장',t:'디자인1팀'},{n:'박재성',r:'차장',t:'디자인1팀'},
+  {n:'김아연',r:'차장',t:'디자인1팀'},{n:'이혜선',r:'차장',t:'디자인1팀'},
+  {n:'박진희',r:'차장',t:'디자인1팀'},{n:'이미라',r:'차장',t:'디자인1팀'},{n:'황선경',r:'대리',t:'디자인1팀'},
+  {n:'한도결',r:'팀장',t:'디자인2팀'},{n:'박은주',r:'차장',t:'디자인2팀'},{n:'권성순',r:'차장',t:'디자인2팀'},
+  {n:'김철수',r:'팀장',t:'디자인개발팀'},
+  {n:'김일환',r:'팀장',t:'생산팀'},
+  {n:'최주혜',r:'팀장',t:'인테리어사업부'},{n:'장보람',r:'과장',t:'인테리어사업부'},{n:'김은주',r:'주임',t:'인테리어사업부'},
+];
+var TEAMS=['경영관리팀','디자인1팀','디자인2팀','디자인개발팀','생산팀','인테리어사업부'];
+var TCOLORS=['#185FA5','#059669','#7c3aed','#d97706','#dc2626','#0891b2'];
+var D_PERSONS=['대표님','전무님','강인걸','이미금','최주혜','장보람','이다솔'];
+
+// ══ 상태 ══
+var works=null, delivery=[];
+try{works=JSON.parse(localStorage.getItem('sd7_works'))||null;}catch(e){}
+try{delivery=JSON.parse(localStorage.getItem('sd7_del'))||[];}catch(e){}
+
+var personF='전체', catF='전체', workView='kanban', curTab='kanban';
+var calYear, calMonth, calSel;
+var editWorkId=null, nowAddStage=0, curCat='', formSubs=[];
+
+function save(){try{localStorage.setItem('sd7_works',JSON.stringify(works));localStorage.setItem('sd7_del',JSON.stringify(delivery));}catch(e){}}
+function uid(){return Date.now()+Math.random();}
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function pad(v){return v<10?'0'+v:''+v;}
+function addD(s,d){var dt=new Date(s);dt.setDate(dt.getDate()+d);return dt.toISOString().split('T')[0];}
+function fmtD(s){if(!s)return '';var d=new Date(s),w=['일','월','화','수','목','금','토'];return(d.getMonth()+1)+'/'+d.getDate()+'('+w[d.getDay()]+')';}
+function diff(s){if(!s)return null;return Math.ceil((new Date(s)-new Date(todayStr()))/(864e5));}
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function pc(nm){var i=MEMBERS.findIndex(function(m){return m.n===nm;});return 'pc'+((i<0?0:i)%8);}
+function catC(c){return CAT_COLOR[c]||'#9ca3af';}
+function catBg(c){return CAT_BG[c]||'#f3f4f6';}
+
+// 샘플 데이터
+if(!works){
+  var t=todayStr();
+  works=[
+    {id:uid(),cat:'인쇄',school:'',n:'특성화고 홍보 브로슈어 제작',p:'김철수',s:0,contact:'',tel:'',m:'1번 스쿨디 브로슈어 제작 완료 후 진행 예정',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'신검단초등학교',n:'엘리베이터 층별 안내 사인물',p:'김철수',s:0,contact:'',tel:'',m:'',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'마케팅 업체 리서치',p:'김철수',s:0,contact:'',tel:'',m:'학교장터 업로드 소개페이지 제작 진행예정',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'AI스터디 교육 구상',p:'김철수',s:1,contact:'',tel:'',m:'커리큘럼 제작중',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'스쿨디 홍보 브로슈어 제작',p:'김철수',s:2,contact:'',tel:'',m:'로고변경작업 + 표지디자인 작업 중',due:'',c:t,size:'A4',page:'8p',cover:'아트지 250g 무광',inner:'스노우 120g',finish:'무선제본',subs:[]},
+    {id:uid(),cat:'인쇄',school:'검단호수초등학교',n:'교표 제작',p:'김철수',s:2,contact:'교무부장',tel:'032-555-1234',m:'화요일 최종 시안 전달완료 / 오후 전화 예정',due:addD(t,2),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'행사',school:'신검단초등학교',n:'어린이날 행사',p:'김철수',s:1,contact:'행사담당',tel:'032-111-2222',m:'5월 5일 어린이날 행사 전체 진행',due:addD(t,7),c:t,size:'',page:'',cover:'',inner:'',finish:'',
+      subs:[{id:uid(),n:'포스터',s:2,done:false},{id:uid(),n:'초대장',s:0,done:false},{id:uid(),n:'자이언트배너',s:0,done:false},{id:uid(),n:'음향',s:1,done:false},{id:uid(),n:'포토월',s:0,done:false}]},
+    {id:uid(),cat:'인쇄',school:'콜롬비아',n:'수료증 30매',p:'김철수',s:3,contact:'',tel:'',m:'디자인 완료 및 동판제작 요청완료 / 내지 내부인쇄 예정',due:addD(t,5),c:t,size:'B5',page:'1p',cover:'',inner:'',finish:'동판',subs:[]},
+  ];
+  save();
+}
+
+// ══ 초기화 ══
+(function(){
+  var now=new Date(); calYear=now.getFullYear(); calMonth=now.getMonth(); calSel=todayStr();
+  buildWfp(); buildDfp(); renderAll();
+})();
+
+function renderAll(){renderKanban();renderList();renderCal();renderDash();renderNotice();updateCnts();}
+
+// ── select 빌드 ──
+function buildWfp(){
+  var s=document.getElementById('wf-p'); if(!s)return; s.innerHTML='';
+  MEMBERS.forEach(function(m){var o=document.createElement('option');o.value=m.n;o.textContent=m.n+' ('+m.r+')';s.appendChild(o);});
+}
+function buildDfp(){
+  var s=document.getElementById('df-p'); if(!s)return; s.innerHTML='';
+  D_PERSONS.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;s.appendChild(o);});
+}
+
+// ── 조직도 모달 ──
+function openOrg(){
+  var body=document.getElementById('org-body'); body.innerHTML='';
+  var allBtn=document.createElement('button'); allBtn.className='org-all'+(personF==='전체'?' on':'');
+  allBtn.innerHTML='👥 전체 담당자';
+  allBtn.onclick=function(){personF='전체';updatePfBtn();closeOrg();renderKanban();renderList();};
+  body.appendChild(allBtn);
+  var tmap={};
+  MEMBERS.forEach(function(m){if(!tmap[m.t])tmap[m.t]=[];tmap[m.t].push(m);});
+  TEAMS.forEach(function(t,ti){
+    if(!tmap[t])return;
+    var tc=TCOLORS[ti]||'#6b7280';
+    var sec=document.createElement('div'); sec.className='org-team';
+    var lbl=document.createElement('div'); lbl.className='org-team-label'; lbl.style.color=tc; lbl.textContent=t; sec.appendChild(lbl);
+    var mw=document.createElement('div'); mw.className='org-members';
+    tmap[t].forEach(function(m){
+      var btn=document.createElement('button'); btn.className='org-mbtn'+(m.n===personF?' on':'');
+      btn.innerHTML='<div class="org-av" style="background:'+(m.n===personF?'rgba(255,255,255,.25)':tc+'22')+';color:'+(m.n===personF?'#fff':tc)+'">'+m.n.slice(0,1)+'</div>'
+        +'<div><div class="org-mname">'+m.n+'</div><div class="org-mrole">'+m.r+'</div></div>';
+      btn.onclick=function(){personF=m.n;updatePfBtn();closeOrg();renderKanban();renderList();};
+      mw.appendChild(btn);
+    });
+    sec.appendChild(mw); body.appendChild(sec);
+  });
+  document.getElementById('org-bg').classList.add('on');
+  document.getElementById('org-panel').classList.add('on');
+}
+function closeOrg(){document.getElementById('org-bg').classList.remove('on');document.getElementById('org-panel').classList.remove('on');}
+function updatePfBtn(){
+  document.getElementById('pf-lbl').textContent=personF==='전체'?'전체 담당자':personF;
+  document.getElementById('pf-av').textContent=personF==='전체'?'전':personF.slice(0,1);
+}
+
+// ── 분류 사이드바 ──
+function selCat(el){
+  catF=el.dataset.c;
+  document.querySelectorAll('.csb').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  renderKanban(); renderList(); updateCnts();
+}
+function updateCnts(){
+  if(!works)return;
+  document.getElementById('cc-전체').textContent=works.length;
+  ['인쇄','인테리어','사인물','행사'].forEach(function(c){
+    var el=document.getElementById('cc-'+c); if(!el)return;
+    el.textContent=works.filter(function(w){return w.cat===c;}).length;
+  });
+}
+
+// ── 칸반 ──
+function getF(){
+  if(!works)return [];
+  return works.filter(function(w){
+    if(personF!=='전체'&&w.p!==personF)return false;
+    if(catF!=='전체'&&w.cat!==catF)return false;
+    return true;
+  });
+}
+
+function renderKanban(){
+  var board=document.getElementById('kanban-board'); board.innerHTML='';
+  var f=getF();
+  STAGES.forEach(function(st,si){
+    var all=f.filter(function(w){return w.s===si;});
+    var col=document.createElement('div'); col.className='kb-col';
+    col.innerHTML='<div class="kb-head"><div class="kb-dot" style="background:'+SDOTS[si]+'"></div><span class="kb-title">'+st+'</span><span class="kb-cnt">'+all.length+'</span></div>';
+    var body=document.createElement('div'); body.className='kb-body';
+    if(catF==='전체'){
+      var any=false;
+      CAT_LIST.forEach(function(cat){
+        var cc=all.filter(function(w){return w.cat===cat.k;});
+        if(!cc.length)return;
+        var grp=document.createElement('div'); grp.className='cat-grp';
+        grp.innerHTML='<span class="cat-grp-label" style="color:'+cat.c+'">'+cat.i+' '+cat.k+'</span><div class="cat-grp-line" style="background:'+cat.c+'"></div>';
+        body.appendChild(grp);
+        cc.forEach(function(w){body.appendChild(mkCard(w));});
+        any=true;
+      });
+      var nc=all.filter(function(w){return !w.cat;});
+      if(nc.length){if(any){var g2=document.createElement('div');g2.className='cat-grp';g2.innerHTML='<span class="cat-grp-label" style="color:#9ca3af">기타</span><div class="cat-grp-line" style="background:#9ca3af"></div>';body.appendChild(g2);}nc.forEach(function(w){body.appendChild(mkCard(w));});any=true;}
+      if(!any){var em=document.createElement('div');em.style='font-size:11px;color:#c0bfbb;text-align:center;padding:14px 0';em.textContent='없음';body.appendChild(em);}
+    } else {
+      if(!all.length){var em=document.createElement('div');em.style='font-size:11px;color:#c0bfbb;text-align:center;padding:14px 0';em.textContent='없음';body.appendChild(em);}
+      all.forEach(function(w){body.appendChild(mkCard(w));});
+    }
+    col.appendChild(body);
+    var ab=document.createElement('button'); ab.className='kb-add'; ab.textContent='+ 새 항목';
+    ab.onclick=function(){openAddWork(si);}; col.appendChild(ab);
+    board.appendChild(col);
+  });
+}
+
+function mkCard(w){
+  var card=document.createElement('div'); card.className='kb-card';
+  var d=diff(w.due);
+  var dueHtml='';
+  if(w.due){
+    var bg=d<0?'#fee2e2':d<=2?'#fef3c7':'#d1fae5', tc=d<0?'#991b1b':d<=2?'#b45309':'#065f46';
+    var dl=d<0?'D+'+Math.abs(d)+' 지연':d===0?'오늘':d===1?'내일':'D-'+d;
+    dueHtml='<span class="kb-due" style="background:'+bg+';color:'+tc+'">📅 '+fmtD(w.due)+' '+dl+'</span>';
+  } else dueHtml='<span class="kb-due" style="background:#fef3c7;color:#b45309">배송일 미지정</span>';
+  var subsHtml='';
+  if(w.cat==='행사'&&w.subs&&w.subs.length){
+    subsHtml='<div class="kb-subitems">';
+    w.subs.forEach(function(s){subsHtml+='<span class="kb-sub-chip'+(s.done?' done':'')+'">'+esc(s.n)+'</span>';});
+    subsHtml+='</div>';
+  }
+  card.innerHTML='<div class="kb-catbar" style="background:'+catC(w.cat)+'"></div>'
+    +(w.school?'<div class="kb-school">🏫 '+esc(w.school)+'</div>':'')
+    +'<div class="kb-name">'+esc(w.n)+'</div>'
+    +subsHtml
+    +(w.m?'<div class="kb-memo">'+esc(w.m)+'</div>':'')
+    +'<div class="kb-foot"><span class="kb-owner '+pc(w.p)+'">'+esc(w.p)+'</span>'+dueHtml+'</div>';
+  card.onclick=function(){openEditWork(w.id);}; return card;
+}
+
+// ── 목록 뷰 ──
+function renderList(){
+  var f=getF(); f.sort(function(a,b){return a.s-b.s;});
+  var body=document.getElementById('list-body');
+  if(!f.length){body.innerHTML='<div class="empty">작업이 없습니다.</div>';return;}
+  body.innerHTML='';
+  f.forEach(function(w){
+    var stOpts=STAGES.map(function(s,si){return'<option value="'+si+'"'+(si===w.s?' selected':'')+'>'+s+'</option>';}).join('');
+    var d=diff(w.due), dC=d<0?'#ef4444':d<=2?'#f59e0b':'#10b981';
+    var dL=w.due?(d<0?'⚠ D+'+Math.abs(d)+' 지연':d===0?'🔴 오늘':d===1?'🟡 내일':'D-'+d):'';
+    var subsHtml='';
+    if(w.cat==='행사'&&w.subs&&w.subs.length){subsHtml='<div class="lv-subitems">';w.subs.forEach(function(s){subsHtml+='<span class="kb-sub-chip'+(s.done?' done':'')+'">'+esc(s.n)+'</span>';});subsHtml+='</div>';}
+    var item=document.createElement('div'); item.className='lv-item';
+    item.innerHTML='<div class="lv-bar" style="background:'+catC(w.cat)+'"></div>'
+      +'<div class="lv-body">'
+        +(w.school?'<div class="lv-school">🏫 '+esc(w.school)+'</div>':'')
+        +'<div class="lv-top"><span class="st-chip '+SCLS[w.s]+'">'+STAGES[w.s]+'</span>'
+          +(w.cat?'<span class="cat-badge cb-'+w.cat+'">'+w.cat+'</span>':'')
+          +(w.due?'<span style="font-size:10px;color:'+dC+';font-weight:500">📅 '+fmtD(w.due)+' '+dL+'</span>'
+            :'<span style="font-size:9px;background:#fef3c7;color:#b45309;padding:2px 7px;border-radius:8px;font-weight:500">배송일 미지정</span>')+'</div>'
+        +'<div class="lv-name">'+esc(w.n)+'</div>'
+        +subsHtml
+        +(w.m?'<div class="lv-memo">'+esc(w.m)+'</div>':'')
+        +'<div class="lv-meta"><span class="kb-owner '+pc(w.p)+'">'+esc(w.p)+'</span>'
+          +(w.contact?'<span style="font-size:10px;color:var(--sub)">👤 '+esc(w.contact)+'</span>':'')
+          +(w.tel?'<span style="font-size:10px;color:var(--sub)">📞 '+esc(w.tel)+'</span>':'')+'</div>'
+      +'</div>'
+      +'<div class="lv-right"><select class="st-sel" onchange="chgSt('+w.id+',this.value)">'+stOpts+'</select>'
+        +'<div class="act-row"><button class="btn btn-outline btn-sm" onclick="openEditWork('+w.id+')">사양서</button>'
+        +'<button class="btn btn-danger btn-sm" onclick="delWork('+w.id+')">삭제</button></div></div>';
+    body.appendChild(item);
+  });
+}
+
+function setWV(v,el){
+  workView=v;
+  document.querySelectorAll('.tv').forEach(function(b){b.classList.remove('on');});el.classList.add('on');
+  document.getElementById('kanban-board').style.display=v==='kanban'?'flex':'none';
+  document.getElementById('list-body').style.display=v==='list'?'block':'none';
+}
+function chgSt(id,v){var w=works.find(function(x){return x.id===id;});if(w){w.s=parseInt(v);save();renderKanban();renderList();renderDash();}}
+
+// ── 제작사양서 ──
+function pickCat(el){
+  curCat=el.dataset.cat||'';
+  document.querySelectorAll('.cat-opt').forEach(function(o){o.className='cat-opt';});
+  if(curCat) el.classList.add('sel-'+curCat);
+  document.getElementById('sec-sub').style.display=curCat==='행사'?'block':'none';
+}
+
+function openAddWork(si){
+  editWorkId=null; nowAddStage=si||0;
+  document.getElementById('mw-title').textContent='제작사양서 — 새 작업';
+  document.getElementById('mw-btn').textContent='추가하기';
+  document.getElementById('mw-del').style.display='none';
+  ['wf-school','wf-n','wf-contact','wf-tel','wf-m','wf-due','wf-size','wf-page','wf-cover','wf-inner','wf-finish'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('wf-s').value=nowAddStage;
+  document.querySelectorAll('.cat-opt').forEach(function(o){o.className='cat-opt';});
+  curCat=''; formSubs=[]; renderSubs();
+  document.getElementById('sec-sub').style.display='none';
+  openModal('modal-work');
+}
+
+function openEditWork(id){
+  var w=works.find(function(x){return x.id===id;}); if(!w)return;
+  editWorkId=id;
+  document.getElementById('mw-title').textContent='제작사양서 — '+esc(w.n);
+  document.getElementById('mw-btn').textContent='저장';
+  document.getElementById('mw-del').style.display='';
+  document.getElementById('wf-school').value=w.school||'';
+  document.getElementById('wf-n').value=w.n||'';
+  document.getElementById('wf-contact').value=w.contact||'';
+  document.getElementById('wf-tel').value=w.tel||'';
+  document.getElementById('wf-m').value=w.m||'';
+  document.getElementById('wf-due').value=w.due||'';
+  document.getElementById('wf-size').value=w.size||'';
+  document.getElementById('wf-page').value=w.page||'';
+  document.getElementById('wf-cover').value=w.cover||'';
+  document.getElementById('wf-inner').value=w.inner||'';
+  document.getElementById('wf-finish').value=w.finish||'';
+  document.getElementById('wf-s').value=w.s;
+  var sp=document.getElementById('wf-p');
+  for(var i=0;i<sp.options.length;i++){if(sp.options[i].value===w.p){sp.selectedIndex=i;break;}}
+  curCat=w.cat||'';
+  document.querySelectorAll('.cat-opt').forEach(function(o){
+    o.className='cat-opt';
+    if(curCat&&o.dataset.cat===curCat) o.classList.add('sel-'+curCat);
+  });
+  formSubs=JSON.parse(JSON.stringify(w.subs||[]));
+  document.getElementById('sec-sub').style.display=curCat==='행사'?'block':'none';
+  renderSubs();
+  openModal('modal-work');
+}
+
+function saveWork(){
+  var nm=document.getElementById('wf-n').value.trim();
+  if(!nm){alert('작업명을 입력하세요.');return;}
+  var data={n:nm,cat:curCat,school:document.getElementById('wf-school').value.trim(),
+    p:document.getElementById('wf-p').value,s:parseInt(document.getElementById('wf-s').value),
+    due:document.getElementById('wf-due').value,
+    contact:document.getElementById('wf-contact').value.trim(),tel:document.getElementById('wf-tel').value.trim(),
+    m:document.getElementById('wf-m').value.trim(),
+    size:document.getElementById('wf-size').value.trim(),page:document.getElementById('wf-page').value.trim(),
+    cover:document.getElementById('wf-cover').value.trim(),inner:document.getElementById('wf-inner').value.trim(),
+    finish:document.getElementById('wf-finish').value.trim(),
+    subs:JSON.parse(JSON.stringify(formSubs))};
+  if(editWorkId){var w=works.find(function(x){return x.id===editWorkId;});if(w)Object.assign(w,data);}
+  else{works.unshift(Object.assign({id:uid(),c:todayStr()},data));}
+  save();closeModal('modal-work');renderAll();
+}
+function delWorkCur(){if(!confirm('삭제할까요?'))return;works=works.filter(function(x){return x.id!==editWorkId;});save();closeModal('modal-work');renderAll();}
+function delWork(id){if(!confirm('삭제할까요?'))return;works=works.filter(function(x){return x.id!==id;});save();renderKanban();renderList();renderDash();}
+
+// ── 하위품목 ──
+function renderSubs(){
+  var list=document.getElementById('sub-list'); list.innerHTML='';
+  formSubs.forEach(function(it,idx){
+    var stOpts=STAGES.map(function(s,si){return'<option value="'+si+'"'+(si===it.s?' selected':'')+'>'+s+'</option>';}).join('');
+    var row=document.createElement('div'); row.className='sub-row';
+    var chk=document.createElement('div'); chk.className='sub-chk'+(it.done?' on':'');
+    if(it.done)chk.innerHTML='<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    chk.onclick=(function(i){return function(){formSubs[i].done=!formSubs[i].done;renderSubs();};})(idx);
+    var nm=document.createElement('span'); nm.className='sub-nm'; nm.textContent=it.n;
+    var st=document.createElement('select'); st.className='sub-st'; st.innerHTML=stOpts;
+    st.onchange=(function(i){return function(){formSubs[i].s=parseInt(this.value);};})(idx);
+    var del=document.createElement('button'); del.className='sub-del'; del.textContent='×';
+    del.onclick=(function(i){return function(){formSubs.splice(i,1);renderSubs();};})(idx);
+    row.appendChild(chk); row.appendChild(nm); row.appendChild(st); row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+function addQ(name){if(formSubs.find(function(i){return i.n===name;}))return;formSubs.push({id:uid(),n:name,s:0,done:false});renderSubs();}
+function addSubInp(){var inp=document.getElementById('sub-inp');var v=inp.value.trim();if(!v)return;formSubs.push({id:uid(),n:v,s:0,done:false});inp.value='';renderSubs();}
+
+// ── 캘린더 ──
+function renderCal(){
+  document.getElementById('cal-title').textContent=calYear+'년 '+(calMonth+1)+'월';
+  var hdrs=document.getElementById('cal-hdrs'); hdrs.innerHTML='';
+  ['일','월','화','수','목','금','토'].forEach(function(d,i){var el=document.createElement('div');el.className='cal-dh';el.textContent=d;if(i===0)el.style.color='#ef4444';if(i===6)el.style.color='#3b82f6';hdrs.appendChild(el);});
+  var first=new Date(calYear,calMonth,1), last=new Date(calYear,calMonth+1,0);
+  var cells=document.getElementById('cal-cells'); cells.innerHTML='';
+  var today=todayStr();
+  for(var i=0;i<first.getDay();i++){var el=document.createElement('div');el.className='cal-cell other';var pl=new Date(calYear,calMonth,0);el.innerHTML='<div class="cal-num">'+(pl.getDate()-first.getDay()+1+i)+'</div>';cells.appendChild(el);}
+  for(var d=1;d<=last.getDate();d++){
+    var ds=calYear+'-'+pad(calMonth+1)+'-'+pad(d);
+    var dow=new Date(calYear,calMonth,d).getDay();
+    var cls='cal-cell'+(ds===today?' today':'')+(ds===calSel?' selected':'')+(dow===0?' sunday':dow===6?' saturday':'');
+    var dayW=works?works.filter(function(w){return w.due===ds;}):[];
+    var dayD=delivery.filter(function(x){return x.date===ds;});
+    var el=document.createElement('div'); el.className=cls; el.dataset.ds=ds;
+    var inner='<div class="cal-num">'+d+'</div>';
+    dayW.slice(0,2).forEach(function(w){inner+='<div class="cal-chip" style="background:'+catBg(w.cat)+';color:'+catC(w.cat)+'">'+(w.school?w.school+' ':'')+w.n+'</div>';});
+    if(dayW.length>2)inner+='<div style="font-size:9px;color:var(--sub)">+'+(dayW.length-2)+'건</div>';
+    dayD.slice(0,1).forEach(function(it){inner+='<div class="cal-chip" style="background:#dbeafe;color:#1d4ed8">🚗 '+esc(it.client)+'</div>';});
+    el.innerHTML=inner;
+    el.onclick=function(){calSel=this.dataset.ds;renderCal();renderCalDay();renderNotice();};
+    cells.appendChild(el);
+  }
+  var rem=(7-((first.getDay()+last.getDate())%7))%7;
+  for(var i=0;i<rem&&rem<7;i++){var el=document.createElement('div');el.className='cal-cell other';el.innerHTML='<div class="cal-num">'+(i+1)+'</div>';cells.appendChild(el);}
+  renderCalDay();
+}
+
+function renderCalDay(){
+  var cd=document.getElementById('cal-detail'); cd.innerHTML='';
+  var dayW=works?works.filter(function(w){return w.due===calSel;}):[];
+  var dayD=delivery.filter(function(x){return x.date===calSel;});
+  var hdr=document.createElement('div'); hdr.className='cal-detail-hdr';
+  hdr.innerHTML='<span class="cal-detail-title">'+fmtD(calSel)+'</span>';
+  var ab=document.createElement('button'); ab.className='btn btn-primary btn-sm'; ab.textContent='+ 배송 추가';
+  ab.onclick=function(){document.getElementById('md-title').textContent='배송 추가 — '+fmtD(calSel);['df-c','df-i','df-q','df-t','df-m'].forEach(function(id){document.getElementById(id).value='';});openModal('modal-del');};
+  hdr.appendChild(ab); cd.appendChild(hdr);
+  if(dayW.length){
+    var lb=document.createElement('div'); lb.className='slabel'; lb.textContent='📋 배송 예정 작업 ('+dayW.length+'건)'; cd.appendChild(lb);
+    dayW.forEach(function(w){
+      var div=document.createElement('div'); div.className='cal-work-item'; div.style.borderLeftColor=catC(w.cat);
+      var subsHtml='';
+      if(w.cat==='행사'&&w.subs&&w.subs.length){subsHtml='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">';w.subs.forEach(function(s){subsHtml+='<span class="kb-sub-chip'+(s.done?' done':'')+'">'+esc(s.n)+'</span>';});subsHtml+='</div>';}
+      div.innerHTML=(w.school?'<div class="cwi-school">🏫 '+esc(w.school)+'</div>':'')
+        +'<div class="cwi-name">'+esc(w.n)+'</div>'
+        +subsHtml
+        +'<div class="cwi-foot" style="margin-top:4px"><span class="kb-owner '+pc(w.p)+'">'+esc(w.p)+'</span>'
+          +(w.cat?'<span class="cat-badge cb-'+w.cat+'">'+w.cat+'</span>':'')
+          +'<span class="st-chip '+SCLS[w.s]+'">'+STAGES[w.s]+'</span>'
+          +(w.tel?'<span style="font-size:10px;color:var(--sub)">📞 '+esc(w.tel)+'</span>':'')+'</div>';
+      div.onclick=function(){openEditWork(w.id);}; cd.appendChild(div);
+    });
+  }
+  if(dayD.length){
+    var lb2=document.createElement('div'); lb2.className='slabel'; lb2.textContent='🚗 배송 일정 ('+dayD.length+'건)'; cd.appendChild(lb2);
+    dayD.forEach(function(it){
+      var div=document.createElement('div'); div.className='di'+(it.done?' done':'');
+      var chk=it.done?'<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';
+      var det=[]; if(it.qty)det.push(it.qty); if(it.tel)det.push('📞 '+it.tel); if(it.memo)det.push('📝 '+it.memo);
+      div.innerHTML='<div class="dchk'+(it.done?' on':'')+'" onclick="toggleD('+it.id+')">'+chk+'</div>'
+        +'<div class="dbody"><div class="dtop"><span class="dperson '+pc(it.person)+'">'+esc(it.person)+'</span><span class="dname">#'+esc(it.client)+'_'+esc(it.item)+'</span></div>'
+        +(det.length?'<div class="ddetail">'+det.map(esc).join('　')+'</div>':'')+'</div>'
+        +'<button class="ddel" onclick="delD('+it.id+')">삭제</button>';
+      cd.appendChild(div);
+    });
+  }
+  if(!dayW.length&&!dayD.length){var em=document.createElement('div');em.className='empty';em.style='padding:16px';em.textContent='이 날 배송 일정이 없습니다.';cd.appendChild(em);}
+}
+
+function moveMonth(dir){calMonth+=dir;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}renderCal();}
+
+function addDelivery(){
+  var c=document.getElementById('df-c').value.trim(), i=document.getElementById('df-i').value.trim();
+  if(!c||!i){alert('거래처명과 품목은 필수입니다.');return;}
+  delivery.push({id:uid(),date:calSel,client:c,item:i,qty:document.getElementById('df-q').value.trim(),tel:document.getElementById('df-t').value.trim(),person:document.getElementById('df-p').value,memo:document.getElementById('df-m').value.trim(),done:false});
+  save(); closeModal('modal-del'); renderCal(); renderDash(); renderNotice();
+}
+function toggleD(id){var it=delivery.find(function(x){return x.id===id;});if(it){it.done=!it.done;save();renderCalDay();renderDash();}}
+function delD(id){if(!confirm('삭제할까요?'))return;delivery=delivery.filter(function(x){return x.id!==id;});save();renderCal();renderDash();renderNotice();}
+
+// ── 대시보드 ──
+function renderDash(){
+  if(!works)return;
+  document.getElementById('d-total').textContent=works.length;
+  document.getElementById('d-ing').textContent=works.filter(function(w){return w.s>0&&w.s<4;}).length;
+  document.getElementById('d-done').textContent=works.filter(function(w){return w.s>=4;}).length;
+  var tp=document.getElementById('team-prog'); tp.innerHTML='';
+  TEAMS.forEach(function(team){
+    var ms=MEMBERS.filter(function(m){return m.t===team;}).map(function(m){return m.n;});
+    var tw=works.filter(function(w){return ms.indexOf(w.p)>=0;});
+    if(!tw.length)return;
+    var done=tw.filter(function(w){return w.s>=4;}).length;
+    var pct=Math.round(done/tw.length*100);
+    var row=document.createElement('div'); row.className='prog-wrap';
+    row.innerHTML='<div class="prog-label"><span>'+team+'</span><span>'+done+'/'+tw.length+'건</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%"></div></div>';
+    tp.appendChild(row);
+  });
+  var dd=document.getElementById('dash-del');
+  var td=delivery.filter(function(d){return d.date===todayStr()&&!d.done;});
+  dd.innerHTML=!td.length?'<div class="empty" style="padding:10px">오늘 배송 없음</div>':'';
+  td.forEach(function(it){var div=document.createElement('div');div.className='dash-mini';div.innerHTML='<div class="dash-mini-top"><span class="dperson '+pc(it.person)+'">'+esc(it.person)+'</span><span style="font-size:12px;font-weight:600">#'+esc(it.client)+'_'+esc(it.item)+'</span></div>';dd.appendChild(div);});
+  var du=document.getElementById('dash-unsched');
+  var us=works.filter(function(w){return !w.due&&w.s<5;});
+  du.innerHTML=!us.length?'<div class="empty" style="padding:10px">✅ 미지정 없음</div>':'';
+  us.forEach(function(w){
+    var div=document.createElement('div');div.className='dash-mini';div.style='border-left:3px solid #f59e0b';
+    div.innerHTML='<div class="dash-mini-top">'+(w.cat?'<span class="cat-badge cb-'+w.cat+'">'+w.cat+'</span>':'')+'<span class="kb-owner '+pc(w.p)+'">'+esc(w.p)+'</span><span style="font-size:12px;font-weight:600">'+(w.school?'['+esc(w.school)+'] ':'')+esc(w.n)+'</span></div>';
+    div.onclick=function(){openEditWork(w.id);}; du.appendChild(div);
+  });
+}
+
+// ── 공지문 ──
+function renderNotice(){
+  var items=delivery.filter(function(d){return d.date===calSel&&!d.done;});
+  var ds=fmtD(calSel); document.getElementById('notice-title').textContent=ds+' 배송 공지문';
+  if(!items.length){document.getElementById('notice-box').textContent='✅ '+ds+' 배송 일정 없음';return;}
+  var byP={};
+  items.forEach(function(it){if(!byP[it.person])byP[it.person]=[];byP[it.person].push(it);});
+  var lines=[ds+' 배송 일정 공지\n'];
+  Object.keys(byP).forEach(function(p){
+    lines.push('── '+p+' 동선 ──');
+    byP[p].forEach(function(it){var line='#'+it.client+'_'+it.item;if(it.qty)line+=' '+it.qty;if(it.tel)line+='\n'+it.tel;if(it.memo)line+='\n'+it.memo;lines.push(line);});
+    lines.push('');
+  });
+  document.getElementById('notice-box').textContent=lines.join('\n');
+}
+function copyNotice(){
+  var text=document.getElementById('notice-box').textContent;
+  var btn=document.getElementById('copy-btn');
+  var ok=function(){btn.textContent='✓ 복사됨';btn.classList.add('done');setTimeout(function(){btn.textContent='복사';btn.classList.remove('done');},2000);};
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(ok).catch(function(){ok();});}else ok();
+}
+
+
+// ══ 거래처 & 상담기록 ══
+var clients = [];
+var consults = [];
+try { clients = JSON.parse(localStorage.getItem('sd7_clients')) || []; } catch(e) {}
+try { consults = JSON.parse(localStorage.getItem('sd7_consults')) || []; } catch(e) {}
+
+function saveClients() {
+  try { localStorage.setItem('sd7_clients', JSON.stringify(clients)); localStorage.setItem('sd7_consults', JSON.stringify(consults)); } catch(e) {}
+}
+
+var editClientId = null;
+var TYPE_COLORS = {'초등학교':'#1a5fa8','중학교':'#059669','고등학교':'#7c3aed','유치원':'#d97706','교육청':'#dc2626','기관':'#0891b2','기타':'#9ca3af'};
+var TYPE_BG = {'초등학교':'#e8f2fc','중학교':'#d1fae5','고등학교':'#ede9fe','유치원':'#fef3c7','교육청':'#fee2e2','기관':'#cffafe','기타':'#f3f4f6'};
+
+// 샘플 거래처
+if (!clients.length) {
+  clients = [
+    {id:uid(), name:'인천검단호수초등학교', contact:'박행복 교감', tel:'032-565-1234', email:'', addr:'인천광역시 서구', type:'초등학교', memo:'도서관 인테리어 관심', c:todayStr()},
+    {id:uid(), name:'신검단초등학교', contact:'김성실 주무관', tel:'032-574-5678', email:'', addr:'인천광역시 서구', type:'초등학교', memo:'', c:todayStr()},
+    {id:uid(), name:'인천교육청', contact:'이담당 장학사', tel:'032-430-0000', email:'', addr:'인천광역시 남동구', type:'교육청', memo:'연간 계획서 정기 발주', c:todayStr()},
+  ];
+  consults = [
+    {id:uid(), clientId:clients[0].id, date:todayStr(), content:'도서관 인테리어 견적 문의. 3D 시안 요청함. 예산 500만원 내외.', person:'강인걸', tags:['인테리어'], assignedWorkId:null, c:todayStr()},
+    {id:uid(), clientId:clients[0].id, date:addD(todayStr(),-3), content:'교표 제작 문의. 기존 교표 리뉴얼 원함. 시안 2안 요청.', person:'김철수', tags:['인쇄'], assignedWorkId:null, c:addD(todayStr(),-3)},
+    {id:uid(), clientId:clients[2].id, date:addD(todayStr(),-1), content:'2026년 교육계획서 발주 예정. 물량 500부. 6월 납품.', person:'이다솔', tags:['인쇄'], assignedWorkId:null, c:addD(todayStr(),-1)},
+  ];
+  saveClients();
+}
+
+// ── 거래처 목록 렌더 ──
+function renderCrm() {
+  var q = (document.getElementById('crm-search').value || '').toLowerCase();
+  var list = document.getElementById('crm-list'); list.innerHTML = '';
+  var filtered = clients.filter(function(c) {
+    return !q || c.name.toLowerCase().includes(q) || (c.contact||'').toLowerCase().includes(q);
+  });
+  if (!filtered.length) { list.innerHTML = '<div class="empty">거래처가 없습니다.<br>+ 거래처 버튼으로 추가하세요.</div>'; return; }
+
+  filtered.forEach(function(cl) {
+    var clConsults = consults.filter(function(c) { return c.clientId === cl.id; });
+    var lastC = clConsults.sort(function(a,b){return b.date.localeCompare(a.date);})[0];
+    var assigned = clConsults.filter(function(c){return c.assignedWorkId;}).length;
+
+    var card = document.createElement('div'); card.className = 'client-card';
+    var tc = TYPE_COLORS[cl.type] || '#9ca3af';
+    var tbg = TYPE_BG[cl.type] || '#f3f4f6';
+    card.innerHTML =
+      '<div class="client-head">'
+        +'<div class="client-avatar" style="background:'+tbg+';color:'+tc+'">'+cl.name.slice(0,1)+'</div>'
+        +'<div class="client-info">'
+          +'<div class="client-name">'+esc(cl.name)+'</div>'
+          +'<div class="client-meta">'+(cl.contact?'👤 '+esc(cl.contact)+'　':'')+(cl.tel?'📞 '+esc(cl.tel):'')+'</div>'
+          +'<div class="client-badges">'
+            +(cl.type?'<span class="client-badge" style="background:'+tbg+';color:'+tc+'">'+cl.type+'</span>':'')
+            +(clConsults.length?'<span class="client-badge" style="background:#f3f4f6;color:#6b7280">상담 '+clConsults.length+'건</span>':'')
+            +(assigned?'<span class="client-badge" style="background:var(--green-lt);color:var(--green)">✅ 작업배정 '+assigned+'건</span>':'')
+          +'</div>'
+        +'</div>'
+        +'<div class="client-actions">'
+          +'<button class="btn btn-outline btn-sm" onclick="openClientDetail(''+cl.id+'');event.stopPropagation()">상세</button>'
+          +'<button class="btn btn-primary btn-sm" onclick="openAddConsult(''+cl.id+'');event.stopPropagation()">+ 상담</button>'
+        +'</div>'
+      +'</div>'
+      +(lastC?'<div style="padding:0 14px 10px;font-size:11px;color:var(--sub);border-top:1px solid var(--border);padding-top:8px">최근 상담 '+esc(fmtD(lastC.date))+' — '+esc(lastC.content.slice(0,40))+(lastC.content.length>40?'…':'')+'</div>':'');
+    card.onclick = function() { openClientDetail(cl.id); };
+    list.appendChild(card);
+  });
+}
+
+// ── 거래처 상세 모달 ──
+function openClientDetail(cid) {
+  var cl = clients.find(function(c){return c.id===cid;}); if(!cl)return;
+  document.getElementById('cd-title').textContent = cl.name;
+  var body = document.getElementById('cd-body'); body.innerHTML = '';
+  var tc = TYPE_COLORS[cl.type]||'#9ca3af', tbg = TYPE_BG[cl.type]||'#f3f4f6';
+
+  // 거래처 정보 헤더
+  var info = document.createElement('div');
+  info.style = 'display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);margin-bottom:0';
+  info.innerHTML =
+    '<div class="client-detail-avatar" style="background:'+tbg+';color:'+tc+'">'+cl.name.slice(0,1)+'</div>'
+    +'<div style="flex:1">'
+      +'<div style="font-size:15px;font-weight:700;margin-bottom:3px">'+esc(cl.name)+'</div>'
+      +'<div style="font-size:12px;color:var(--sub)">'+(cl.contact?'👤 '+esc(cl.contact)+'　':'')+(cl.tel?'📞 '+esc(cl.tel):'')+'</div>'
+      +(cl.addr?'<div style="font-size:11px;color:var(--sub);margin-top:2px">📍 '+esc(cl.addr)+'</div>':'')
+    +'</div>'
+    +'<button class="btn btn-outline btn-sm" onclick="openEditClient(''+cid+'')">수정</button>';
+  body.appendChild(info);
+
+  // 빠른 상담 입력
+  var qform = document.createElement('div');
+  qform.className = 'consult-quick';
+  qform.style = 'margin-top:12px';
+  qform.innerHTML =
+    '<div class="consult-quick-title">📝 새 상담 기록</div>'
+    +'<textarea class="consult-quick-input" id="cq-content" rows="2" placeholder="상담 내용을 입력하세요..."></textarea>'
+    +'<div class="consult-quick-foot">'
+      +'<select id="cq-person" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--white);outline:none;flex:1">'
+        + MEMBERS.map(function(m){return '<option value="'+m.n+'">'+m.n+'</option>';}).join('')
+      +'</select>'
+      +'<button class="btn btn-primary btn-sm" onclick="saveConsult(''+cid+'')">기록 저장</button>'
+    +'</div>';
+  body.appendChild(qform);
+
+  // 상담 기록 목록
+  var clConsults = consults.filter(function(c){return c.clientId===cid;}).sort(function(a,b){return b.date.localeCompare(a.date);});
+  var slbl = document.createElement('div');
+  slbl.style = 'font-size:11px;color:var(--sub);font-weight:600;letter-spacing:.5px;margin:14px 0 8px';
+  slbl.textContent = '상담 이력 ('+clConsults.length+'건)';
+  body.appendChild(slbl);
+
+  if (!clConsults.length) {
+    var em = document.createElement('div'); em.className='empty'; em.style='padding:16px';
+    em.textContent='상담 기록이 없습니다.'; body.appendChild(em);
+  } else {
+    clConsults.forEach(function(c) {
+      var w = c.assignedWorkId ? works.find(function(x){return x.id===c.assignedWorkId;}) : null;
+      var item = document.createElement('div'); item.className='consult-item';
+      item.innerHTML =
+        '<div class="consult-date">'+esc(fmtD(c.date))+'<br><span style="font-size:9px">'+esc(c.person)+'</span></div>'
+        +'<div class="consult-body">'
+          +'<div class="consult-content">'+esc(c.content)+'</div>'
+          +'<div class="consult-tags">'
+            +(c.tags||[]).map(function(t){return '<span class="consult-tag">'+esc(t)+'</span>';}).join('')
+            +(w?'<span class="consult-tag assigned">✅ '+esc(w.n)+'</span>':'')
+          +'</div>'
+        +'</div>'
+        +'<div class="consult-actions">'
+          +(!w?'<button class="assign-btn" onclick="assignWork(''+c.id+'',''+cid+'')">→ 작업배정</button>':'')
+          +'<button class="btn btn-danger btn-sm" style="font-size:10px;padding:4px 7px" onclick="delConsult(''+c.id+'')">삭제</button>'
+        +'</div>';
+      body.appendChild(item);
+    });
+  }
+  openModal('modal-crm-detail');
+}
+
+// ── 상담 저장 ──
+function saveConsult(cid) {
+  var content = document.getElementById('cq-content').value.trim();
+  if (!content) { alert('상담 내용을 입력하세요.'); return; }
+  var person = document.getElementById('cq-person').value;
+  consults.unshift({id:uid(), clientId:cid, date:todayStr(), content:content, person:person, tags:[], assignedWorkId:null, c:todayStr()});
+  saveClients();
+  document.getElementById('cq-content').value = '';
+  openClientDetail(cid); // 새로고침
+}
+function delConsult(cid) {
+  if (!confirm('상담 기록을 삭제할까요?')) return;
+  consults = consults.filter(function(c){return c.id!==cid;});
+  saveClients(); closeModal('modal-crm-detail'); renderCrm();
+}
+
+// ── 빠른 상담 입력 (목록에서) ──
+function openAddConsult(cid) {
+  openClientDetail(cid);
+  setTimeout(function(){var el=document.getElementById('cq-content');if(el)el.focus();}, 300);
+}
+
+// ── 작업 배정 ──
+function assignWork(consultId, clientId) {
+  var cl = clients.find(function(c){return c.id===clientId;});
+  if (!cl) return;
+  var consult = consults.find(function(c){return c.id===consultId;});
+  if (!consult) return;
+
+  // 제작사양서 모달 열기 (거래처 정보 자동 입력)
+  openAddWork(0);
+  setTimeout(function() {
+    document.getElementById('wf-school').value = cl.name;
+    document.getElementById('wf-contact').value = cl.contact || '';
+    document.getElementById('wf-tel').value = cl.tel || '';
+    // 상담 내용을 메모에 자동 입력
+    document.getElementById('wf-m').value = '[상담기록] ' + consult.content;
+    document.getElementById('mw-title').textContent = '제작사양서 — 작업배정 (' + cl.name + ')';
+    // 저장 후 상담기록에 연결
+    var origSave = window._origSaveWork;
+    window._pendingAssign = {consultId: consultId, clientId: clientId};
+  }, 100);
+
+  closeModal('modal-crm-detail');
+}
+
+// saveWork 후 상담기록 연결 처리
+var _origSaveWork = null;
+(function patchSaveWork() {
+  var orig = window.saveWork;
+  window.saveWork = function() {
+    orig();
+    if (window._pendingAssign) {
+      var pa = window._pendingAssign;
+      var c = consults.find(function(x){return x.id===pa.consultId;});
+      if (c && works.length > 0) {
+        c.assignedWorkId = works[0].id; // 방금 추가된 작업
+        saveClients();
+      }
+      window._pendingAssign = null;
+    }
+  };
+})();
+
+// ── 거래처 추가/수정 ──
+function openAddClient() {
+  editClientId = null;
+  document.getElementById('mc-title').textContent = '거래처 추가';
+  document.getElementById('mc-btn').textContent = '추가하기';
+  document.getElementById('mc-del').style.display = 'none';
+  ['cf-name','cf-contact','cf-tel','cf-email','cf-addr','cf-memo'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('cf-type').value = '';
+  openModal('modal-client');
+}
+function openEditClient(cid) {
+  var cl = clients.find(function(c){return c.id===cid;}); if(!cl)return;
+  editClientId = cid;
+  document.getElementById('mc-title').textContent = '거래처 수정';
+  document.getElementById('mc-btn').textContent = '저장';
+  document.getElementById('mc-del').style.display = '';
+  document.getElementById('cf-name').value = cl.name||'';
+  document.getElementById('cf-contact').value = cl.contact||'';
+  document.getElementById('cf-tel').value = cl.tel||'';
+  document.getElementById('cf-email').value = cl.email||'';
+  document.getElementById('cf-addr').value = cl.addr||'';
+  document.getElementById('cf-memo').value = cl.memo||'';
+  document.getElementById('cf-type').value = cl.type||'';
+  closeModal('modal-crm-detail');
+  openModal('modal-client');
+}
+function saveClient() {
+  var name = document.getElementById('cf-name').value.trim();
+  if (!name) { alert('거래처명을 입력하세요.'); return; }
+  var data = {name:name, contact:document.getElementById('cf-contact').value.trim(),
+    tel:document.getElementById('cf-tel').value.trim(), email:document.getElementById('cf-email').value.trim(),
+    addr:document.getElementById('cf-addr').value.trim(), type:document.getElementById('cf-type').value,
+    memo:document.getElementById('cf-memo').value.trim()};
+  if (editClientId) {
+    var cl = clients.find(function(c){return c.id===editClientId;}); if(cl) Object.assign(cl, data);
+  } else {
+    clients.unshift(Object.assign({id:uid(), c:todayStr()}, data));
+  }
+  saveClients(); closeModal('modal-client'); renderCrm();
+}
+function delClientCur() {
+  if (!confirm('거래처를 삭제할까요? 상담기록도 모두 삭제됩니다.')) return;
+  clients = clients.filter(function(c){return c.id!==editClientId;});
+  consults = consults.filter(function(c){return c.clientId!==editClientId;});
+  saveClients(); closeModal('modal-client'); renderCrm();
+}
+
+// ── 뷰 전환 ──
+function sw(id,el){
+  curTab=id;
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');v.style.display='none';});
+  document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
+  var v=document.getElementById('v-'+id); v.classList.add('on'); v.style.display='flex';
+  if(el)el.classList.add('on');
+  var tvw=document.querySelector('.tv-wrap'); if(tvw)tvw.style.display=id==='kanban'?'flex':'none';
+  if(id==='cal')renderCal();
+  if(id==='crm'){renderCrm();}
+  if(id==='dash')renderDash();
+  if(id==='notice')renderNotice();
+}
+
+function openModal(id){document.getElementById(id).classList.add('on');}
+function closeModal(id){document.getElementById(id).classList.remove('on');}
+document.querySelectorAll('.modal-bg').forEach(function(bg){bg.addEventListener('click',function(e){if(e.target===this)this.classList.remove('on');});});
+</script>
+</body>
+</html>
