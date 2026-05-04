@@ -81,10 +81,10 @@ html,body{height:100%;font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sa
 .csb-div{width:28px;height:1px;background:var(--border);flex-shrink:0;margin:2px 0}
 
 /* ── 칸반 보드 ── */
-.kanban{flex:1;overflow-x:auto;overflow-y:hidden;display:flex;align-items:flex-start;padding:10px 10px 16px;gap:8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.kanban{flex:1;overflow-x:auto;overflow-y:hidden;display:flex;align-items:flex-start;padding:8px 6px 16px;gap:5px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .kanban::-webkit-scrollbar{height:4px}
 .kanban::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.kb-col{flex:0 0 192px;display:flex;flex-direction:column;background:#eeeeed;border-radius:10px;overflow:hidden;max-height:calc(100vh - 170px)}
+.kb-col{flex:1 1 0;min-width:130px;display:flex;flex-direction:column;background:#eeeeed;border-radius:10px;overflow:hidden;max-height:calc(100vh - 170px)}
 .kb-head{padding:8px 10px 7px;display:flex;align-items:center;gap:6px;flex-shrink:0}
 .kb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .kb-title{font-size:12px;font-weight:700;color:var(--text)}
@@ -101,8 +101,10 @@ html,body{height:100%;font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sa
 .cat-grp-line{flex:1;height:1.5px;border-radius:1px;opacity:.35}
 
 /* 칸반 카드 */
-.kb-card{background:var(--white);border-radius:8px;padding:9px 10px;border:1px solid var(--border);cursor:pointer;transition:box-shadow .15s,transform .1s}
+.kb-card{background:var(--white);border-radius:8px;padding:9px 10px;border:1px solid var(--border);cursor:grab;transition:box-shadow .15s,transform .1s;user-select:none;-webkit-user-select:none}
 .kb-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.1);transform:translateY(-1px)}
+.kb-card *{pointer-events:none}
+.kb-body.drag-over{background:#EBF5FF;border-radius:8px;outline:2px dashed var(--blue)}
 .kb-catbar{height:3px;border-radius:2px;margin-bottom:6px}
 .kb-school{font-size:9px;color:var(--sub);margin-bottom:2px}
 .kb-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:3px;word-break:keep-all}
@@ -771,7 +773,7 @@ html,body{height:100%;font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sa
             <option value="4">디자인컨펌</option>
             <option value="5">제작중-발주</option><option value="6">제작중-인쇄</option>
             <option value="7">제작중-후가공</option><option value="8">제작중-검수</option>
-            <option value="9">제작완료</option><option value="10">배송완료</option><option value="11">서류처리완료</option>
+            <option value="9">제작완료</option><option value="10">배송예정</option><option value="11">배송완료</option><option value="12">서류처리완료</option>
           </select>
         </div>
       </div>
@@ -1163,20 +1165,21 @@ var _store = (function(){
 })();
 
 // ══ 상수 ══
-var STAGES=['작업접수','톡방개설','디자인초안','디자인수정중','디자인컨펌','제작중-발주','제작중-인쇄','제작중-후가공','제작중-검수','제작완료','배송완료','서류처리완료'];
-var SDOTS=['#9ca3af','#3b82f6','#f59e0b','#8b5cf6','#a855f7','#f97316','#ef4444','#ec4899','#84cc16','#10b981','#0ea5e9','#06b6d4'];
-var SCLS=['st-0','st-1','st-2','st-3','st-4','st-5','st-6','st-7','st-8','st-9','st-10','st-11'];
+var STAGES=['작업접수','톡방개설','디자인초안','디자인수정중','디자인컨펌','제작중-발주','제작중-인쇄','제작중-후가공','제작중-검수','제작완료','배송예정','배송완료','서류처리완료'];
+var SDOTS=['#9ca3af','#3b82f6','#f59e0b','#8b5cf6','#a855f7','#f97316','#ef4444','#ec4899','#84cc16','#10b981','#f59e0b','#0ea5e9','#06b6d4'];
+var SCLS=['st-0','st-1','st-2','st-3','st-4','st-5','st-6','st-7','st-8','st-9','st-10','st-11','st-12'];
 // 칸반 표시용 그룹 (제작중 4단계 → 1컬럼)
 var KANBAN_COLS=[
-  {label:'작업접수', stages:[0], dot:'#9ca3af'},
-  {label:'톡방개설', stages:[1], dot:'#3b82f6'},
-  {label:'디자인초안', stages:[2], dot:'#f59e0b'},
-  {label:'디자인수정중', stages:[3], dot:'#8b5cf6'},
-  {label:'디자인컨펌', stages:[4], dot:'#a855f7'},
-  {label:'제작중', stages:[5,6,7,8], dot:'#ef4444'},
-  {label:'제작완료', stages:[9], dot:'#10b981'},
-  {label:'배송완료', stages:[10], dot:'#0ea5e9'},
-  {label:'서류처리완료', stages:[11], dot:'#06b6d4'},
+  {label:'작업접수',    stages:[0],        dot:'#9ca3af'},
+  {label:'톡방개설',    stages:[1],        dot:'#3b82f6'},
+  {label:'디자인초안',  stages:[2],        dot:'#f59e0b'},
+  {label:'디자인수정중',stages:[3],        dot:'#8b5cf6'},
+  {label:'디자인컨펌',  stages:[4],        dot:'#a855f7'},
+  {label:'제작중',      stages:[5,6,7,8],  dot:'#ef4444'},
+  {label:'제작완료',    stages:[9],        dot:'#10b981'},
+  {label:'배송예정',    stages:[10],       dot:'#f59e0b'},
+  {label:'배송완료',    stages:[11],       dot:'#0ea5e9'},
+  {label:'서류처리완료',stages:[12],       dot:'#06b6d4'},
 ];
 // 제작중 세부단계 라벨 (카드 뱃지용)
 var MFG_LABELS={5:'발주',6:'인쇄',7:'후가공',8:'검수'};
@@ -1328,124 +1331,91 @@ function pc(nm){var i=MEMBERS.findIndex(function(m){return m.n===nm;});return 'p
 function catC(c){return CAT_COLOR[c]||'#9ca3af';}
 function catBg(c){return CAT_BG[c]||'#f3f4f6';}
 
-// 샘플 데이터
+// 실제 작업 데이터
 if(!works || !works.length){
   var t=todayStr();
   works=[
-    {id:uid(),cat:'인쇄',school:'',n:'특성화고 홍보 브로슈어 제작',p:'김철수',s:0,contact:'',tel:'',m:'1번 스쿨디 브로슈어 제작 완료 후 진행 예정',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'사인물',school:'신검단초등학교',n:'엘리베이터 층별 안내 사인물',p:'김철수',s:0,contact:'',tel:'',m:'',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'마케팅 업체 리서치',p:'김철수',s:0,contact:'',tel:'',m:'학교장터 업로드 소개페이지 제작 진행예정',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'AI스터디 교육 구상',p:'김철수',s:1,contact:'',tel:'',m:'커리큘럼 제작중',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'스쿨디 홍보 브로슈어 제작',p:'김철수',s:2,contact:'',tel:'',m:'로고변경작업 + 표지디자인 작업 중',due:'',c:t,size:'A4',page:'8p',cover:'아트지 250g 무광',inner:'스노우 120g',finish:'무선제본',subs:[]},
-    {id:uid(),cat:'인쇄',school:'검단호수초등학교',n:'교표 제작',p:'김철수',s:2,contact:'교무부장',tel:'032-555-1234',m:'화요일 최종 시안 전달완료 / 오후 전화 예정',due:addD(t,2),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'행사',school:'신검단초등학교',n:'어린이날 행사',p:'김철수',s:1,contact:'행사담당',tel:'032-111-2222',m:'5월 5일 어린이날 행사 전체 진행',due:addD(t,7),c:t,size:'',page:'',cover:'',inner:'',finish:'',
-      subs:[{id:uid(),n:'포스터',s:2,done:false},{id:uid(),n:'초대장',s:0,done:false},{id:uid(),n:'자이언트배너',s:0,done:false},{id:uid(),n:'음향',s:1,done:false},{id:uid(),n:'포토월',s:0,done:false}]},
-    {id:uid(),cat:'인쇄',school:'콜롬비아',n:'수료증 30매',p:'김철수',s:3,contact:'',tel:'',m:'디자인 완료 및 동판제작 요청완료 / 내지 내부인쇄 예정',due:addD(t,5),c:t,size:'B5',page:'1p',cover:'',inner:'',finish:'동판',subs:[]},
+    // ── 김철수 ──
+    {id:uid(),cat:'인쇄',school:'스쿨디',n:'스쿨디 홍보 브로슈어 제작',p:'김철수',s:3,
+      m:'로고변경작업 + 표지디자인 작업 중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'특성화고 홍보 브로슈어 제작',p:'김철수',s:0,
+      m:'1번 스쿨디 브로슈어 제작 완료 후 진행예정',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'AI스터디 교육 구상',p:'김철수',s:1,
+      m:'커리큘럼 제작중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'검단호수초등학교',n:'교표 제작',p:'김철수',s:2,
+      m:'화요일 최종 시안 전달완료 / 오후 전화예정',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'신검단초등학교',n:'엘리베이터 층별 안내 사인물 제작',p:'김철수',s:0,
+      m:'',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'콜롬비아',n:'수료증 제작 30매',p:'김철수',s:6,
+      m:'디자인 완료 및 동판제작 요청완료 / 내지는 내부인쇄 예정',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'내부인쇄',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'마케팅 업체 리서치',p:'김철수',s:0,
+      m:'진행예정 → 학교장터 업로드 (소개페이지 제작)',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
 
-    // ── 디자인1팀 ──
-    {id:uid(),cat:'인쇄',school:'인천검단호수초등학교',n:'2026 학교요람 디자인',p:'김영애',s:2,contact:'박행복 교감',tel:'032-565-1234',m:'표지 시안 3안 전달, 내지 작업 진행중',due:addD(t,10),c:addD(t,-5),size:'A4',page:'48p',cover:'아트지 250g 무광',inner:'스노우 100g',finish:'무선제본',subs:[]},
-    {id:uid(),cat:'인쇄',school:'청라중학교',n:'졸업앨범 시안',p:'김영애',s:1,contact:'교무부장',tel:'032-577-1100',m:'클래스별 페이지 구성 협의중',due:addD(t,30),c:addD(t,-3),size:'A4',page:'120p',cover:'',inner:'',finish:'양장제본',subs:[]},
-    {id:uid(),cat:'사인물',school:'동춘초등학교',n:'본관 학교명 외부 사인',p:'김영애',s:2,contact:'행정실장',tel:'032-432-5566',m:'채널레터 제작 도면 확정, 시공 일정 조율',due:addD(t,14),c:addD(t,-7),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'1팀 디자인 가이드라인 정리',p:'김영애',s:0,contact:'',tel:'',m:'팀 내부 문서. 5월 중 완료 목표',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'간석초등학교',n:'학교 안내 리플렛',p:'김영애',s:3,contact:'김교사',tel:'032-422-3344',m:'납품 완료, 정산 대기',due:addD(t,-2),c:addD(t,-20),size:'A4',page:'4p',cover:'아트지 200g',inner:'',finish:'4단접지',subs:[]},
-    {id:uid(),cat:'인쇄',school:'서창중학교',n:'학교생활규정집',p:'김영애',s:1,contact:'생활부장',tel:'032-461-8899',m:'원고 수령, 편집 시작',due:addD(t,21),c:addD(t,-2),size:'A5',page:'64p',cover:'스노우 200g',inner:'모조 80g',finish:'중철제본',subs:[]},
-    {id:uid(),cat:'사인물',school:'인천검단호수초등학교',n:'도서관 안내 사인 세트',p:'김영애',s:2,contact:'박행복 교감',tel:'032-565-1234',m:'재질 시안 전달, 색상 컨펌 대기',due:addD(t,12),c:addD(t,-4),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    // ── 황선경 ──
+    {id:uid(),cat:'인쇄',school:'중등교육과',n:'고교학점제 리플렛',p:'황선경',s:2,
+      m:'시안작업중',due:'',c:t,contact:'장학사님',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'중등교육과',n:'꿈두레 웹페이지',p:'황선경',s:4,
+      m:'장학사님 검수중',due:'',c:t,contact:'장학사님',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'서부교육청',n:'L자화일, 종이상장케이스',p:'황선경',s:4,
+      m:'장학사님 검수중',due:'',c:t,contact:'장학사님',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'은송초등학교',n:'상장용지',p:'황선경',s:4,
+      m:'행정실장님 검수중',due:'',c:t,contact:'행정실장님',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'제물포구청장 선거캠프',n:'명함 / 벽보',p:'황선경',s:3,
+      m:'명함: 추가인쇄 파일 업로드 / 벽보: 시안 답변대기중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'동인천고등학교',n:'게시판 및 시트지',p:'황선경',s:0,
+      m:'원고대기중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
 
-    {id:uid(),cat:'인쇄',school:'부평여자중학교',n:'학교 소개 책자',p:'박재성',s:2,contact:'홍보담당',tel:'032-526-7700',m:'사진 촬영 완료, 본문 디자인 80%',due:addD(t,8),c:addD(t,-6),size:'A4',page:'32p',cover:'아트지 250g 유광',inner:'스노우 120g',finish:'무선제본',subs:[]},
-    {id:uid(),cat:'사인물',school:'논현고등학교',n:'급식실 메뉴판 시스템',p:'박재성',s:1,contact:'영양교사',tel:'032-466-2233',m:'주간 교체형 메뉴판 디자인 진행',due:addD(t,15),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'송도초등학교',n:'운동회 프로그램북',p:'박재성',s:0,contact:'체육부장',tel:'032-832-4400',m:'5월 중순 미팅 예정',due:addD(t,18),c:addD(t,-1),size:'A5',page:'16p',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'주안초등학교',n:'학부모 안내문 디자인',p:'박재성',s:3,contact:'',tel:'',m:'납품 완료',due:addD(t,-5),c:addD(t,-15),size:'A4',page:'2p',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'사인물',school:'논현고등학교',n:'특별실 도어 사인',p:'박재성',s:2,contact:'행정실',tel:'032-466-2233',m:'아크릴 + 시트 작업, 부착 일정 협의',due:addD(t,9),c:addD(t,-4),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    // ── 박진희 ──
+    {id:uid(),cat:'인쇄',school:'자유유치원',n:'운영계획서 표지',p:'박진희',s:2,
+      m:'시안 작업 중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'중등교육과',n:'고교학점제 안내서 (표지/간지/내지)',p:'박진희',s:2,
+      m:'시안 작업 중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'스쿨디',n:'샘플제작 (통지표/현수막/신입생안내자료 표지)',p:'박진희',s:2,
+      m:'조금씩 작업 중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'산곡초등학교',n:'민주시민교육 선도학교 현판',p:'박진희',s:4,
+      m:'시안 완료 / 제작 대기',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'AI중점학교',n:'현판',p:'박진희',s:4,
+      m:'시안 완료 / 제작 대기',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'안전복지과',n:'안내판',p:'박진희',s:4,
+      m:'시안 완료 / 제작 대기',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'김찬진 선거',n:'홍보물 12p',p:'박진희',s:0,
+      m:'진행예정',due:'',c:t,contact:'',tel:'',size:'',page:'12p',cover:'',inner:'',finish:'',subs:[]},
 
-    {id:uid(),cat:'인쇄',school:'연수초등학교',n:'학교폭력 예방 교재',p:'김아연',s:1,contact:'생활지도부',tel:'032-822-1100',m:'시안 1차 전달',due:addD(t,20),c:addD(t,-2),size:'A4',page:'40p',cover:'아트지 200g',inner:'모조 100g',finish:'무선제본',subs:[]},
-    {id:uid(),cat:'사인물',school:'학익초등학교',n:'복도 환경 사인 30종',p:'김아연',s:2,contact:'교감',tel:'032-868-3300',m:'디자인 80% 완료, 재질 견적 진행',due:addD(t,11),c:addD(t,-5),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'스쿨디 SNS 카드뉴스 5종',p:'김아연',s:1,contact:'',tel:'',m:'주제별 시안 작업중',due:addD(t,4),c:t,size:'정사각',page:'5p',cover:'',inner:'',finish:'디지털',subs:[]},
-    {id:uid(),cat:'사인물',school:'서구청소년수련관',n:'외부 현수막 5종',p:'김아연',s:3,contact:'담당주임',tel:'032-560-5500',m:'납품 완료, 거치 확인',due:addD(t,-3),c:addD(t,-10),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'청학중학교',n:'동아리 활동 보고서',p:'김아연',s:0,contact:'',tel:'',m:'원고 수령 대기',due:'',c:t,size:'A4',page:'',cover:'',inner:'',finish:'',subs:[]},
+    // ── 김영애 ──
+    {id:uid(),cat:'사인물',school:'은송중학교',n:'정문벽면 현수막',p:'김영애',s:0,
+      m:'',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'인천고등학교',n:'정문 사인',p:'김영애',s:0,
+      m:'',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'해사고등학교',n:'MOU 사인',p:'김영애',s:0,
+      m:'',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'송월초등학교',n:'게시판 사인',p:'김영애',s:0,
+      m:'',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'운서중학교',n:'교장실 학생사진+아크릴',p:'김영애',s:0,
+      m:'',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'초은초등학교',n:'역대교장 벽면교체',p:'김영애',s:0,
+      m:'',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'해양경찰청',n:'표지',p:'김영애',s:0,
+      m:'',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'제물포구 선거',n:'선거 인쇄물',p:'김영애',s:0,
+      m:'',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'멘터사이언스',n:'비닐 제작',p:'김영애',s:0,
+      m:'품목 미정',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
 
-    {id:uid(),cat:'인쇄',school:'만수북초등학교',n:'2025 학교 신문 봄호',p:'이혜선',s:2,contact:'교사회',tel:'032-466-7788',m:'기사 편집 완료, 디자인 마무리',due:addD(t,6),c:addD(t,-8),size:'타블로이드',page:'8p',cover:'',inner:'신문지',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'간석여자고등학교',n:'진로진학 안내책자',p:'이혜선',s:1,contact:'진학상담부',tel:'032-422-9900',m:'대학 정보 자료 정리중',due:addD(t,25),c:addD(t,-2),size:'A4',page:'80p',cover:'아트지 250g 무광',inner:'',finish:'무선제본',subs:[]},
-    {id:uid(),cat:'사인물',school:'',n:'스쿨디 사무실 입구 사인',p:'이혜선',s:2,contact:'',tel:'',m:'내부 작업, 디자인 컨펌 대기',due:addD(t,7),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'동막초등학교',n:'졸업기념 문집',p:'이혜선',s:3,contact:'6학년부장',tel:'032-832-7766',m:'납품 완료',due:addD(t,-7),c:addD(t,-25),size:'B5',page:'150p',cover:'',inner:'',finish:'양장제본',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'명함 디자인 5종',p:'이혜선',s:1,contact:'',tel:'',m:'사내 직원 명함 갱신',due:addD(t,3),c:t,size:'90x50',page:'',cover:'스노우 250g',inner:'',finish:'양면',subs:[]},
-
-    {id:uid(),cat:'인쇄',school:'서창고등학교',n:'학교 안내 책자',p:'박진희',s:2,contact:'홍보부장',tel:'032-461-1199',m:'영문 버전 별도 작업 진행',due:addD(t,12),c:addD(t,-7),size:'A4',page:'24p',cover:'아트지 250g 유광',inner:'스노우 120g',finish:'중철제본',subs:[]},
-    {id:uid(),cat:'사인물',school:'송도풍림초등학교',n:'학년별 사물함 라벨',p:'박진희',s:1,contact:'행정실',tel:'032-832-2200',m:'학생 명단 수령 대기',due:addD(t,16),c:addD(t,-1),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'인천교육청',n:'2026년 교육계획서',p:'박진희',s:1,contact:'이담당 장학사',tel:'032-430-0000',m:'500부, 6월 납품 예정. 목차 확정',due:addD(t,40),c:addD(t,-2),size:'A4',page:'200p',cover:'아트지 300g',inner:'모조 100g',finish:'양장제본',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'분기 보고서 디자인',p:'박진희',s:0,contact:'',tel:'',m:'내부 분기 보고서, 자료 수령 대기',due:addD(t,22),c:t,size:'A4',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'사인물',school:'서창고등학교',n:'운동장 안내 배너',p:'박진희',s:2,contact:'체육부장',tel:'032-461-1199',m:'시안 컨펌 완료, 출력 진행',due:addD(t,5),c:addD(t,-6),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-
-    {id:uid(),cat:'인쇄',school:'옥련초등학교',n:'독서기록장 제작',p:'이미라',s:2,contact:'도서관담당',tel:'032-832-5577',m:'학년별 4종 디자인 진행',due:addD(t,9),c:addD(t,-5),size:'B5',page:'48p',cover:'아트지 200g',inner:'모조 80g',finish:'중철제본',subs:[]},
-    {id:uid(),cat:'인쇄',school:'논현초등학교',n:'학생 안전수칙 포스터',p:'이미라',s:3,contact:'',tel:'',m:'납품 완료',due:addD(t,-4),c:addD(t,-12),size:'B2',page:'',cover:'아트지 200g',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'사인물',school:'당하초등학교',n:'중앙 현관 환영 사인',p:'이미라',s:1,contact:'교감',tel:'032-565-9988',m:'아크릴 + 메탈 컨셉, 시안 작업중',due:addD(t,17),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'스쿨디 카탈로그 갱신',p:'이미라',s:1,contact:'',tel:'',m:'2026 버전, 신규 사례 추가',due:addD(t,28),c:addD(t,-2),size:'A4',page:'32p',cover:'',inner:'',finish:'무선제본',subs:[]},
-
-    {id:uid(),cat:'인쇄',school:'마전중학교',n:'체험학습 안내 리플렛',p:'황선경',s:2,contact:'교무부',tel:'032-565-3322',m:'사진 보정 완료, 본문 작업',due:addD(t,5),c:addD(t,-4),size:'A4',page:'4p',cover:'',inner:'',finish:'3단접지',subs:[]},
-    {id:uid(),cat:'사인물',school:'당산초등학교',n:'급식실 안내판',p:'황선경',s:1,contact:'영양사',tel:'032-832-4411',m:'시안 작업중',due:addD(t,13),c:addD(t,-2),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'사내 환경 미화 인쇄물',p:'황선경',s:0,contact:'',tel:'',m:'사무실 분위기 개선용',due:addD(t,20),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-
-    // ── 디자인2팀 ──
-    {id:uid(),cat:'행사',school:'인천검단호수초등학교',n:'개교 30주년 기념행사',p:'한도결',s:1,contact:'교장',tel:'032-565-1234',m:'전체 기획 진행, 6월 행사',due:addD(t,45),c:addD(t,-7),size:'',page:'',cover:'',inner:'',finish:'',
-      subs:[{id:uid(),n:'기념 책자',s:1,done:false},{id:uid(),n:'무대 백드롭',s:0,done:false},{id:uid(),n:'기념품',s:0,done:false},{id:uid(),n:'초청장',s:1,done:false},{id:uid(),n:'영상',s:0,done:false}]},
-    {id:uid(),cat:'행사',school:'서구청',n:'서구민 한마당',p:'한도결',s:2,contact:'문화진흥과',tel:'032-560-1100',m:'10월 행사, 디자인 시안 작업중',due:addD(t,150),c:addD(t,-10),size:'',page:'',cover:'',inner:'',finish:'',
-      subs:[{id:uid(),n:'포스터',s:2,done:false},{id:uid(),n:'현수막',s:1,done:false},{id:uid(),n:'프로그램북',s:0,done:false}]},
-    {id:uid(),cat:'인쇄',school:'',n:'2팀 작업 일정 정리',p:'한도결',s:0,contact:'',tel:'',m:'팀 내부 관리',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'행사',school:'신검단초등학교',n:'학예회',p:'한도결',s:0,contact:'담당교사',tel:'032-574-5678',m:'11월 예정, 사전 미팅 필요',due:addD(t,180),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'부평초등학교',n:'졸업식 식순 책자',p:'한도결',s:3,contact:'교무부',tel:'032-526-2200',m:'납품 완료',due:addD(t,-30),c:addD(t,-50),size:'A5',page:'8p',cover:'',inner:'',finish:'중철제본',subs:[]},
-    {id:uid(),cat:'행사',school:'송도국제고등학교',n:'국제 교류 컨퍼런스',p:'한도결',s:2,contact:'국제교류부',tel:'032-832-9911',m:'영문 자료 포함, 9월 행사',due:addD(t,120),c:addD(t,-5),size:'',page:'',cover:'',inner:'',finish:'',
-      subs:[{id:uid(),n:'영문 프로그램',s:2,done:false},{id:uid(),n:'명찰',s:1,done:false},{id:uid(),n:'배너',s:0,done:false}]},
-    {id:uid(),cat:'사인물',school:'송도국제고등학교',n:'컨퍼런스 안내 사인',p:'한도결',s:1,contact:'국제교류부',tel:'032-832-9911',m:'동선 사인 디자인 작업중',due:addD(t,110),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-
-    {id:uid(),cat:'행사',school:'논현초등학교',n:'운동회',p:'박은주',s:2,contact:'체육부',tel:'032-466-3344',m:'5월 말 행사. 자이언트배너 + 응원 도구',due:addD(t,20),c:addD(t,-7),size:'',page:'',cover:'',inner:'',finish:'',
-      subs:[{id:uid(),n:'자이언트배너',s:2,done:false},{id:uid(),n:'반별 깃발',s:1,done:false},{id:uid(),n:'점수판',s:0,done:false}]},
-    {id:uid(),cat:'인쇄',school:'간석초등학교',n:'학부모회 회보',p:'박은주',s:1,contact:'학부모회장',tel:'010-2233-4455',m:'월간 발행, 5월호 작업',due:addD(t,8),c:addD(t,-2),size:'A4',page:'8p',cover:'',inner:'모조 80g',finish:'중철제본',subs:[]},
-    {id:uid(),cat:'행사',school:'',n:'자체 워크숍',p:'박은주',s:0,contact:'',tel:'',m:'팀 분기 워크숍 기획',due:addD(t,35),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'사인물',school:'간석여자고등학교',n:'동아리실 명패',p:'박은주',s:2,contact:'학생부',tel:'032-422-9900',m:'15개 동아리, 디자인 진행',due:addD(t,11),c:addD(t,-4),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'주안남초등학교',n:'학교 연감',p:'박은주',s:1,contact:'교무부장',tel:'032-422-5566',m:'사진 정리중',due:addD(t,32),c:addD(t,-3),size:'A4',page:'60p',cover:'아트지 250g 무광',inner:'',finish:'무선제본',subs:[]},
-
-    {id:uid(),cat:'행사',school:'서창중학교',n:'체육대회',p:'권성순',s:1,contact:'체육교사',tel:'032-461-8899',m:'6월 행사 준비',due:addD(t,40),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',
-      subs:[{id:uid(),n:'배너',s:1,done:false},{id:uid(),n:'시상지',s:0,done:false}]},
-    {id:uid(),cat:'인쇄',school:'옥련여자고등학교',n:'문학동아리 작품집',p:'권성순',s:2,contact:'국어과',tel:'032-832-1199',m:'편집 마무리 단계',due:addD(t,7),c:addD(t,-9),size:'A5',page:'80p',cover:'스노우 250g',inner:'모조 80g',finish:'무선제본',subs:[]},
-    {id:uid(),cat:'사인물',school:'마전초등학교',n:'학년 표시 사인',p:'권성순',s:0,contact:'',tel:'',m:'예산 협의 단계',due:addD(t,30),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'행사',school:'',n:'스쿨디 창립기념일',p:'권성순',s:0,contact:'',tel:'',m:'사내 행사 기획',due:addD(t,60),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-
-    // ── 생산팀 ──
-    {id:uid(),cat:'사인물',school:'인천검단호수초등학교',n:'채널레터 시공 관리',p:'김일환',s:2,contact:'박행복 교감',tel:'032-565-1234',m:'시공 일정 조율, 안전 확인 필요',due:addD(t,14),c:addD(t,-5),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'사인물',school:'논현고등학교',n:'아크릴 도어사인 30종 제작',p:'김일환',s:2,contact:'행정실',tel:'032-466-2233',m:'레이저 가공 완료, 후가공 진행',due:addD(t,9),c:addD(t,-4),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'외주 인쇄소 단가표 갱신',p:'김일환',s:1,contact:'',tel:'',m:'5개 업체 비교 진행',due:addD(t,10),c:addD(t,-2),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'사인물',school:'송도풍림초등학교',n:'사물함 라벨 출력/부착',p:'김일환',s:1,contact:'행정실',tel:'032-832-2200',m:'디자인 수령 대기',due:addD(t,16),c:addD(t,-1),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'콜롬비아',n:'동판 제작 발주',p:'김일환',s:2,contact:'',tel:'',m:'동판 제작 진행중, 인쇄 대기',due:addD(t,3),c:addD(t,-2),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'사인물',school:'',n:'생산 장비 점검',p:'김일환',s:0,contact:'',tel:'',m:'분기 점검, 5월 셋째주 예정',due:addD(t,18),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-
-    // ── 인테리어사업부 ──
-    {id:uid(),cat:'인테리어',school:'인천검단호수초등학교',n:'도서관 리모델링',p:'최주혜',s:2,contact:'박행복 교감',tel:'032-565-1234',m:'예산 500만원, 3D 시안 2차 전달. 가구 견적 진행',due:addD(t,30),c:addD(t,-12),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'동춘초등학교',n:'본관 1층 라운지',p:'최주혜',s:1,contact:'행정실장',tel:'032-432-5566',m:'현장 실측 완료, 컨셉 시안 작업',due:addD(t,50),c:addD(t,-5),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'간석여자고등학교',n:'진로진학실 환경 개선',p:'최주혜',s:1,contact:'진학부장',tel:'032-422-9900',m:'현장 미팅 완료',due:addD(t,40),c:addD(t,-7),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'송도초등학교',n:'유휴교실 → 메이커스페이스',p:'최주혜',s:2,contact:'정보부장',tel:'032-832-4400',m:'기본 설계 완료, 가구/장비 리스트 작성중',due:addD(t,60),c:addD(t,-15),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'',n:'사업부 분기 영업 보고',p:'최주혜',s:0,contact:'',tel:'',m:'2분기 실적 정리',due:addD(t,25),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'당하초등학교',n:'급식실 인테리어',p:'최주혜',s:0,contact:'영양사',tel:'032-565-9988',m:'견적 의뢰 단계',due:addD(t,70),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'서창고등학교',n:'교실 환경 개선 시범사업',p:'최주혜',s:3,contact:'시설담당',tel:'032-461-1199',m:'시공 완료, 만족도 조사 진행',due:addD(t,-10),c:addD(t,-60),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-
-    {id:uid(),cat:'인테리어',school:'인천검단호수초등학교',n:'도서관 가구 견적/발주',p:'장보람',s:2,contact:'박행복 교감',tel:'032-565-1234',m:'3개 업체 견적 비교, 1차 후보 선정',due:addD(t,14),c:addD(t,-8),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'송도초등학교',n:'메이커스페이스 가구 리스트',p:'장보람',s:2,contact:'정보부장',tel:'032-832-4400',m:'장비별 단가표 작성중',due:addD(t,18),c:addD(t,-6),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'동춘초등학교',n:'라운지 시공 일정 조율',p:'장보람',s:1,contact:'행정실장',tel:'032-432-5566',m:'협력업체 일정 확인중',due:addD(t,28),c:addD(t,-2),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'',n:'협력업체 단가 정리',p:'장보람',s:1,contact:'',tel:'',m:'분기 단가 갱신',due:addD(t,12),c:addD(t,-1),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-
-    {id:uid(),cat:'인테리어',school:'간석여자고등학교',n:'현장 실측/촬영',p:'김은주',s:2,contact:'진학부장',tel:'032-422-9900',m:'실측 완료, 도면 정리중',due:addD(t,7),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'',n:'납품 자재 검수',p:'김은주',s:1,contact:'',tel:'',m:'주간 입고 자재 확인',due:addD(t,2),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인테리어',school:'당하초등학교',n:'견적용 자료 정리',p:'김은주',s:0,contact:'',tel:'',m:'급식실 견적 자료 준비',due:addD(t,5),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-
-    // ── 경영관리팀 ──
-    {id:uid(),cat:'인쇄',school:'인천교육청',n:'2026년 교육계획서 영업관리',p:'이다솔',s:1,contact:'이담당 장학사',tel:'032-430-0000',m:'500부, 계약서 검토중',due:addD(t,42),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'4월 정산 마감',p:'이다솔',s:2,contact:'',tel:'',m:'세금계산서 발행 진행',due:addD(t,3),c:addD(t,-5),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'전사 회의 자료 준비',p:'이다솔',s:1,contact:'',tel:'',m:'월간 전사 회의 5월 둘째주',due:addD(t,9),c:t,size:'A4',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'2분기 사업계획 정리',p:'이다솔',s:0,contact:'',tel:'',m:'팀별 취합 예정',due:addD(t,15),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'직원 채용 공고',p:'이다솔',s:1,contact:'',tel:'',m:'디자인1팀 충원, 공고문 작성중',due:addD(t,5),c:addD(t,-1),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'사무실 비품 발주',p:'이다솔',s:3,contact:'',tel:'',m:'완료',due:addD(t,-2),c:addD(t,-8),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-
-    {id:uid(),cat:'인쇄',school:'',n:'급여 명세서 발송',p:'이미금',s:1,contact:'',tel:'',m:'5월 25일 발송 예정',due:addD(t,21),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'세금계산서 정리',p:'이미금',s:2,contact:'',tel:'',m:'4월분 정리 진행',due:addD(t,4),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
-    {id:uid(),cat:'인쇄',school:'',n:'직원 경조사 관리',p:'이미금',s:1,contact:'',tel:'',m:'월간 정리',due:addD(t,8),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    // ── 박재성 ──
+    {id:uid(),cat:'인쇄',school:'디지털교육팀',n:'한눈에 알아보는 일정표',p:'박재성',s:3,
+      m:'3차 수정중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'류성근',n:'사진도록',p:'박재성',s:6,
+      m:'가제본',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'무선제본',subs:[]},
+    {id:uid(),cat:'인쇄',school:'기프트럭',n:'기프트럭',p:'박재성',s:9,
+      m:'컨펌완료 출력물 정리중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'성지초등학교',n:'병설유치원 복도벽면·현관 불투명시트 2종',p:'박재성',s:3,
+      m:'복도벽면 3차수정 / 현관 시안작업중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'학생안전체험관',n:'볼풀벽면',p:'박재성',s:2,
+      m:'1차 시안전달',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'신월초등학교',n:'병설유치원 외부간판',p:'박재성',s:3,
+      m:'2차 추가시안작업중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'글소리',n:'2027 달력',p:'박재성',s:3,
+      m:'알판 작업중',due:'',c:t,contact:'',tel:'',size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
   ];
   save();
 }
@@ -1596,6 +1566,7 @@ function renderKanban(){
     }
     colEl.innerHTML='<div class="kb-head"><div class="kb-dot" style="background:'+col.dot+'"></div><span class="kb-title">'+col.label+'</span>'+cntHtml+'</div>';
     var body=document.createElement('div'); body.className='kb-body';
+    body.dataset.stage=col.stages[0];
     if(catF==='전체'){
       var any=false;
       CAT_LIST.forEach(function(cat){
@@ -1653,6 +1624,10 @@ function mkCard(w){
     +subsHtml
     +(w.m?'<div class="kb-memo">'+esc(w.m)+'</div>':'')
     +'<div class="kb-foot"><span class="kb-owner '+pc(w.p)+'">'+esc(w.p)+'</span>'+dueHtml+'</div>';
+  card.addEventListener('mousedown', function(e){
+    if(e.button!==0)return;
+    startDrag(e, w.id, card);
+  });
   card.onclick=(function(wid,isMfg){return function(){if(isMfg)openMfg(wid);else openEditWork(wid);};})(w.id, MFG_LABELS[w.s]!==undefined); return card;
 }
 
@@ -3361,6 +3336,69 @@ function syncVendorInput(sel){
 function syncVendorSelect(inp){
   var sel=document.getElementById('wf-vendor');
   if(inp.value && sel) sel.value='';
+}
+
+// ════════════════════════════════════════════════════════════════
+// ══ 칸반 드래그앤드롭 (마우스 이벤트 방식) ══
+// ════════════════════════════════════════════════════════════════
+var _drag={active:false, wid:null, ghost:null, startX:0, startY:0, moved:false};
+
+function startDrag(e, wid, card){
+  _drag.wid=wid; _drag.startX=e.clientX; _drag.startY=e.clientY;
+  _drag.moved=false; _drag.active=false;
+
+  function onMove(e2){
+    var dx=e2.clientX-_drag.startX, dy=e2.clientY-_drag.startY;
+    if(!_drag.active && Math.sqrt(dx*dx+dy*dy)>6){
+      // 드래그 시작
+      _drag.active=true;
+      // 고스트 카드 생성
+      var ghost=card.cloneNode(true);
+      ghost.style.cssText='position:fixed;z-index:9999;pointer-events:none;opacity:.8;transform:rotate(2deg) scale(1.03);box-shadow:0 8px 24px rgba(0,0,0,.2);width:'+card.offsetWidth+'px;transition:none';
+      ghost.style.left=(e.clientX-card.offsetWidth/2)+'px';
+      ghost.style.top=(e.clientY-20)+'px';
+      document.body.appendChild(ghost);
+      _drag.ghost=ghost;
+      card.style.opacity='0.3';
+      document.body.style.userSelect='none';
+      _drag.moved=true;
+    }
+    if(_drag.active && _drag.ghost){
+      _drag.ghost.style.left=(e2.clientX-_drag.ghost.offsetWidth/2)+'px';
+      _drag.ghost.style.top=(e2.clientY-20)+'px';
+      // 현재 마우스 아래 kb-body 찾기
+      _drag.ghost.style.display='none';
+      var el=document.elementFromPoint(e2.clientX, e2.clientY);
+      _drag.ghost.style.display='';
+      document.querySelectorAll('.kb-body').forEach(function(b){b.classList.remove('drag-over');});
+      var body=el?el.closest('.kb-body'):null;
+      if(body) body.classList.add('drag-over');
+    }
+  }
+
+  function onUp(e2){
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.body.style.userSelect='';
+    if(_drag.ghost){_drag.ghost.remove(); _drag.ghost=null;}
+    card.style.opacity='';
+    document.querySelectorAll('.kb-body').forEach(function(b){b.classList.remove('drag-over');});
+
+    if(_drag.active){
+      // 드롭 위치 찾기
+      var el=document.elementFromPoint(e2.clientX, e2.clientY);
+      var body=el?el.closest('.kb-body'):null;
+      if(body && body.dataset.stage!==undefined){
+        var ns=parseInt(body.dataset.stage);
+        var w=works.find(function(x){return x.id===_drag.wid;});
+        if(w && w.s!==ns){ w.s=ns; save(); renderKanban(); renderList(); renderDash(); }
+      }
+    }
+    _drag.active=false; _drag.wid=null; _drag.moved=false;
+  }
+
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
 }
 
 </script>
