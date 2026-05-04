@@ -1,0 +1,3381 @@
+<!DOCTYPE html>
+<!-- saved from url=(0031)https://skool-d-erp.vercel.app/ -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>스쿨디 업무관리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#0d3f7a;--blue:#1a5fa8;--blue-lt:#e8f2fc;
+  --green:#059669;--green-lt:#d1fae5;
+  --red:#dc2626;--red-lt:#fee2e2;
+  --amber:#d97706;--amber-lt:#fef3c7;
+  --border:#e2e5ea;--bg:#f0f2f6;--white:#fff;--text:#111827;--sub:#6b7280;
+  --s0:#9ca3af;--s1:#3b82f6;--s2:#f59e0b;--s3:#8b5cf6;--s4:#10b981;--s5:#ef4444;--s6:#06b6d4;
+  --c인쇄:#1a5fa8;--c인테리어:#059669;--c사인물:#d97706;--c행사:#dc2626;
+  --bg인쇄:#e8f2fc;--bg인테리어:#d1fae5;--bg사인물:#fef3c7;--bg행사:#fee2e2;
+}
+html,body{height:100%;font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow:hidden}
+
+/* ── 상단 탭바 ── */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:60;height:54px;background:#0a2236;display:flex;align-items:center;padding:0 4px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.topbar-logo{padding:0 12px 0 8px;color:#fff;font-size:15px;font-weight:700;letter-spacing:.5px;white-space:nowrap;flex-shrink:0;border-right:1px solid rgba(255,255,255,.12);margin-right:4px}
+.tb{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:inherit;position:relative}
+.tb-icon{font-size:18px;line-height:1;filter:grayscale(1) brightness(2) opacity(.28);transition:filter .2s,transform .15s}
+.tb-label{font-size:9px;color:rgba(255,255,255,.22);font-weight:400;letter-spacing:.2px;transition:color .2s}
+.tb.on .tb-icon{filter:none;transform:translateY(-1px)}
+.tb.on .tb-label{color:rgba(255,255,255,.9);font-weight:600}
+.tb.on::after{content:'';position:absolute;bottom:0;left:18%;right:18%;height:2.5px;background:#5ba3f5;border-radius:3px 3px 0 0}
+
+/* ── BODY ── */
+.body{padding-top:54px;height:100vh;overflow:hidden}
+.view{display:none;height:100%;flex-direction:column;overflow:hidden}
+.view.on{display:flex}
+
+/* ── 칸반 툴바 ── */
+.kb-toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:7px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tv-wrap{display:flex;gap:3px}
+.tv{padding:5px 12px;border-radius:6px;font-size:12px;color:var(--sub);cursor:pointer;background:none;border:none;font-family:inherit}
+.tv.on{background:var(--bg);color:var(--text);font-weight:600}
+
+/* ── 담당자 아바타 바 ── */
+.pf-bar{background:var(--white);border-bottom:1px solid var(--border);padding:0 10px;height:52px;display:flex;align-items:center;gap:0;flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.pf-bar::-webkit-scrollbar{display:none}
+.pf-all{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px;border-radius:10px;cursor:pointer;border:none;background:transparent;font-family:inherit;flex-shrink:0;transition:background .15s}
+.pf-all:hover{background:var(--bg)}
+.pf-all.on{background:var(--navy)}
+.pf-all-circle{width:32px;height:32px;border-radius:50%;background:var(--bg);color:var(--sub);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid transparent;transition:all .15s}
+.pf-all.on .pf-all-circle{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3)}
+.pf-all-label{font-size:9px;color:var(--sub);font-weight:500;white-space:nowrap}
+.pf-all.on .pf-all-label{color:rgba(255,255,255,.8)}
+.pf-div{width:1px;height:30px;background:var(--border);flex-shrink:0;margin:0 4px}
+.pf-av-btn{display:flex;flex-direction:column;align-items:center;gap:0;padding:2px 3px;border-radius:8px;cursor:pointer;border:none;background:transparent;font-family:inherit;flex-shrink:0;position:relative;transition:background .15s}
+.pf-av-btn:hover{background:var(--bg)}
+.pf-av-btn.on{background:transparent}
+.pf-av-circle{width:36px;height:36px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid transparent;transition:all .15s;flex-shrink:0;letter-spacing:-0.5px}
+.pf-av-btn.on .pf-av-circle{box-shadow:0 0 0 2px var(--blue)}
+.pf-av-name{display:none}
+.pf-team-label{font-size:8px;font-weight:700;letter-spacing:.5px;color:var(--sub);padding:0 4px;flex-shrink:0;writing-mode:horizontal-tb;align-self:center;opacity:.6}
+
+
+/* ── 분류 사이드바 ── */
+.kb-wrap{flex:1;display:flex;overflow:hidden;min-height:0}
+.cat-sidebar{width:50px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:6px 0;gap:3px}
+.csb{width:44px;padding:7px 3px;border:none;border-radius:8px;background:transparent;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;transition:background .15s}
+.csb:hover{background:var(--bg)}
+.csb.on{background:#eef4fd}
+.csb.on::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 2px 2px 0;background:var(--blue)}
+.csb[data-c="인쇄"].on::before{background:var(--c인쇄)}
+.csb[data-c="인테리어"].on::before{background:var(--c인테리어)}
+.csb[data-c="사인물"].on::before{background:var(--c사인물)}
+.csb[data-c="행사"].on::before{background:var(--c행사)}
+.csb-icon{font-size:15px;line-height:1}
+.csb-label{font-size:8px;color:var(--sub);text-align:center;font-weight:400}
+.csb.on .csb-label{font-weight:700;color:var(--navy)}
+.csb[data-c="인쇄"].on .csb-label{color:var(--c인쇄)}
+.csb[data-c="인테리어"].on .csb-label{color:var(--c인테리어)}
+.csb[data-c="사인물"].on .csb-label{color:var(--c사인물)}
+.csb[data-c="행사"].on .csb-label{color:var(--c행사)}
+.csb-cnt{font-size:9px;font-weight:600;padding:1px 4px;border-radius:8px;background:var(--bg);color:var(--sub);min-width:16px;text-align:center}
+.csb-div{width:28px;height:1px;background:var(--border);flex-shrink:0;margin:2px 0}
+
+/* ── 칸반 보드 ── */
+.kanban{flex:1;overflow-x:auto;overflow-y:hidden;display:flex;align-items:flex-start;padding:10px 10px 16px;gap:8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.kanban::-webkit-scrollbar{height:4px}
+.kanban::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.kb-col{flex:0 0 192px;display:flex;flex-direction:column;background:#eeeeed;border-radius:10px;overflow:hidden;max-height:calc(100vh - 170px)}
+.kb-head{padding:8px 10px 7px;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.kb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kb-title{font-size:12px;font-weight:700;color:var(--text)}
+.kb-cnt{font-size:11px;color:var(--sub);margin-left:auto;background:rgba(0,0,0,.07);padding:1px 7px;border-radius:10px}
+.kb-body{flex:1;overflow-y:auto;padding:3px 6px 6px;display:flex;flex-direction:column;gap:5px;scrollbar-width:none}
+.kb-body::-webkit-scrollbar{display:none}
+.kb-add{flex-shrink:0;padding:7px 10px;margin:0 6px 6px;border-radius:6px;font-size:11px;color:var(--sub);cursor:pointer;background:none;border:none;font-family:inherit;text-align:left}
+.kb-add:hover{background:rgba(0,0,0,.05);color:var(--text)}
+
+/* 분류 그룹 헤더 */
+.cat-grp{display:flex;align-items:center;gap:5px;padding:6px 4px 2px;flex-shrink:0}
+.cat-grp:first-child{padding-top:2px}
+.cat-grp-label{font-size:9px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+.cat-grp-line{flex:1;height:1.5px;border-radius:1px;opacity:.35}
+
+/* 칸반 카드 */
+.kb-card{background:var(--white);border-radius:8px;padding:9px 10px;border:1px solid var(--border);cursor:pointer;transition:box-shadow .15s,transform .1s}
+.kb-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.1);transform:translateY(-1px)}
+.kb-catbar{height:3px;border-radius:2px;margin-bottom:6px}
+.kb-school{font-size:9px;color:var(--sub);margin-bottom:2px}
+.kb-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:3px;word-break:keep-all}
+.kb-subitems{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px}
+.kb-sub-chip{font-size:9px;padding:2px 6px;border-radius:6px;background:#f3f4f6;color:var(--sub);font-weight:500}
+.kb-sub-chip.done{background:var(--green-lt);color:var(--green);text-decoration:line-through;opacity:.65}
+.kb-memo{font-size:10px;color:var(--sub);line-height:1.5;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.kb-foot{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.kb-owner{font-size:9px;padding:2px 6px;border-radius:8px;font-weight:500;white-space:nowrap}
+.kb-due{font-size:9px;padding:2px 6px;border-radius:8px;font-weight:500;white-space:nowrap}
+
+/* ── 목록 뷰 ── */
+.list-scroll{flex:1;overflow-y:auto;padding:10px 12px}
+.lv-item{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;gap:10px;align-items:flex-start}
+.lv-bar{width:4px;min-height:28px;border-radius:2px;flex-shrink:0;margin-top:2px}
+.lv-body{flex:1;min-width:0}
+.lv-school{font-size:10px;color:var(--sub);margin-bottom:2px}
+.lv-top{display:flex;gap:5px;margin-bottom:3px;flex-wrap:wrap;align-items:center}
+.lv-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.lv-subitems{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.lv-memo{font-size:11px;color:var(--sub);margin-top:2px;line-height:1.5}
+.lv-meta{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;align-items:center}
+.lv-right{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.st-sel{font-size:10px;padding:4px 5px;border:1px solid var(--border);border-radius:6px;font-family:inherit;background:var(--white);outline:none;max-width:82px;cursor:pointer;color:var(--text)}
+.act-row{display:flex;gap:3px}
+
+/* ── STATUS ── */
+.st-chip{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.st-chip::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.st-0{background:#f3f4f6;color:#6b7280}.st-0::before{background:#9ca3af}
+.st-1{background:#dbeafe;color:#1d4ed8}.st-1::before{background:#3b82f6}
+.st-2{background:#fef3c7;color:#b45309}.st-2::before{background:#f59e0b}
+.st-3{background:#ede9fe;color:#6d28d9}.st-3::before{background:#8b5cf6}
+.st-4{background:#d1fae5;color:#065f46}.st-4::before{background:#10b981}
+.st-5{background:#fee2e2;color:#991b1b}.st-5::before{background:#ef4444}
+.st-6{background:#cffafe;color:#0e7490}.st-6::before{background:#06b6d4}
+
+/* 분류 뱃지 */
+.cat-badge{display:inline-flex;font-size:9px;font-weight:600;padding:2px 7px;border-radius:8px;white-space:nowrap}
+.cb-인쇄{background:var(--bg인쇄);color:var(--c인쇄)}
+.cb-인테리어{background:var(--bg인테리어);color:var(--c인테리어)}
+.cb-사인물{background:var(--bg사인물);color:var(--c사인물)}
+.cb-행사{background:var(--bg행사);color:var(--c행사)}
+
+/* ── 캘린더 ── */
+#v-cal{overflow-y:auto;padding:14px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav-title{font-size:17px;font-weight:700}
+.cal-nav-btn{width:30px;height:30px;border:1px solid var(--border);border-radius:7px;background:var(--white);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-dh{text-align:center;font-size:10px;color:var(--sub);padding:3px 0;font-weight:500}
+.cal-dh:first-child{color:#ef4444}.cal-dh:last-child{color:#3b82f6}
+.cal-cell{min-height:62px;border-radius:7px;padding:4px;cursor:pointer;background:var(--white);border:1px solid var(--border);vertical-align:top}
+.cal-cell:hover{background:var(--blue-lt)}
+.cal-cell.today{border:2px solid var(--blue)}
+.cal-cell.selected{background:#EBF5FF;border:2px solid var(--blue)}
+.cal-cell.other{opacity:.3}
+.cal-cell.sunday .cal-num{color:#ef4444}
+.cal-cell.saturday .cal-num{color:#3b82f6}
+.cal-num{font-size:12px;font-weight:600;line-height:1;margin-bottom:3px}
+.cal-chip{font-size:9px;padding:1px 5px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;line-height:1.5;display:block;width:100%}
+.cal-chip-leave{background:#ede9fe;color:#7c3aed}
+.cal-chip-meet{background:#fef3c7;color:#92400e}
+.cal-chip-install{background:#ffedd5;color:#c2410c}
+.cal-chip-delivery{background:#dbeafe;color:#1d4ed8}
+.cal-detail{margin-top:12px}
+.cal-detail-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-detail-title{font-size:14px;font-weight:700}
+.cal-work-item{background:var(--white);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:8px;padding:10px 12px;margin-bottom:5px;cursor:pointer}
+.cal-work-item:hover{box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.cwi-school{font-size:10px;color:var(--sub);margin-bottom:2px}
+.cwi-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.cwi-foot{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.di{background:var(--white);border:1px solid var(--border);border-radius:9px;padding:9px 11px;margin-bottom:5px;display:flex;align-items:flex-start;gap:8px}
+.di.done{opacity:.4}
+.dchk{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;background:var(--white)}
+.dchk.on{background:var(--blue);border-color:var(--blue)}
+.dbody{flex:1;min-width:0}
+.dtop{display:flex;gap:5px;margin-bottom:3px;flex-wrap:wrap;align-items:center}
+.dperson{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500;white-space:nowrap}
+.dname{font-size:12px;font-weight:600}
+.ddetail{font-size:11px;color:var(--sub);line-height:1.6}
+.ddel{padding:3px 7px;border:1px solid var(--border);border-radius:5px;font-size:10px;color:var(--sub);cursor:pointer;background:none;font-family:inherit;flex-shrink:0}
+
+/* ── 대시보드 ── */
+#v-dash{overflow-y:auto;padding:14px}
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.dg{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.dg-n{font-size:26px;font-weight:700;color:var(--blue);line-height:1}
+.dg-l{font-size:10px;color:var(--sub);margin-top:3px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.card-title{font-size:13px;font-weight:600;margin-bottom:10px}
+.prog-wrap{margin-bottom:8px}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;color:var(--sub)}
+.prog-bar{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .5s}
+.slabel{font-size:11px;color:var(--sub);letter-spacing:.5px;margin:12px 0 7px;font-weight:500}
+.dash-mini{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 11px;margin-bottom:5px;cursor:pointer}
+.dash-mini-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* ── 공지문 ── */
+#v-notice{overflow-y:auto;padding:14px}
+.notice-box{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:13px;line-height:2.1;white-space:pre-wrap;color:var(--text);min-height:120px;font-family:inherit;word-break:break-all}
+.copy-btn{padding:9px 22px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.copy-btn.done{background:var(--green)}
+
+/* ── 공통 ── */
+.btn{padding:9px 16px;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-outline{background:var(--white);color:var(--text);border:1px solid var(--border)}
+.btn-danger{background:var(--red-lt);color:var(--red);border:1px solid #fca5a5}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.btn-full{width:100%}
+.empty{text-align:center;padding:28px 16px;color:var(--sub);font-size:12px;line-height:2}
+
+/* ── 모달 ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;display:none;align-items:flex-end;justify-content:center}
+.modal-bg.on{display:flex}
+.modal{background:var(--white);border-radius:20px 20px 0 0;padding:0;width:100%;max-width:560px;max-height:94vh;overflow-y:auto}
+.modal-head{position:sticky;top:0;z-index:2;background:var(--white);padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-head-title{font-size:16px;font-weight:700}
+.modal-close{font-size:22px;cursor:pointer;color:var(--sub);background:none;border:none;font-family:inherit;line-height:1;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.modal-close:hover{background:var(--bg)}
+.form-wrap{padding:0 18px}
+.fsec{margin-top:20px}
+.fsec-title{font-size:10px;font-weight:600;color:var(--sub);letter-spacing:1.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.ff{display:flex;flex-direction:column;gap:4px;margin-bottom:13px}
+.ff label{font-size:12px;color:var(--text);font-weight:500}
+.ff input,.ff select,.ff textarea{padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none;-webkit-appearance:none;transition:border-color .15s}
+.ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--blue)}
+.ff textarea{resize:vertical;min-height:72px;line-height:1.7}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-foot{padding:14px 18px 0;display:flex;gap:10px}
+
+/* 분류 선택 */
+.cat-selector{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
+.cat-opt{padding:9px 4px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;font-size:11px;font-weight:500;color:var(--sub);transition:all .15s;background:var(--white)}
+.cat-opt:hover{background:var(--bg)}
+.cat-opt.sel-인쇄{border-color:var(--c인쇄);background:var(--bg인쇄);color:var(--c인쇄)}
+.cat-opt.sel-인테리어{border-color:var(--c인테리어);background:var(--bg인테리어);color:var(--c인테리어)}
+.cat-opt.sel-사인물{border-color:var(--c사인물);background:var(--bg사인물);color:var(--c사인물)}
+.cat-opt.sel-행사{border-color:var(--c행사);background:var(--bg행사);color:var(--c행사)}
+
+/* 행사 하위품목 */
+.sub-quick{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.sub-qbtn{padding:4px 10px;border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;background:var(--white);color:var(--sub);font-family:inherit}
+.sub-qbtn:hover{border-color:var(--c행사);color:var(--c행사)}
+.sub-list{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.sub-row{display:flex;align-items:center;gap:7px;background:var(--bg);border-radius:8px;padding:6px 10px}
+.sub-chk{width:18px;height:18px;border:2px solid var(--border);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--white)}
+.sub-chk.on{background:var(--green);border-color:var(--green)}
+.sub-nm{flex:1;font-size:12px;font-weight:500;color:var(--text)}
+.sub-st{font-size:10px;padding:3px 5px;border:1px solid var(--border);border-radius:6px;font-family:inherit;background:var(--white);cursor:pointer;color:var(--sub);max-width:76px}
+.sub-del{font-size:18px;color:var(--sub);cursor:pointer;background:none;border:none;padding:0;line-height:1;flex-shrink:0}
+.sub-doc{font-size:14px;cursor:pointer;background:none;border:none;padding:2px 4px;border-radius:5px;flex-shrink:0;color:var(--sub);transition:all .15s;line-height:1}
+.sub-doc:hover{background:var(--blue-lt);color:var(--blue)}
+.sub-doc.filled{color:var(--blue);background:var(--blue-lt)}
+/* 품목 사양 팝업 */
+.sub-spec-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center}
+.sub-spec-bg.on{display:flex}
+.sub-spec-box{background:var(--white);border-radius:16px;width:90%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.18);overflow:hidden}
+.sub-spec-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sub-spec-title{font-size:14px;font-weight:700;color:var(--text)}
+.sub-spec-close{font-size:22px;cursor:pointer;color:var(--sub);background:none;border:none;font-family:inherit;line-height:1}
+.sub-spec-body{padding:14px 18px;display:flex;flex-direction:column;gap:10px;max-height:65vh;overflow-y:auto}
+.sub-spec-row{display:flex;flex-direction:column;gap:4px}
+.sub-spec-label{font-size:11px;font-weight:600;color:var(--sub)}
+.sub-spec-input{padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none}
+.sub-spec-input:focus{border-color:var(--blue)}
+.sub-spec-foot{padding:12px 18px;border-top:1px solid var(--border)}
+.sub-add-row{display:flex;gap:6px}
+.sub-add-input{flex:1;padding:8px 11px;border:1.5px dashed var(--border);border-radius:8px;font-size:12px;font-family:inherit;color:var(--text);background:var(--white);outline:none}
+.sub-add-input:focus{border-color:var(--c행사);border-style:solid}
+.sub-add-btn{padding:8px 14px;background:var(--c행사);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+
+/* 배송 추가 모달 */
+.del-modal .form-wrap{padding:0 18px}
+
+/* PERSON COLORS */
+.pc0{background:#dbeafe;color:#1d4ed8}.pc1{background:#d1fae5;color:#065f46}
+.pc2{background:#fef3c7;color:#b45309}.pc3{background:#ede9fe;color:#7c3aed}
+.pc4{background:#fee2e2;color:#991b1b}.pc5{background:#cffafe;color:#0e7490}
+.pc6{background:#fce7f3;color:#9d174d}.pc7{background:#fef9c3;color:#854d0e}
+
+/* ── 상담기록 ── */
+#v-crm{overflow-y:auto;padding:12px}
+.crm-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.crm-search{flex:1;padding:9px 13px 9px 36px;border:1px solid var(--border);border-radius:20px;font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none}
+.crm-search-wrap{position:relative;flex:1}
+.crm-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+/* 거래처 카드 */
+.client-card{background:var(--white);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;cursor:pointer;transition:box-shadow .15s}
+.client-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.client-head{padding:12px 14px;display:flex;align-items:center;gap:10px}
+.client-avatar{width:38px;height:38px;border-radius:10px;background:var(--blue-lt);color:var(--blue);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.client-info{flex:1;min-width:0}
+.client-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.client-meta{font-size:11px;color:var(--sub)}
+.client-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.client-badge{font-size:9px;padding:2px 7px;border-radius:8px;font-weight:500}
+.client-actions{display:flex;gap:6px;flex-shrink:0}
+/* 상담 기록 리스트 */
+.consult-list{border-top:1px solid var(--border);padding:0 14px 8px}
+.consult-item{padding:10px 0;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
+.consult-item:last-child{border-bottom:none}
+.consult-date{font-size:10px;color:var(--sub);white-space:nowrap;margin-top:2px;min-width:56px}
+.consult-body{flex:1;min-width:0}
+.consult-content{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:4px}
+.consult-tags{display:flex;gap:4px;flex-wrap:wrap}
+.consult-tag{font-size:9px;padding:2px 7px;border-radius:8px;background:var(--bg);color:var(--sub);font-weight:500}
+.consult-tag.assigned{background:var(--green-lt);color:var(--green)}
+.consult-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+/* 상담 입력 폼 */
+.consult-quick{background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.consult-quick-title{font-size:11px;font-weight:600;color:var(--sub);margin-bottom:8px;letter-spacing:.5px}
+.consult-quick-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none;resize:none;line-height:1.6}
+.consult-quick-input:focus{border-color:var(--blue)}
+.consult-quick-foot{display:flex;align-items:center;gap:8px;margin-top:8px}
+/* 거래처 상세 모달 */
+.client-detail-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.client-detail-avatar{width:44px;height:44px;border-radius:12px;background:var(--blue-lt);color:var(--blue);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* 배정 버튼 */
+.assign-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:var(--blue-lt);color:var(--blue);border:1px solid #bfdbfe;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap}
+.assign-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ── 톱니바퀴(관리자) 버튼 ── */
+.tb-admin{height:100%;width:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;font-family:inherit;flex-shrink:0;border-left:1px solid rgba(255,255,255,.1)}
+.tb-admin .tb-icon{filter:grayscale(1) brightness(2) opacity(.4);transition:opacity .15s}
+.tb-admin:hover .tb-icon{opacity:.9;filter:none}
+.tb-dot{position:absolute;top:8px;right:18%;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid #0a2236}
+
+/* ── 공지사항 ── */
+#v-board{overflow-y:auto;padding:12px;background:var(--bg)}
+.bd-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bd-tabs{display:flex;gap:4px;flex:1;overflow-x:auto}
+.bd-tab{padding:7px 12px;border-radius:18px;border:1px solid var(--border);background:var(--white);color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.bd-tab.on{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:600}
+.bd-userbar{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.bd-userlabel{font-size:11px;color:var(--sub)}
+.bd-userselect{flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:12px;background:var(--white);outline:none}
+.bd-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;position:relative}
+.bd-card.pinned{border-color:#fca5a5;box-shadow:0 2px 12px rgba(220,38,38,.08)}
+.bd-card.pinned::before{content:'📌';position:absolute;top:-6px;left:12px;background:var(--white);padding:0 6px;font-size:13px}
+.bd-card-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.bd-cat{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.bd-cat.긴급{background:var(--red-lt);color:var(--red)}
+.bd-cat.전사{background:var(--blue-lt);color:var(--blue)}
+.bd-cat.팀별{background:var(--green-lt);color:var(--green)}
+.bd-title{font-size:14px;font-weight:700;color:var(--text);flex:1;min-width:0}
+.bd-meta{font-size:11px;color:var(--sub);margin-bottom:8px}
+.bd-content{font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap;margin-bottom:10px}
+.bd-image{max-width:100%;border-radius:8px;margin:8px 0;cursor:pointer}
+.bd-deadline{display:inline-block;font-size:10px;padding:3px 9px;border-radius:8px;background:var(--amber-lt);color:var(--amber);font-weight:500;margin-bottom:8px}
+.bd-deadline.over{background:var(--red-lt);color:var(--red)}
+.bd-foot{display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap}
+.bd-readbtn{padding:6px 14px;border-radius:8px;border:1.5px solid var(--blue);background:var(--white);color:var(--blue);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.bd-readbtn.read{background:var(--green-lt);color:var(--green);border-color:#86efac}
+.bd-readstats{font-size:11px;color:var(--sub);flex:1}
+.bd-actions{display:flex;gap:4px}
+.bd-act-btn{padding:5px 9px;border-radius:6px;border:1px solid var(--border);background:var(--white);font-size:11px;cursor:pointer;font-family:inherit;color:var(--sub)}
+.bd-act-btn:hover{border-color:var(--blue);color:var(--blue)}
+.bd-readlist{margin-top:8px;padding:8px 10px;background:var(--bg);border-radius:8px;font-size:11px;line-height:1.7}
+.bd-readlist-title{font-weight:600;color:var(--sub);margin-bottom:4px}
+.bd-readname{display:inline-block;margin:2px 4px 2px 0;padding:2px 7px;border-radius:7px;background:var(--white);font-size:10px}
+.bd-readname.read{background:var(--green-lt);color:var(--green)}
+.bd-readname.unread{background:var(--white);color:var(--sub)}
+
+/* ── 연차 ── */
+#v-leave{overflow-y:auto;padding:12px;background:var(--bg)}
+.lv-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.lv-userwrap{flex:1;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:7px 10px;display:flex;align-items:center;gap:6px}
+.lv-userlabel{font-size:11px;color:var(--sub);flex-shrink:0}
+.lv-userselect{flex:1;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:12px;outline:none}
+.lv-summary{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.lv-stat{padding:6px 4px}
+.lv-stat-v{font-size:22px;font-weight:700;color:var(--navy);line-height:1.1}
+.lv-stat-l{font-size:10px;color:var(--sub);margin-top:4px}
+.lv-stat.used .lv-stat-v{color:var(--amber)}
+.lv-stat.left .lv-stat-v{color:var(--green)}
+.lv-cal-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+.lv-cal-head{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px}
+.lv-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.lv-cal-dow{text-align:center;font-size:10px;color:var(--sub);padding:6px 0;font-weight:600}
+.lv-cal-dow.sun{color:var(--red)}
+.lv-cal-dow.sat{color:var(--blue)}
+.lv-cal-cell{aspect-ratio:1;border-radius:7px;background:var(--bg);padding:4px;font-size:11px;display:flex;flex-direction:column;align-items:flex-start;overflow:hidden;position:relative;min-height:48px}
+.lv-cal-cell.empty{background:transparent}
+.lv-cal-cell.today{background:var(--blue-lt);border:1.5px solid var(--blue)}
+.lv-cal-cell-date{font-weight:600;color:var(--text);font-size:11px}
+.lv-cal-cell.sun .lv-cal-cell-date{color:var(--red)}
+.lv-cal-cell.sat .lv-cal-cell-date{color:var(--blue)}
+.lv-cal-pill{font-size:8.5px;padding:1px 4px;border-radius:4px;margin-top:2px;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-weight:500}
+.lv-cal-pill.pending{background:#fbbf24;color:#78350f}
+.lv-cal-pill.approved{background:#10b981}
+.lv-cal-pill.rejected{background:#9ca3af;text-decoration:line-through;opacity:.6}
+.lv-list-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px}
+.lv-list-tabs{display:flex;gap:4px;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.lv-tab{padding:6px 12px;border-radius:8px;border:none;background:transparent;color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit}
+.lv-tab.on{background:var(--navy);color:#fff;font-weight:600}
+.lv-item{padding:11px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.lv-item:last-child{border-bottom:none}
+.lv-item-info{flex:1;min-width:0}
+.lv-item-row1{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}
+.lv-name{font-size:13px;font-weight:600;color:var(--text)}
+.lv-type{font-size:10px;padding:2px 7px;border-radius:6px;background:var(--blue-lt);color:var(--blue);font-weight:500}
+.lv-status{font-size:10px;padding:2px 7px;border-radius:6px;font-weight:500}
+.lv-status.pending{background:#fef3c7;color:#92400e}
+.lv-status.approved{background:var(--green-lt);color:var(--green)}
+.lv-status.rejected{background:#f3f4f6;color:#6b7280}
+.lv-date{font-size:11px;color:var(--sub)}
+.lv-reason{font-size:11px;color:var(--sub);margin-top:3px;font-style:italic}
+.lv-item-actions{display:flex;gap:5px;flex-shrink:0}
+.lv-empty{text-align:center;padding:24px 12px;color:var(--sub);font-size:12px}
+
+/* ── 관리자 모달 ── */
+.adm-section{padding:14px 18px;border-bottom:1px solid var(--border)}
+.adm-section:last-child{border-bottom:none}
+.adm-section-title{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.5px;margin-bottom:10px;text-transform:uppercase}
+.adm-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.adm-row:last-child{margin-bottom:0}
+.adm-label{font-size:12px;color:var(--text);flex:1;min-width:0}
+.adm-leave-grid{display:grid;grid-template-columns:1fr 80px 70px;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.adm-leave-grid:last-child{border-bottom:none}
+.adm-leave-input{padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:12px;text-align:center;outline:none}
+.adm-leave-input:focus{border-color:var(--blue)}
+.adm-pwbox{padding:14px;background:var(--bg);border-radius:10px;text-align:center}
+.adm-pwinput{width:120px;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:18px;text-align:center;letter-spacing:8px;outline:none;margin:8px 0}
+.adm-pwinput:focus{border-color:var(--blue)}
+.adm-pwerror{color:var(--red);font-size:11px;margin-top:4px;min-height:14px}
+
+/* ── 제작중 뷰 ── */
+#v-mfg{overflow:hidden;background:var(--bg)}
+.mfg-header{background:var(--white);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.mfg-back{padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--white);cursor:pointer;font-family:inherit;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:4px}
+.mfg-back:hover{border-color:var(--blue);color:var(--blue)}
+.mfg-work-title{font-size:14px;font-weight:700;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mfg-body{flex:1;overflow-y:auto;padding:12px}
+.mfg-stage-row{display:flex;align-items:stretch;gap:0;margin-bottom:14px;position:relative}
+.mfg-stage-item{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.mfg-stage-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;z-index:1;flex-shrink:0;border:3px solid var(--white);box-shadow:0 0 0 2px var(--border);cursor:pointer;transition:box-shadow .15s}
+.mfg-stage-dot.active{box-shadow:0 0 0 3px var(--blue)}
+.mfg-stage-dot.done{opacity:.7}
+.mfg-stage-label{font-size:10px;font-weight:600;margin-top:5px;text-align:center;color:var(--sub)}
+.mfg-stage-label.active{color:var(--text);font-weight:700}
+.mfg-connector{position:absolute;top:16px;left:50%;right:-50%;height:2px;z-index:0}
+.mfg-stage-item:last-child .mfg-connector{display:none}
+.mfg-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.mfg-card-title{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.3px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.mfg-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mfg-info-item{background:var(--bg);border-radius:8px;padding:8px 10px}
+.mfg-info-label{font-size:10px;color:var(--sub);margin-bottom:2px}
+.mfg-info-value{font-size:12px;font-weight:600;color:var(--text)}
+.mfg-vendor-select{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);background:var(--white);outline:none}
+.mfg-vendor-select:focus{border-color:var(--blue)}
+.mfg-stage-btns{display:flex;gap:8px;margin-top:10px}
+
+/* ── 협력업체 뷰 ── */
+#v-vendor{overflow-y:auto;padding:12px;background:var(--bg)}
+.vendor-type-label{font-size:10px;font-weight:700;letter-spacing:.5px;padding:10px 4px 6px;color:var(--sub)}
+.vendor-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:box-shadow .15s}
+.vendor-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.vendor-avatar{width:36px;height:36px;border-radius:9px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vendor-info{flex:1;min-width:0}
+.vendor-name{font-size:13px;font-weight:600;color:var(--text)}
+.vendor-meta{font-size:11px;color:var(--sub);margin-top:2px}
+.vendor-using{font-size:10px;color:var(--blue);margin-top:3px}
+.vendor-memo{font-size:10px;color:var(--sub);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── 제작중 슬라이드업 패널 ── */
+.mfg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150;display:none;align-items:flex-end}
+.mfg-overlay.on{display:flex}
+.mfg-panel{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-height:88vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.mfg-overlay.on .mfg-panel{transform:translateY(0)}
+.mfg-panel-handle{width:36px;height:4px;border-radius:2px;background:#d1d5db;margin:10px auto 0}
+.mfg-panel-head{padding:12px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.mfg-panel-close{font-size:22px;cursor:pointer;color:var(--sub);background:none;border:none;font-family:inherit;line-height:1;margin-left:auto}
+.mfg-panel-title{font-size:15px;font-weight:700;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mfg-panel-body{flex:1;overflow-y:auto;padding:14px 16px 20px}
+.mfg-stage-track{display:flex;align-items:center;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
+.mfg-stage-track::-webkit-scrollbar{display:none}
+.mfg-step{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;cursor:pointer}
+.mfg-step-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2.5px solid transparent;transition:all .2s}
+.mfg-step-circle.done{color:#fff}
+.mfg-step-circle.active{color:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.3)}
+.mfg-step-circle.idle{background:#f3f4f6;color:#9ca3af;border-color:#e5e7eb}
+.mfg-step-label{font-size:9px;font-weight:600;color:var(--sub);white-space:nowrap}
+.mfg-step-label.active{color:var(--text)}
+.mfg-step-line{height:2px;flex:1;min-width:12px;margin:0 2px;margin-bottom:18px;flex-shrink:0}
+.mfg-section{background:var(--bg);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.mfg-section-title{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.4px;margin-bottom:10px}
+.mfg-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.mfg-info-item{background:var(--white);border-radius:8px;padding:8px 10px;border:1px solid var(--border)}
+.mfg-info-label{font-size:10px;color:var(--sub);margin-bottom:2px}
+.mfg-info-value{font-size:12px;font-weight:600;color:var(--text)}
+.mfg-nav-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+
+/* ── 로그인 화면 ── */
+#login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0a2236 0%,#0d3f7a 60%,#1a5fa8 100%);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px}
+#login-screen.hidden{display:none}
+.login-logo{color:#fff;font-size:28px;font-weight:800;letter-spacing:1px;margin-bottom:4px}
+.login-sub{color:rgba(255,255,255,.5);font-size:13px;margin-bottom:32px}
+.login-card{background:var(--white);border-radius:20px;padding:24px 22px;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:18px;text-align:center}
+.login-field{margin-bottom:14px}
+.login-field label{font-size:11px;font-weight:600;color:var(--sub);display:block;margin-bottom:5px}
+.login-select{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;color:var(--text);background:var(--white);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.login-select:focus{border-color:var(--blue)}
+.login-pw{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:18px;letter-spacing:6px;color:var(--text);outline:none;text-align:center}
+.login-pw:focus{border-color:var(--blue)}
+.login-btn{width:100%;padding:13px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:background .15s}
+.login-btn:hover{background:var(--blue)}
+.login-err{color:var(--red);font-size:12px;text-align:center;min-height:18px;margin-top:8px}
+.login-version{color:rgba(255,255,255,.25);font-size:10px;margin-top:24px}
+
+/* ── 상단 로그인 사용자 표시 ── */
+.topbar-user{display:flex;align-items:center;gap:6px;padding:0 8px 0 6px;border-left:1px solid rgba(255,255,255,.12);flex-shrink:0;cursor:pointer}
+.topbar-user-av{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.topbar-user-name{font-size:11px;color:rgba(255,255,255,.8);font-weight:500;white-space:nowrap}
+.topbar-logout{font-size:10px;color:rgba(255,255,255,.4);cursor:pointer;background:none;border:none;font-family:inherit;padding:0}
+.topbar-logout:hover{color:rgba(255,255,255,.8)}
+
+</style>
+</head>
+<body>
+
+<!-- 로그인 화면 -->
+<div id="login-screen">
+  <div class="login-logo">S;D</div>
+  <div class="login-sub">스쿨디 업무관리 시스템</div>
+  <div class="login-card">
+    <div class="login-card-title">🔐 로그인</div>
+    <div class="login-field">
+      <label>이름</label>
+      <select class="login-select" id="login-name"></select>
+    </div>
+    <div class="login-field">
+      <label>비밀번호</label>
+      <input class="login-pw" id="login-pw" type="password" maxlength="20" placeholder="••••" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">로그인</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+  <div class="login-version">스쿨디 ERP v1.0</div>
+</div>
+
+<!-- 상단 탭바 -->
+<div class="topbar">
+  <div class="topbar-logo">S;D</div>
+  <button class="tb on" onclick="sw(&#39;kanban&#39;,this)"><span class="tb-icon">📋</span><span class="tb-label">작업</span></button>
+  <button class="tb" onclick="sw(&#39;cal&#39;,this)"><span class="tb-icon">📅</span><span class="tb-label">배송</span></button>
+  <button class="tb" onclick="sw(&#39;dash&#39;,this)"><span class="tb-icon">📊</span><span class="tb-label">대시</span></button>
+  <button class="tb" onclick="sw(&#39;board&#39;,this);renderBoard()"><span class="tb-icon">📌</span><span class="tb-label">공지</span><span class="tb-dot" id="board-dot" style="display:none"></span></button>
+  <button class="tb" onclick="sw(&#39;notice&#39;,this);renderNotice()"><span class="tb-icon">💬</span><span class="tb-label">공지문</span></button>
+  <button class="tb" onclick="sw(&#39;crm&#39;,this);renderCrm()"><span class="tb-icon">🤝</span><span class="tb-label">상담</span></button>
+  <button class="tb" onclick="sw(&#39;vendor&#39;,this);renderVendors()"><span class="tb-icon">🏭</span><span class="tb-label">협력사</span></button>
+  <button class="tb" onclick="sw(&#39;leave&#39;,this);renderLeave()"><span class="tb-icon">🌴</span><span class="tb-label">연차</span></button>
+  <button class="tb-admin" onclick="openAdminGate()" title="관리자"><span class="tb-icon">⚙️</span></button>
+  <div class="topbar-user" onclick="doLogout()" title="로그아웃">
+    <div class="topbar-user-av" id="topbar-av">?</div>
+    <div style="display:flex;flex-direction:column;gap:1px">
+      <div class="topbar-user-name" id="topbar-name">-</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:400">로그아웃</div>
+    </div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- 작업 칸반 -->
+  <div class="view on" id="v-kanban">
+    <div class="kb-toolbar">
+      <div class="tv-wrap">
+        <button class="tv on" id="tv-k" onclick="setWV(&#39;kanban&#39;,this)">⊞ 칸반</button>
+        <button class="tv" id="tv-l" onclick="setWV(&#39;list&#39;,this)">≡ 목록</button>
+      </div>
+      <div style="margin-left:auto"><button class="btn btn-primary btn-sm" onclick="openAddWork(0)">+ 작업</button></div>
+    </div>
+    <!-- 담당자 아바타 바 -->
+    <div class="pf-bar" id="pf-bar">
+      <!-- buildPfBar()로 동적 생성 -->
+    </div>
+    <!-- 칸반 영역 -->
+    <div class="kb-wrap">
+      <!-- 분류 사이드바 -->
+      <div class="cat-sidebar">
+        <button class="csb on" data-c="전체" onclick="selCat(this)"><span class="csb-icon">☰</span><span class="csb-label">전체</span><span class="csb-cnt" id="cc-전체">0</span></button>
+        <div class="csb-div"></div>
+        <button class="csb" data-c="인쇄" onclick="selCat(this)"><span class="csb-icon">🖨</span><span class="csb-label">인쇄</span><span class="csb-cnt" id="cc-인쇄">0</span></button>
+        <button class="csb" data-c="인테리어" onclick="selCat(this)"><span class="csb-icon">🏫</span><span class="csb-label">인테리어</span><span class="csb-cnt" id="cc-인테리어">0</span></button>
+        <button class="csb" data-c="사인물" onclick="selCat(this)"><span class="csb-icon">🪧</span><span class="csb-label">사인물</span><span class="csb-cnt" id="cc-사인물">0</span></button>
+        <button class="csb" data-c="행사" onclick="selCat(this)"><span class="csb-icon">🎪</span><span class="csb-label">행사</span><span class="csb-cnt" id="cc-행사">0</span></button>
+      </div>
+      <div class="kanban" id="kanban-board"></div>
+      <div class="list-scroll" id="list-body" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- 배송달력 -->
+  <div class="view" id="v-cal">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="moveMonth(-1)">‹</button>
+      <span class="cal-nav-title" id="cal-title"></span>
+      <button class="cal-nav-btn" onclick="moveMonth(1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-hdrs"></div>
+    <div class="cal-grid" id="cal-cells" style="margin-top:2px"></div>
+    <div class="cal-detail" id="cal-detail"></div>
+  </div>
+
+  <!-- 대시보드 -->
+  <div class="view" id="v-dash">
+    <div class="dash-grid">
+      <div class="dg"><div class="dg-n" id="d-total">0</div><div class="dg-l">전체</div></div>
+      <div class="dg"><div class="dg-n" id="d-ing" style="color:var(--amber)">0</div><div class="dg-l">진행중</div></div>
+      <div class="dg"><div class="dg-n" id="d-done" style="color:var(--green)">0</div><div class="dg-l">완료</div></div>
+    </div>
+    <div class="card"><div class="card-title">📊 팀별 진행 현황</div><div id="team-prog"></div></div>
+    <div class="slabel">📦 오늘 배송</div><div id="dash-del"></div>
+    <div class="slabel" style="color:var(--amber)">⚠ 배송일 미지정</div><div id="dash-unsched"></div>
+  </div>
+
+  <!-- 공지문 -->
+  <div class="view" id="v-notice">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:15px;font-weight:600" id="notice-title">배송 공지문</span>
+      <button class="copy-btn" id="copy-btn" onclick="copyNotice()">복사</button>
+    </div>
+    <div class="notice-box" id="notice-box">배송 달력에서 날짜를 선택하면 자동 생성됩니다.</div>
+    <div style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center">복사 후 카카오톡에 바로 붙여넣기</div>
+  </div>
+
+
+  <!-- 상담기록 -->
+  <div class="view" id="v-crm">
+    <div class="crm-toolbar">
+      <div class="crm-search-wrap">
+        <span class="crm-search-icon">🔍</span>
+        <input class="crm-search" id="crm-search" placeholder="거래처명 검색..." oninput="renderCrm()">
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openAddClient()">+ 거래처</button>
+    </div>
+    <div id="crm-list"></div>
+  </div>
+
+  <!-- 협력업체 -->
+  <div class="view" id="v-vendor">
+    <div class="crm-toolbar">
+      <div class="crm-search-wrap">
+        <span class="crm-search-icon">🔍</span>
+        <input class="crm-search" id="vendor-search" placeholder="업체명 검색..." oninput="renderVendors()">
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openAddVendor()">+ 협력업체</button>
+    </div>
+    <div id="vendor-list"></div>
+  </div>
+
+  <!-- 업무 공지사항 -->
+  <div class="view" id="v-board">
+    <div class="bd-toolbar">
+      <div class="bd-tabs">
+        <button class="bd-tab on" data-bf="전체" onclick="setBdFilter(this)">전체</button>
+        <button class="bd-tab" data-bf="긴급" onclick="setBdFilter(this)">🚨 긴급</button>
+        <button class="bd-tab" data-bf="전사" onclick="setBdFilter(this)">전사</button>
+        <button class="bd-tab" data-bf="팀별" onclick="setBdFilter(this)">팀별</button>
+      </div>
+      <button class="btn btn-primary btn-sm" id="bd-add-btn" onclick="openAddBoard()" style="display:none">+ 공지</button>
+    </div>
+    <div id="bd-list"></div>
+  </div>
+
+  <!-- 직원 연차 -->
+  <div class="view" id="v-leave">
+    <div class="lv-toolbar">
+      <div class="lv-userwrap">
+        <span class="lv-userlabel">👤</span>
+        <span class="lv-userselect" id="lv-current-user-label" style="font-size:13px;font-weight:600;color:var(--text)">-</span>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openAddLeave()">+ 연차신청</button>
+    </div>
+    <div class="lv-summary" id="lv-summary"></div>
+    <div class="lv-cal-wrap">
+      <div class="lv-cal-head">
+        <button class="cal-nav" onclick="lvMonth(-1)">‹</button>
+        <span class="cal-title" id="lv-title">2026년 5월</span>
+        <button class="cal-nav" onclick="lvMonth(1)">›</button>
+      </div>
+      <div class="lv-cal-grid" id="lv-cal-grid"></div>
+    </div>
+    <div class="lv-list-wrap">
+      <div class="lv-list-tabs">
+        <button class="lv-tab on" data-lf="내신청" onclick="setLvFilter(this)">내 신청</button>
+        <button class="lv-tab" data-lf="결재대기" onclick="setLvFilter(this)">결재 대기</button>
+        <button class="lv-tab" data-lf="전체" onclick="setLvFilter(this)">전체</button>
+      </div>
+      <div id="lv-list"></div>
+    </div>
+  </div>
+
+  <!-- 제작중 슬라이드업 패널 (view 아님 - 오버레이) -->
+
+</div>
+
+<!-- 제작중 상세 슬라이드업 패널 -->
+<div class="mfg-overlay" id="mfg-overlay" onclick="if(event.target===this)exitMfg()">
+  <div class="mfg-panel" id="mfg-panel">
+    <div class="mfg-panel-handle"></div>
+    <div class="mfg-panel-head">
+      <span class="mfg-panel-title" id="mfg-work-title">제작중 상세</span>
+      <button class="btn btn-outline btn-sm" onclick="openEditWork(curMfgId)" style="flex-shrink:0">수정</button>
+      <button class="mfg-panel-close" onclick="exitMfg()">×</button>
+    </div>
+    <div class="mfg-panel-body">
+      <!-- 공정 트래커 -->
+      <div class="mfg-section">
+        <div class="mfg-section-title">🔧 공정 단계</div>
+        <div class="mfg-stage-track" id="mfg-stage-row"></div>
+        <div class="mfg-nav-btns">
+          <button class="btn btn-outline btn-full" id="mfg-btn-prev" onclick="moveMfgStage(-1)">← 이전</button>
+          <button class="btn btn-primary btn-full" id="mfg-btn-next" onclick="moveMfgStage(1)">다음 →</button>
+        </div>
+      </div>
+      <!-- 협력업체 -->
+      <div class="mfg-section">
+        <div class="mfg-section-title">🏭 협력업체</div>
+        <select class="mfg-vendor-select" id="mfg-vendor" onchange="saveMfgVendor(this.value)" style="width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:var(--white);outline:none;margin-bottom:8px">
+          <option value="">선택 안함</option>
+        </select>
+        <input style="width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);background:var(--white);outline:none" id="mfg-vendor-custom" placeholder="직접 입력 (목록에 없는 경우)" oninput="saveMfgVendorCustom(this.value)">
+      </div>
+      <!-- 작업 정보 -->
+      <div class="mfg-section">
+        <div class="mfg-section-title">📋 작업 정보</div>
+        <div class="mfg-info-grid" id="mfg-info-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 제작사양서 모달 -->
+<div class="modal-bg" id="modal-work"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="mw-title">제작사양서</span>
+    <button class="modal-close" onclick="closeModal(&#39;modal-work&#39;)">×</button>
+  </div>
+  <div class="form-wrap">
+    <div class="fsec">
+      <div class="fsec-title">기본 정보</div>
+      <div class="ff">
+        <label>분류</label>
+        <div class="cat-selector">
+          <div class="cat-opt" data-cat="인쇄" onclick="pickCat(this)">🖨 인쇄</div>
+          <div class="cat-opt" data-cat="인테리어" onclick="pickCat(this)">🏫 인테리어</div>
+          <div class="cat-opt" data-cat="사인물" onclick="pickCat(this)">🪧 사인물</div>
+          <div class="cat-opt" data-cat="행사" onclick="pickCat(this)">🎪 행사</div>
+        </div>
+      </div>
+      <div class="ff"><label>학교명</label><input id="wf-school" placeholder="예: 검단호수초등학교"></div>
+      <div class="ff"><label>작업명 *</label><input id="wf-n" placeholder="예: 어린이날 행사 / 교육계획서"></div>
+      <div class="fg2">
+        <div class="ff"><label>담당자</label><select id="wf-p"></select></div>
+        <div class="ff"><label>상태</label>
+          <select id="wf-s">
+            <option value="0">작업접수</option><option value="1">톡방개설</option>
+            <option value="2">디자인초안</option><option value="3">디자인수정중</option>
+            <option value="4">디자인컨펌</option>
+            <option value="5">제작중-발주</option><option value="6">제작중-인쇄</option>
+            <option value="7">제작중-후가공</option><option value="8">제작중-검수</option>
+            <option value="9">제작완료</option><option value="10">배송완료</option><option value="11">서류처리완료</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="fsec" id="sec-sub" style="display:none">
+      <div class="fsec-title">행사 품목 구성</div>
+      <div class="sub-quick">
+        <button class="sub-qbtn" onclick="addQ(&#39;포스터&#39;)">+ 포스터</button>
+        <button class="sub-qbtn" onclick="addQ(&#39;초대장&#39;)">+ 초대장</button>
+        <button class="sub-qbtn" onclick="addQ(&#39;자이언트배너&#39;)">+ 자이언트배너</button>
+        <button class="sub-qbtn" onclick="addQ(&#39;현수막&#39;)">+ 현수막</button>
+        <button class="sub-qbtn" onclick="addQ(&#39;음향&#39;)">+ 음향</button>
+        <button class="sub-qbtn" onclick="addQ(&#39;포토월&#39;)">+ 포토월</button>
+        <button class="sub-qbtn" onclick="addQ(&#39;X배너&#39;)">+ X배너</button>
+      </div>
+      <div class="sub-list" id="sub-list"></div>
+      <div class="sub-add-row">
+        <input class="sub-add-input" id="sub-inp" placeholder="품목 직접 입력..." onkeydown="if(event.key===&#39;Enter&#39;)addSubInp()">
+        <button class="sub-add-btn" onclick="addSubInp()">추가</button>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">거래처 정보</div>
+      <div class="fg2">
+        <div class="ff"><label>거래처 담당자</label><input id="wf-contact" placeholder="예: 홍길동 선생님"></div>
+        <div class="ff"><label>연락처</label><input id="wf-tel" type="tel" placeholder="032-000-0000"></div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">🏭 협력업체 (제작중 단계)</div>
+      <div class="fg2">
+        <div class="ff">
+          <label>협력업체</label>
+          <select id="wf-vendor" onchange="syncVendorInput(this)">
+            <option value="">선택 안함</option>
+          </select>
+        </div>
+        <div class="ff">
+          <label>직접입력</label>
+          <input id="wf-vendor-custom" placeholder="업체명 직접 입력" oninput="syncVendorSelect(this)">
+        </div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">제작 사양</div>
+      <div class="fg2">
+        <div class="ff"><label>사이즈</label><input id="wf-size" placeholder="예: A4 / 297×420mm"></div>
+        <div class="ff"><label>페이지</label><input id="wf-page" placeholder="예: 32p"></div>
+      </div>
+      <div class="ff"><label>표지 사양</label><input id="wf-cover" placeholder="예: 스노우지 250g / 무광코팅"></div>
+      <div class="ff"><label>내지 사양</label><input id="wf-inner" placeholder="예: 스노우지 120g / 4도"></div>
+      <div class="ff"><label>기타 후가공</label><input id="wf-finish" placeholder="예: 무선제본 / 에폭시 / 형압"></div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">일정 &amp; 메모</div>
+      <div class="fg2">
+        <div class="ff"><label>배송 예정일</label><input type="date" id="wf-due"></div>
+        <div class="ff"><label>미팅 일정</label><input type="date" id="wf-meet"></div>
+      </div>
+      <div class="fg2">
+        <div class="ff"><label>시공 일정</label><input type="date" id="wf-install"></div>
+        <div class="ff"></div>
+      </div>
+      <div class="ff"><label>세부 내용 / 메모</label><textarea id="wf-m" placeholder="진행 노트, 특이사항 등"></textarea></div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-primary" style="flex:1" id="mw-btn" onclick="saveWork()">추가하기</button>
+    <button class="btn btn-danger btn-sm" id="mw-del" style="display:none" onclick="delWorkCur()">삭제</button>
+  </div>
+</div></div>
+
+<!-- 거래처 추가 모달 -->
+<div class="modal-bg" id="modal-client"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="mc-title">거래처 추가</span>
+    <button class="modal-close" onclick="closeModal(&#39;modal-client&#39;)">×</button>
+  </div>
+  <div class="form-wrap">
+    <div class="fsec">
+      <div class="fsec-title">기본 정보</div>
+      <div class="ff"><label>거래처명 *</label><input id="cf-name" placeholder="예: 인천검단호수초등학교"></div>
+      <div class="fg2">
+        <div class="ff"><label>담당자명</label><input id="cf-contact" placeholder="예: 홍길동 선생님"></div>
+        <div class="ff"><label>연락처</label><input id="cf-tel" type="tel" placeholder="032-000-0000"></div>
+      </div>
+      <div class="ff"><label>이메일</label><input id="cf-email" type="email" placeholder="example@school.kr"></div>
+      <div class="ff"><label>주소</label><input id="cf-addr" placeholder="예: 인천광역시 서구 검단로 123"></div>
+      <div class="ff"><label>분류</label>
+        <select id="cf-type">
+          <option value="">선택</option>
+          <option value="초등학교">초등학교</option>
+          <option value="중학교">중학교</option>
+          <option value="고등학교">고등학교</option>
+          <option value="유치원">유치원</option>
+          <option value="교육청">교육청</option>
+          <option value="기관">기관</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+      <div class="ff"><label>메모</label><textarea id="cf-memo" placeholder="특이사항, 선호사항 등"></textarea></div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-primary" style="flex:1" id="mc-btn" onclick="saveClient()">추가하기</button>
+    <button class="btn btn-danger btn-sm" id="mc-del" style="display:none" onclick="delClientCur()">삭제</button>
+  </div>
+</div></div>
+
+<!-- 상담기록 상세 모달 -->
+<div class="modal-bg" id="modal-crm-detail"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="cd-title">상담 기록</span>
+    <button class="modal-close" onclick="closeModal(&#39;modal-crm-detail&#39;)">×</button>
+  </div>
+  <div id="cd-body" style="padding:0 18px 16px"></div>
+</div></div>
+
+<!-- 배송 추가 모달 -->
+<div class="modal-bg del-modal" id="modal-del"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="md-title">배송 추가</span>
+    <button class="modal-close" onclick="closeModal(&#39;modal-del&#39;)">×</button>
+  </div>
+  <div class="form-wrap">
+    <div class="fsec">
+      <div class="fsec-title">배송 정보</div>
+      <div class="fg2">
+        <div class="ff"><label>거래처 *</label><input id="df-c" placeholder="예: 멘토사이언스"></div>
+        <div class="ff"><label>품목 *</label><input id="df-i" placeholder="예: 리플렛"></div>
+      </div>
+      <div class="fg2">
+        <div class="ff"><label>수량</label><input id="df-q" placeholder="500매"></div>
+        <div class="ff"><label>담당자</label><select id="df-p"></select></div>
+      </div>
+      <div class="ff"><label>연락처</label><input id="df-t" placeholder="010-0000-0000" type="tel"></div>
+      <div class="ff"><label>메모</label><input id="df-m" placeholder="오전동선, 부재시 연락 등"></div>
+    </div>
+  </div>
+  <div class="modal-foot"><button class="btn btn-primary btn-full" onclick="addDelivery()">추가하기</button></div>
+</div></div>
+
+<!-- 협력업체 추가/수정 모달 -->
+<div class="modal-bg" id="modal-vendor"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="vdf-title">협력업체 추가</span>
+    <button class="modal-close" onclick="closeModal('modal-vendor')">×</button>
+  </div>
+  <div class="form-wrap">
+    <div class="fsec">
+      <div class="fg2">
+        <div class="ff"><label>업체명 *</label><input id="vdf-name" placeholder="예: 삼성인쇄"></div>
+        <div class="ff"><label>업종</label>
+          <select id="vdf-type">
+            <option value="인쇄소">인쇄소</option>
+            <option value="후가공">후가공</option>
+            <option value="현수막">현수막</option>
+            <option value="사인물">사인물</option>
+            <option value="인테리어">인테리어</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg2">
+        <div class="ff"><label>담당자</label><input id="vdf-contact" placeholder="홍길동"></div>
+        <div class="ff"><label>연락처</label><input id="vdf-tel" type="tel" placeholder="010-0000-0000"></div>
+      </div>
+      <div class="fg2">
+        <div class="ff"><label>이메일</label><input id="vdf-email" type="email" placeholder="example@naver.com"></div>
+        <div class="ff"><label>사업자번호</label><input id="vdf-bizno" placeholder="000-00-00000"></div>
+      </div>
+      <div class="ff"><label>주소</label><input id="vdf-addr" placeholder="예: 인천광역시 서구"></div>
+      <div class="ff"><label>메모</label><textarea id="vdf-memo" rows="2" placeholder="단가, 납기, 특이사항 등"></textarea></div>
+    </div>
+  </div>
+  <div class="modal-foot" style="display:flex;gap:8px">
+    <button class="btn btn-outline btn-sm" id="vdf-del" onclick="deleteVendor()" style="display:none;color:var(--red);border-color:#fca5a5">삭제</button>
+    <button class="btn btn-primary btn-full" onclick="saveVendorForm()">저장</button>
+  </div>
+</div></div>
+
+<!-- 품목 사양 팝업 -->
+<div class="sub-spec-bg" id="sub-spec-bg" onclick="if(event.target===this)closeSubSpec()">
+  <div class="sub-spec-box">
+    <div class="sub-spec-head">
+      <span class="sub-spec-title" id="sub-spec-title">📄 품목 사양</span>
+      <button class="sub-spec-close" onclick="closeSubSpec()">×</button>
+    </div>
+    <div class="sub-spec-body">
+      <div class="sub-spec-row">
+        <label class="sub-spec-label">수량</label>
+        <input class="sub-spec-input" id="ss-qty" placeholder="예: 500매, 10개">
+      </div>
+      <div class="sub-spec-row">
+        <label class="sub-spec-label">사이즈</label>
+        <input class="sub-spec-input" id="ss-size" placeholder="예: A4, B5, 900×2000mm">
+      </div>
+      <div class="sub-spec-row">
+        <label class="sub-spec-label">페이지</label>
+        <input class="sub-spec-input" id="ss-page" placeholder="예: 4p, 8p, 단면">
+      </div>
+      <div class="sub-spec-row">
+        <label class="sub-spec-label">표지 사양</label>
+        <input class="sub-spec-input" id="ss-cover" placeholder="예: 아트지 250g 무광">
+      </div>
+      <div class="sub-spec-row">
+        <label class="sub-spec-label">내지 사양</label>
+        <input class="sub-spec-input" id="ss-inner" placeholder="예: 스노우 120g">
+      </div>
+      <div class="sub-spec-row">
+        <label class="sub-spec-label">후가공</label>
+        <input class="sub-spec-input" id="ss-finish" placeholder="예: 무선제본, 라미네이팅, 동판">
+      </div>
+      <div class="sub-spec-row">
+        <label class="sub-spec-label">메모</label>
+        <input class="sub-spec-input" id="ss-memo" placeholder="추가 사항">
+      </div>
+    </div>
+    <div class="sub-spec-foot">
+      <button class="btn btn-primary btn-full" onclick="saveSubSpec()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 공지사항 작성 모달 -->
+<div class="modal-bg" id="modal-board"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="bdf-title">공지사항 작성</span>
+    <button class="modal-close" onclick="closeModal(&#39;modal-board&#39;)">×</button>
+  </div>
+  <div class="form-wrap">
+    <div class="fsec">
+      <div class="fg2">
+        <div class="ff"><label>분류</label><select id="bdf-cat"><option value="전사">전사</option><option value="팀별">팀별</option><option value="긴급">긴급</option></select></div>
+        <div class="ff"><label>대상 팀 (팀별일 때)</label><select id="bdf-team"><option value="">선택</option></select></div>
+      </div>
+      <div class="ff"><label>제목 *</label><input id="bdf-title-i" placeholder="공지 제목"></div>
+      <div class="ff"><label>내용 *</label><textarea id="bdf-content" rows="6" placeholder="공지 내용"></textarea></div>
+      <div class="fg2">
+        <div class="ff"><label><input type="checkbox" id="bdf-pin" style="vertical-align:middle"> 상단 고정</label></div>
+        <div class="ff"><label>확인 기한</label><input id="bdf-deadline" type="date"></div>
+      </div>
+      <div class="ff">
+        <label>이미지 첨부</label>
+        <input id="bdf-image" type="file" accept="image/*" onchange="bdfImagePreview(this)">
+        <div id="bdf-image-preview" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-foot"><button class="btn btn-primary btn-full" onclick="saveBoardPost()">등록</button></div>
+</div></div>
+
+<!-- 공지 읽음 현황 모달 -->
+<div class="modal-bg" id="modal-board-reads"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title">읽음 현황</span>
+    <button class="modal-close" onclick="closeModal(&#39;modal-board-reads&#39;)">×</button>
+  </div>
+  <div class="form-wrap" id="bd-reads-body" style="padding:14px 18px;max-height:60vh;overflow-y:auto"></div>
+</div></div>
+
+<!-- 연차 신청 모달 -->
+<div class="modal-bg" id="modal-leave"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title" id="lvf-title">연차 신청</span>
+    <button class="modal-close" onclick="closeModal(&#39;modal-leave&#39;)">×</button>
+  </div>
+  <div class="form-wrap">
+    <div class="fsec">
+      <div class="ff"><label>신청자</label><input id="lvf-person" readonly style="background:var(--bg);color:var(--sub)"></div>
+      <div class="ff"><label>유형 *</label>
+        <select id="lvf-type">
+          <option value="연차">연차 (1일)</option>
+          <option value="오전반차">오전반차 (0.5일)</option>
+          <option value="오후반차">오후반차 (0.5일)</option>
+        </select>
+      </div>
+      <div class="fg2">
+        <div class="ff"><label>시작일 *</label><input id="lvf-start" type="date"></div>
+        <div class="ff"><label>종료일</label><input id="lvf-end" type="date"></div>
+      </div>
+      <div class="ff"><label>사유 (선택)</label><textarea id="lvf-reason" rows="3" placeholder="개인사정, 가족행사 등"></textarea></div>
+      <div class="ff" id="lvf-summary" style="background:var(--bg);padding:10px;border-radius:8px;font-size:12px;color:var(--sub);text-align:center"></div>
+    </div>
+  </div>
+  <div class="modal-foot"><button class="btn btn-primary btn-full" onclick="saveLeave()">신청</button></div>
+</div></div>
+
+<!-- 관리자 비밀번호 모달 -->
+<div class="modal-bg" id="modal-adm-gate"><div class="modal" style="max-width:340px">
+  <div class="modal-head">
+    <span class="modal-head-title">🔐 관리자 인증</span>
+    <button class="modal-close" onclick="closeModal(&#39;modal-adm-gate&#39;)">×</button>
+  </div>
+  <div class="form-wrap">
+    <div class="fsec">
+      <div class="adm-pwbox">
+        <div style="font-size:12px;color:var(--sub);margin-bottom:4px">최기수 대표만 접근 가능</div>
+        <input class="adm-pwinput" id="adm-pw" type="password" maxlength="4" placeholder="••••" inputmode="numeric" onkeydown="if(event.key===&#39;Enter&#39;)tryAdminLogin()">
+        <div class="adm-pwerror" id="adm-pw-err"></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-foot"><button class="btn btn-primary btn-full" onclick="tryAdminLogin()">확인</button></div>
+</div></div>
+
+<!-- 관리자 패널 모달 -->
+<div class="modal-bg" id="modal-admin"><div class="modal">
+  <div class="modal-head">
+    <span class="modal-head-title">⚙️ 관리자 패널</span>
+    <button class="modal-close" onclick="closeAdmin()">×</button>
+  </div>
+  <div class="form-wrap" style="padding:0;max-height:75vh;overflow-y:auto">
+    <div class="adm-section">
+      <div class="adm-section-title">📊 시스템 현황</div>
+      <div id="adm-stats" style="font-size:12px;color:var(--text);line-height:1.8"></div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-title">🔑 직원 비밀번호 관리</div>
+      <div class="adm-leave-grid" style="font-weight:600;color:var(--sub);font-size:11px;grid-template-columns:1fr 100px 60px">
+        <div>이름 / 팀</div><div>새 비밀번호</div><div></div>
+      </div>
+      <div id="adm-pw-list"></div>
+      <div style="font-size:11px;color:var(--sub);margin-top:8px">초기 비밀번호: <b>1234</b> · 직원이 로그인 후 변경 가능</div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-title">🌴 직원 연차 잔여일 관리</div>
+      <div class="adm-leave-grid" style="font-weight:600;color:var(--sub);font-size:11px">
+        <div>이름 / 팀</div><div style="text-align:center">사용</div><div style="text-align:center">잔여 (편집)</div>
+      </div>
+      <div id="adm-leave-list"></div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-title">💾 데이터 백업/복원</div>
+      <div class="adm-row">
+        <button class="btn btn-outline btn-sm" onclick="downloadBackup()" style="flex:1">📥 백업 다운로드</button>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('adm-restore-file').click()" style="flex:1">📤 복원 업로드</button>
+        <input type="file" id="adm-restore-file" accept=".json" onchange="restoreBackup(this)" style="display:none">
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-top:6px">JSON 파일로 모든 데이터(작업/거래처/공지/연차)를 백업하거나 복원합니다.</div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-title">🔑 비밀번호 변경</div>
+      <div class="adm-row">
+        <input type="password" id="adm-newpw" placeholder="새 비밀번호 (4자리 숫자)" maxlength="4" inputmode="numeric" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px">
+        <button class="btn btn-primary btn-sm" onclick="changeAdminPw()">변경</button>
+      </div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-title">⚠️ 위험 구역</div>
+      <div class="adm-row">
+        <button class="btn btn-outline btn-sm" onclick="resetAllData()" style="flex:1;color:var(--red);border-color:#fca5a5">🗑️ 전체 데이터 초기화</button>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-top:6px">모든 데이터를 삭제하고 초기 샘플 상태로 되돌립니다. 복원 불가능합니다.</div>
+    </div>
+  </div>
+</div></div>
+
+<script>
+// ── localStorage 안전 래퍼 (file:// 환경 대응) ──
+var _store = (function(){
+  var mem = {};
+  try {
+    _store.set('__test__','1');
+    _store.remove('__test__');
+    return {
+      get: function(k){ try{return _store.get(k);}catch(e){return mem[k]||null;} },
+      set: function(k,v){ try{_store.set(k,v);}catch(e){mem[k]=v;} },
+      remove: function(k){ try{_store.remove(k);}catch(e){delete mem[k];} }
+    };
+  } catch(e) {
+    // localStorage 차단된 환경 (file://) → 메모리로 대체
+    return {
+      get: function(k){ return mem[k]||null; },
+      set: function(k,v){ mem[k]=v; },
+      remove: function(k){ delete mem[k]; }
+    };
+  }
+})();
+
+// ══ 상수 ══
+var STAGES=['작업접수','톡방개설','디자인초안','디자인수정중','디자인컨펌','제작중-발주','제작중-인쇄','제작중-후가공','제작중-검수','제작완료','배송완료','서류처리완료'];
+var SDOTS=['#9ca3af','#3b82f6','#f59e0b','#8b5cf6','#a855f7','#f97316','#ef4444','#ec4899','#84cc16','#10b981','#0ea5e9','#06b6d4'];
+var SCLS=['st-0','st-1','st-2','st-3','st-4','st-5','st-6','st-7','st-8','st-9','st-10','st-11'];
+// 칸반 표시용 그룹 (제작중 4단계 → 1컬럼)
+var KANBAN_COLS=[
+  {label:'작업접수', stages:[0], dot:'#9ca3af'},
+  {label:'톡방개설', stages:[1], dot:'#3b82f6'},
+  {label:'디자인초안', stages:[2], dot:'#f59e0b'},
+  {label:'디자인수정중', stages:[3], dot:'#8b5cf6'},
+  {label:'디자인컨펌', stages:[4], dot:'#a855f7'},
+  {label:'제작중', stages:[5,6,7,8], dot:'#ef4444'},
+  {label:'제작완료', stages:[9], dot:'#10b981'},
+  {label:'배송완료', stages:[10], dot:'#0ea5e9'},
+  {label:'서류처리완료', stages:[11], dot:'#06b6d4'},
+];
+// 제작중 세부단계 라벨 (카드 뱃지용)
+var MFG_LABELS={5:'발주',6:'인쇄',7:'후가공',8:'검수'};
+
+// 분류별 공정 순서 정의
+var MFG_PROCESS={
+  '인쇄':[
+    {key:'지류',   label:'지류 발주',  vendors:['신흥페이퍼','페이퍼프라이스']},
+    {key:'판출력', label:'판·출력',    vendors:['지니디앤피','엠에스프린팅']},
+    {key:'인쇄',   label:'인쇄',       vendors:['내부인쇄','글소리','성용인쇄사','엠에스프린팅','신도인쇄']},
+    {key:'코팅',   label:'코팅',       vendors:['아미기업'], optional:true},
+    {key:'박',     label:'박',         vendors:['아미기업'], optional:true},
+    {key:'제본',   label:'제본',       vendors:['민성바인텍','비앤피테크','형제제본','대한제책','도원제책'], optional:true},
+    {key:'배송',   label:'배송',       vendors:['글소리','푸른퀵화물']},
+  ],
+  '사인물':[
+    {key:'출력',   label:'출력·제작',  vendors:['웅그래픽','홍애드','형제아크릴']},
+    {key:'가공',   label:'후가공',     vendors:['형제아크릴'], optional:true},
+    {key:'배송',   label:'설치·배송',  vendors:['글소리','푸른퀵화물']},
+  ],
+  '인테리어':[
+    {key:'설계',   label:'설계·디자인',vendors:[]},
+    {key:'발주',   label:'자재 발주',  vendors:[]},
+    {key:'시공',   label:'시공',       vendors:[]},
+    {key:'검수',   label:'검수·완료',  vendors:[]},
+  ],
+  '행사':[
+    {key:'발주',   label:'인쇄·제작 발주', vendors:[]},
+    {key:'납품',   label:'납품',           vendors:['글소리','푸른퀵화물']},
+    {key:'현장',   label:'현장 설치',      vendors:[]},
+    {key:'완료',   label:'완료·정산',      vendors:[]},
+  ],
+};
+var CAT_COLOR={인쇄:'#1a5fa8',인테리어:'#059669',사인물:'#d97706',행사:'#dc2626'};
+var CAT_BG={인쇄:'#e8f2fc',인테리어:'#d1fae5',사인물:'#fef3c7',행사:'#fee2e2'};
+var CAT_LIST=[{k:'인쇄',c:'#1a5fa8',i:'🖨'},{k:'인테리어',c:'#059669',i:'🏫'},{k:'사인물',c:'#d97706',i:'🪧'},{k:'행사',c:'#dc2626',i:'🎪'}];
+
+var MEMBERS=[
+  {n:'최기수',r:'대표',t:'경영'},{n:'김종근',r:'부사장',t:'경영'},{n:'강인걸',r:'전무',t:'경영'},
+  {n:'이다솔',r:'팀장',t:'경영관리팀'},{n:'이미금',r:'주임',t:'경영관리팀'},
+  {n:'김영애',r:'팀장',t:'디자인1팀'},{n:'박재성',r:'차장',t:'디자인1팀'},
+  {n:'김아연',r:'차장',t:'디자인1팀'},{n:'이혜선',r:'차장',t:'디자인1팀'},
+  {n:'박진희',r:'차장',t:'디자인1팀'},{n:'이미라',r:'차장',t:'디자인1팀'},{n:'황선경',r:'대리',t:'디자인1팀'},
+  {n:'한도결',r:'팀장',t:'디자인2팀'},{n:'박은주',r:'차장',t:'디자인2팀'},{n:'권성순',r:'차장',t:'디자인2팀'},
+  {n:'김철수',r:'팀장',t:'디자인개발팀'},
+  {n:'김일환',r:'팀장',t:'생산팀'},
+  {n:'최주혜',r:'팀장',t:'인테리어사업부'},{n:'장보람',r:'과장',t:'인테리어사업부'},{n:'김은주',r:'주임',t:'인테리어사업부'},
+];
+var TEAMS=['경영','경영관리팀','디자인1팀','디자인2팀','디자인개발팀','생산팀','인테리어사업부'];
+var TCOLORS=['#dc2626','#185FA5','#059669','#7c3aed','#d97706','#ef4444','#0891b2'];
+var D_PERSONS=['대표님','전무님','강인걸','이미금','최주혜','장보람','이다솔'];
+
+// ══ 상태 ══
+var works=null, delivery=[];
+try{works=JSON.parse(_store.get('sd7_works'))||null;}catch(e){}
+try{delivery=JSON.parse(_store.get('sd7_del'))||[];}catch(e){}
+
+// 새 기능 상태
+var boardPosts=[], leaveRequests=[], leaveBalances={}, currentUser='', adminPw='0000', isAdmin=false;
+var vendors=[];
+var memberPws={}; // 직원 비밀번호 {이름: 비밀번호}
+try{memberPws=JSON.parse(_store.get('sd7_pws'))||{};}catch(e){}
+function savePws(){try{_store.set('sd7_pws',JSON.stringify(memberPws));}catch(e){}}
+try{vendors=JSON.parse(_store.get('sd7_vendors'))||[];}catch(e){}
+// 협력업체 초기 데이터
+if(!vendors.length){
+  var VI=[
+    // ── 지류 ──
+    {id:'v1', name:'신흥페이퍼(주)',    type:'지류',   process:'지류',   contact:'최창규',       tel:'010-9146-0200', email:'sinpaper@naver.com',       addr:'인천광역시 중구 신흥동3가 7-39',                              bizno:'121-81-66138', memo:'지류'},
+    {id:'v2', name:'페이퍼프라이스(주)', type:'지류',   process:'지류',   contact:'차봉준',       tel:'1544-3191',     email:'paperprice@paperprice.co.kr',addr:'경기도 하남시 미사대로 550, 9층 17호(현대지식산업센터 한강미사)', bizno:'209-81-56740', memo:'지류'},
+    // ── 판출력 ──
+    {id:'v4', name:'지니디앤피',        type:'판출력', process:'판출력', contact:'황선심',       tel:'032-882-4107',  email:'sim2276@hanmail.net',        addr:'인천광역시 미추홀구 석정로76번길 23, 2층(숭의동, 평화빌딩)',     bizno:'161-69-00108', memo:'판출력'},
+    {id:'v5', name:'엠에스프린팅',      type:'인쇄소', process:'옵셋인쇄',contact:'오인택',      tel:'010-5266-4552', email:'bhan4552@naver.com',         addr:'경기 고양시 일산동구 장대길 42-76',                            bizno:'128-31-68923', memo:'판출력/옵셋인쇄'},
+    // ── 인쇄 ──
+    {id:'v6', name:'내부인쇄',          type:'인쇄소', process:'인쇄',   contact:'',             tel:'',              email:'',                           addr:'',                                                            bizno:'',             memo:'사내 인쇄'},
+    {id:'v7', name:'글소리',            type:'인쇄소', process:'인쇄',   contact:'',             tel:'',              email:'',                           addr:'',                                                            bizno:'',             memo:'흑백-캐논오세 / 칼라-리코칼라'},
+    {id:'v8', name:'한결',              type:'인쇄소', process:'옵셋인쇄',contact:'최은주 외 1명', tel:'010-3393-0544',email:'hk0544@nate.com',           addr:'인천광역시 동구 염전로40번길 40-42(송림동)',                    bizno:'878-24-00258', memo:'옵셋인쇄'},
+    {id:'v9', name:'성용인쇄사',        type:'인쇄소', process:'옵셋인쇄',contact:'정지성',      tel:'032-887-3653',  email:'sy3653@hanmail.net',         addr:'인천광역시 중구 인중로 48(신흥동3가, 1층)',                    bizno:'121-61-62473', memo:'옵셋인쇄'},
+    {id:'v10',name:'건영프린테크',      type:'인쇄소', process:'옵셋인쇄',contact:'전건호',      tel:'031-8073-8223', email:'kyp9931@hanmail.net',        addr:'경기도 고양시 일산동구 장항로225번길 216(장항동)',              bizno:'292-61-00347', memo:'옵셋인쇄'},
+    {id:'v11',name:'신도인쇄',          type:'인쇄소', process:'옵셋인쇄',contact:'',            tel:'',              email:'',                           addr:'',                                                            bizno:'',             memo:'옵셋인쇄'},
+    // ── 코팅 ──
+    {id:'v12',name:'하나코팅',          type:'후가공', process:'코팅',   contact:'김현',         tel:'032-887-7077',  email:'khc062111@naver.com',        addr:'인천광역시 중구 서해대로458번길 8(신흥동2가, 1층)',              bizno:'121-14-49684', memo:'코팅'},
+    {id:'v13',name:'아미기업',          type:'후가공', process:'코팅',   contact:'유창열',       tel:'010-6206-2670', email:'ycy0324@hanmail.net',        addr:'경기도 고양시 일산동구 장항로225번길 217(장항동)',              bizno:'113-05-90822', memo:'코팅'},
+    // ── 박/후가공 ──
+    {id:'v14',name:'조광',              type:'후가공', process:'동판',   contact:'방수길 외 1명', tel:'010-2321-8171',email:'gongik91@naver.com',         addr:'서울특별시 중구 퇴계로41가길 11-10(충무로4가)',                bizno:'201-21-70652', memo:'동판'},
+    {id:'v15',name:'유일동판',          type:'후가공', process:'동판',   contact:'윤기호외1',    tel:'031-908-4877',  email:'youil4877@hanmail.net',      addr:'경기 고양 일산동구 노첨길24번길 39',                           bizno:'128-36-31038', memo:'동판'},
+    {id:'v16',name:'신진문화',          type:'후가공', process:'톰슨',   contact:'신범영',       tel:'010-7712-8448', email:'',                           addr:'인천광역시 남구 숭의동 435-46',                               bizno:'121-18-84151', memo:'톰슨'},
+    {id:'v17',name:'대송',              type:'후가공', process:'톰슨',   contact:'김병태',       tel:'010-5220-5034', email:'dsbyn5415@naver.com',        addr:'경기도 고양시 일산동구 장대길 42-46, 라동동 1층(장항동)',      bizno:'128-40-16316', memo:'톰슨'},
+    {id:'v18',name:'천안금박',          type:'후가공', process:'금박,형압',contact:'조윤호',     tel:'032-886-0724',  email:'chon0724@hanmail.net',       addr:'인천광역시 미추홀구 석정로 37-1',                             bizno:'121-14-72754', memo:'금박, 형압'},
+    {id:'v19',name:'태창금박지 주식회사',type:'후가공', process:'박원단', contact:'이호준',      tel:'031-908-9083',  email:'taechang813@naver.com',      addr:'경기도 고양시 일산동구 장대길 58(장항동)',                     bizno:'813-88-01121', memo:'박원단'},
+    // ── 제본 ──
+    {id:'v20',name:'민성바인텍',        type:'제본',   process:'무선제본', contact:'이이범',     tel:'031-905-8664',  email:'minsung0170@naver.com',      addr:'경기도 고양시 일산서구 멱절길 124(대화동)',                    bizno:'450-13-02047', memo:'무선제본'},
+    {id:'v21',name:'비앤피테크',        type:'제본',   process:'중철제본', contact:'최양희',     tel:'010-2797-1457', email:'choihee05@naver.com',        addr:'경기도 파주시 상지석길 318-46(상지석동)',                      bizno:'533-27-00128', memo:'중철제본'},
+    {id:'v22',name:'형제인쇄제본',      type:'제본',   process:'무선/중철/접지',contact:'김명석',tel:'032-886-9766', email:'dohc1597@hanmail.net',       addr:'인천광역시 미추홀구 석정로76번길 23(숭의동, 평화빌딩내 지하1층)',bizno:'121-22-39240', memo:'무선제본, 중철제본, 접지제본'},
+    {id:'v23',name:'대한제책',          type:'제본',   process:'무선/중철/접지',contact:'임형숙',tel:'032-764-3810', email:'lhs1209@hanmail.net',        addr:'인천광역시 동구 샛골로 230-5(송현동)',                         bizno:'121-06-20697', memo:'무선제본, 중철제본, 접지제본'},
+    {id:'v24',name:'도원제본',          type:'제본',   process:'무선/중철/접지',contact:'이광열',tel:'032-883-5580', email:'leekw0725@hanmail.net',      addr:'인천광역시 미추홀구 석정로76번길 16(숭의동)',                  bizno:'121-19-42842', memo:'무선제본, 중철제본, 접지제본'},
+    {id:'v25',name:'천일제책사',        type:'제본',   process:'양장제본', contact:'장난석',     tel:'031-905-8181',  email:'0319058181@hanmail.net',     addr:'경기도 고양시 일산동구 장대길 42-84(장항동)',                  bizno:'128-18-92313', memo:'양장제본'},
+    {id:'v26',name:'우성사',            type:'제본',   process:'스프링제본',contact:'심상구',    tel:'010-9928-8200', email:'woosung1988@naver.com',      addr:'인천광역시 미추홀구 경인로7번길 27(숭의동)',                   bizno:'121-25-57012', memo:'스프링제본'},
+    {id:'v27',name:'홍인문화사',        type:'제본',   process:'스프링제본',contact:'정영택',    tel:'010-3799-4226', email:'hongin8608@naver.com',       addr:'인천광역시 중구 도원로8번길 35(선화동)',                       bizno:'121-19-55328', memo:'스프링제본'},
+    {id:'v28',name:'성일사',            type:'제본',   process:'스프링제본',contact:'우진문',    tel:'010-7393-4022', email:'jm510a@naver.com',           addr:'경기도 고양시 일산동구 장대길 86-17(장항동, 가동)',             bizno:'128-31-05743', memo:'스프링제본'},
+    // ── 배송 ──
+    {id:'v29',name:'푸른퀵화물',        type:'배송',   process:'배송',   contact:'김기선',       tel:'010-3262-1559', email:'vnfmsznlr@daum.net',         addr:'인천광역시 동구 방축로83번길 23, 31동 227호(송림동, 인천산업유통센타)',bizno:'121-12-33515',memo:'배송'},
+    // ── 사인물 ──
+    {id:'v30',name:'(주)웅그래픽',      type:'사인물', process:'출력',   contact:'정한웅',       tel:'032-764-5008',  email:'dnd5008@naver.com',          addr:'인천광역시 미추홀구 석정로 37-1, 3층(숭의동)',                 bizno:'446-87-01088', memo:'배너 페트지, 현수막'},
+    {id:'v31',name:'홍애드',            type:'사인물', process:'출력',   contact:'',             tel:'',              email:'',                           addr:'',                                                            bizno:'',             memo:'배너 페트지, 현수막'},
+    {id:'v32',name:'형제아크릴',        type:'사인물', process:'출력,가공',contact:'',           tel:'',              email:'',                           addr:'',                                                            bizno:'',             memo:'포맥스, 폼보드, 기타 가공물'},
+    // ── 기타 ──
+    {id:'v33',name:'고려기프트 주식회사', type:'기타',  process:'판촉물', contact:'이흥원,김금숙',tel:'',             email:'fin@koreagift.com',          addr:'서울특별시 도봉구 도봉로191가길 8(도봉동)',                     bizno:'210-81-60114', memo:'판촉물'},
+    {id:'v34',name:'은창인재사',         type:'기타',  process:'봉투',   contact:'안병환',       tel:'032-886-3476',  email:'ak2337@naver.com',           addr:'인천광역시 미추홀구 경인로 77(숭의동, 1층)',                   bizno:'121-04-65555', memo:'봉투'},
+    {id:'v35',name:'주식회사삼원에스앤씨',type:'기타', process:'상장케이스',contact:'남기한 외 1명',tel:'031-952-3400',email:'samwonsnc@naver.com',       addr:'경기도 파주시 파주읍 술이홀로 17',                            bizno:'295-87-00894', memo:'상장케이스 싸바리'},
+    {id:'v36',name:'주성패키지',         type:'기타',  process:'수작업', contact:'조용배',       tel:'010-8273-2431', email:'cho7029@esero.go.kr',        addr:'경기도 고양시 일산동구 노첨길56번길 15(장항동)',                bizno:'130-23-19532', memo:'수작업'},
+    {id:'v37',name:'도토리',             type:'기타',  process:'쇼핑백', contact:'김은숙 외 1명',tel:'010-5793-8058', email:'dot52@daum.net',             addr:'경기도 부천시 원미구 부흥로296번길 19-17, 3층(중동)',           bizno:'127-70-04191', memo:'쇼핑백'},
+    {id:'v38',name:'엔터즈컴퍼니',       type:'기타',  process:'영상',   contact:'이사야',       tel:'010-2313-2802', email:'master@enterscompany.com',   addr:'경기도 고양시 덕양구 은빛로29번길 5-12, 1층 B동(화정동)',      bizno:'511-09-93055', memo:'영상'},
+    {id:'v39',name:'모티브로(MOTIVRO)',   type:'기타',  process:'웹',     contact:'김훈',         tel:'010-2630-6793', email:'motivro.official@gmail.com', addr:'서울특별시 마포구 동교로 139, 5층(서교동, 수영빌딩)',          bizno:'211-27-64300', memo:'웹'},
+    {id:'v40',name:'마인모리',            type:'기타',  process:'행사',   contact:'박훈',         tel:'010-8726-6899', email:'',                           addr:'서울특별시 강남구 학동로20길 66, 지하층(논현동)',               bizno:'211-10-13292', memo:'행사'},
+    {id:'v41',name:'경인칠판교구',        type:'기타',  process:'칠판',   contact:'김현기',       tel:'031-988-7874',  email:'khk6362@naver.com',          addr:'경기도 김포시 운양로97번길 83(운양동)',                        bizno:'139-10-82406', memo:'칠판'},
+    {id:'v42',name:'(주)부광포장',        type:'기타',  process:'박스원단',contact:'이창호',      tel:'031-553-1355',  email:'bukwang0211@hanmail.net',    addr:'경기도 남양주시 화도읍 북한강로 1441-13',                     bizno:'132-86-28987', memo:'박스원단'},
+    {id:'v43',name:'부용포장공업 주식회사',type:'기타', process:'박스원단',contact:'전통일',      tel:'010-7108-8915', email:'',                           addr:'인천광역시 남동구 고잔동 680-4 남동공단80블럭5로트',           bizno:'131-86-31946', memo:'박스원단'},
+    {id:'v44',name:'대원디자인포장산업주식회사',type:'기타',process:'박스원단',contact:'고은원', tel:'032-245-8111',  email:'daewondnp@naver.com',        addr:'인천광역시 서구 염곡로15번길 5-7(가좌동)',                     bizno:'140-81-91225', memo:'박스원단'},
+  ];
+  vendors=VI;
+  saveVendors();
+}
+try{boardPosts=JSON.parse(_store.get('sd7_board'))||[];}catch(e){}
+try{leaveRequests=JSON.parse(_store.get('sd7_leaves'))||[];}catch(e){}
+try{leaveBalances=JSON.parse(_store.get('sd7_lvbal'))||{};}catch(e){}
+try{currentUser=_store.get('sd7_curuser')||'';}catch(e){}
+try{adminPw=_store.get('sd7_admpw')||'0000';}catch(e){}
+
+var personF=[], catF='전체', workView='kanban', curTab='kanban';
+var calYear, calMonth, calSel;
+var editWorkId=null, nowAddStage=0, curCat='', formSubs=[];
+var boardFilter='전체', boardImageData='';
+var lvFilter='내신청', lvYear, lvMonth;
+
+function save(){try{_store.set('sd7_works',JSON.stringify(works));_store.set('sd7_del',JSON.stringify(delivery));}catch(e){}}
+function saveBoard(){try{_store.set('sd7_board',JSON.stringify(boardPosts));}catch(e){}}
+function saveLeaves(){try{_store.set('sd7_leaves',JSON.stringify(leaveRequests));_store.set('sd7_lvbal',JSON.stringify(leaveBalances));}catch(e){}}
+function saveVendors(){try{_store.set('sd7_vendors',JSON.stringify(vendors));}catch(e){}}
+function setCurrentUser(n){currentUser=n;try{_store.set('sd7_curuser',n);}catch(e){}}
+function uid(){return Date.now()+Math.random();}
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function pad(v){return v<10?'0'+v:''+v;}
+function addD(s,d){var dt=new Date(s);dt.setDate(dt.getDate()+d);return dt.toISOString().split('T')[0];}
+function fmtD(s){if(!s)return '';var d=new Date(s),w=['일','월','화','수','목','금','토'];return(d.getMonth()+1)+'/'+d.getDate()+'('+w[d.getDay()]+')';}
+function diff(s){if(!s)return null;return Math.ceil((new Date(s)-new Date(todayStr()))/(864e5));}
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function pc(nm){var i=MEMBERS.findIndex(function(m){return m.n===nm;});return 'pc'+((i<0?0:i)%8);}
+function catC(c){return CAT_COLOR[c]||'#9ca3af';}
+function catBg(c){return CAT_BG[c]||'#f3f4f6';}
+
+// 샘플 데이터
+if(!works){
+  var t=todayStr();
+  works=[
+    {id:uid(),cat:'인쇄',school:'',n:'특성화고 홍보 브로슈어 제작',p:'김철수',s:0,contact:'',tel:'',m:'1번 스쿨디 브로슈어 제작 완료 후 진행 예정',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'신검단초등학교',n:'엘리베이터 층별 안내 사인물',p:'김철수',s:0,contact:'',tel:'',m:'',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'마케팅 업체 리서치',p:'김철수',s:0,contact:'',tel:'',m:'학교장터 업로드 소개페이지 제작 진행예정',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'AI스터디 교육 구상',p:'김철수',s:1,contact:'',tel:'',m:'커리큘럼 제작중',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'스쿨디 홍보 브로슈어 제작',p:'김철수',s:2,contact:'',tel:'',m:'로고변경작업 + 표지디자인 작업 중',due:'',c:t,size:'A4',page:'8p',cover:'아트지 250g 무광',inner:'스노우 120g',finish:'무선제본',subs:[]},
+    {id:uid(),cat:'인쇄',school:'검단호수초등학교',n:'교표 제작',p:'김철수',s:2,contact:'교무부장',tel:'032-555-1234',m:'화요일 최종 시안 전달완료 / 오후 전화 예정',due:addD(t,2),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'행사',school:'신검단초등학교',n:'어린이날 행사',p:'김철수',s:1,contact:'행사담당',tel:'032-111-2222',m:'5월 5일 어린이날 행사 전체 진행',due:addD(t,7),c:t,size:'',page:'',cover:'',inner:'',finish:'',
+      subs:[{id:uid(),n:'포스터',s:2,done:false},{id:uid(),n:'초대장',s:0,done:false},{id:uid(),n:'자이언트배너',s:0,done:false},{id:uid(),n:'음향',s:1,done:false},{id:uid(),n:'포토월',s:0,done:false}]},
+    {id:uid(),cat:'인쇄',school:'콜롬비아',n:'수료증 30매',p:'김철수',s:3,contact:'',tel:'',m:'디자인 완료 및 동판제작 요청완료 / 내지 내부인쇄 예정',due:addD(t,5),c:t,size:'B5',page:'1p',cover:'',inner:'',finish:'동판',subs:[]},
+
+    // ── 디자인1팀 ──
+    {id:uid(),cat:'인쇄',school:'인천검단호수초등학교',n:'2026 학교요람 디자인',p:'김영애',s:2,contact:'박행복 교감',tel:'032-565-1234',m:'표지 시안 3안 전달, 내지 작업 진행중',due:addD(t,10),c:addD(t,-5),size:'A4',page:'48p',cover:'아트지 250g 무광',inner:'스노우 100g',finish:'무선제본',subs:[]},
+    {id:uid(),cat:'인쇄',school:'청라중학교',n:'졸업앨범 시안',p:'김영애',s:1,contact:'교무부장',tel:'032-577-1100',m:'클래스별 페이지 구성 협의중',due:addD(t,30),c:addD(t,-3),size:'A4',page:'120p',cover:'',inner:'',finish:'양장제본',subs:[]},
+    {id:uid(),cat:'사인물',school:'동춘초등학교',n:'본관 학교명 외부 사인',p:'김영애',s:2,contact:'행정실장',tel:'032-432-5566',m:'채널레터 제작 도면 확정, 시공 일정 조율',due:addD(t,14),c:addD(t,-7),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'1팀 디자인 가이드라인 정리',p:'김영애',s:0,contact:'',tel:'',m:'팀 내부 문서. 5월 중 완료 목표',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'간석초등학교',n:'학교 안내 리플렛',p:'김영애',s:3,contact:'김교사',tel:'032-422-3344',m:'납품 완료, 정산 대기',due:addD(t,-2),c:addD(t,-20),size:'A4',page:'4p',cover:'아트지 200g',inner:'',finish:'4단접지',subs:[]},
+    {id:uid(),cat:'인쇄',school:'서창중학교',n:'학교생활규정집',p:'김영애',s:1,contact:'생활부장',tel:'032-461-8899',m:'원고 수령, 편집 시작',due:addD(t,21),c:addD(t,-2),size:'A5',page:'64p',cover:'스노우 200g',inner:'모조 80g',finish:'중철제본',subs:[]},
+    {id:uid(),cat:'사인물',school:'인천검단호수초등학교',n:'도서관 안내 사인 세트',p:'김영애',s:2,contact:'박행복 교감',tel:'032-565-1234',m:'재질 시안 전달, 색상 컨펌 대기',due:addD(t,12),c:addD(t,-4),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    {id:uid(),cat:'인쇄',school:'부평여자중학교',n:'학교 소개 책자',p:'박재성',s:2,contact:'홍보담당',tel:'032-526-7700',m:'사진 촬영 완료, 본문 디자인 80%',due:addD(t,8),c:addD(t,-6),size:'A4',page:'32p',cover:'아트지 250g 유광',inner:'스노우 120g',finish:'무선제본',subs:[]},
+    {id:uid(),cat:'사인물',school:'논현고등학교',n:'급식실 메뉴판 시스템',p:'박재성',s:1,contact:'영양교사',tel:'032-466-2233',m:'주간 교체형 메뉴판 디자인 진행',due:addD(t,15),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'송도초등학교',n:'운동회 프로그램북',p:'박재성',s:0,contact:'체육부장',tel:'032-832-4400',m:'5월 중순 미팅 예정',due:addD(t,18),c:addD(t,-1),size:'A5',page:'16p',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'주안초등학교',n:'학부모 안내문 디자인',p:'박재성',s:3,contact:'',tel:'',m:'납품 완료',due:addD(t,-5),c:addD(t,-15),size:'A4',page:'2p',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'논현고등학교',n:'특별실 도어 사인',p:'박재성',s:2,contact:'행정실',tel:'032-466-2233',m:'아크릴 + 시트 작업, 부착 일정 협의',due:addD(t,9),c:addD(t,-4),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    {id:uid(),cat:'인쇄',school:'연수초등학교',n:'학교폭력 예방 교재',p:'김아연',s:1,contact:'생활지도부',tel:'032-822-1100',m:'시안 1차 전달',due:addD(t,20),c:addD(t,-2),size:'A4',page:'40p',cover:'아트지 200g',inner:'모조 100g',finish:'무선제본',subs:[]},
+    {id:uid(),cat:'사인물',school:'학익초등학교',n:'복도 환경 사인 30종',p:'김아연',s:2,contact:'교감',tel:'032-868-3300',m:'디자인 80% 완료, 재질 견적 진행',due:addD(t,11),c:addD(t,-5),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'스쿨디 SNS 카드뉴스 5종',p:'김아연',s:1,contact:'',tel:'',m:'주제별 시안 작업중',due:addD(t,4),c:t,size:'정사각',page:'5p',cover:'',inner:'',finish:'디지털',subs:[]},
+    {id:uid(),cat:'사인물',school:'서구청소년수련관',n:'외부 현수막 5종',p:'김아연',s:3,contact:'담당주임',tel:'032-560-5500',m:'납품 완료, 거치 확인',due:addD(t,-3),c:addD(t,-10),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'청학중학교',n:'동아리 활동 보고서',p:'김아연',s:0,contact:'',tel:'',m:'원고 수령 대기',due:'',c:t,size:'A4',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    {id:uid(),cat:'인쇄',school:'만수북초등학교',n:'2025 학교 신문 봄호',p:'이혜선',s:2,contact:'교사회',tel:'032-466-7788',m:'기사 편집 완료, 디자인 마무리',due:addD(t,6),c:addD(t,-8),size:'타블로이드',page:'8p',cover:'',inner:'신문지',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'간석여자고등학교',n:'진로진학 안내책자',p:'이혜선',s:1,contact:'진학상담부',tel:'032-422-9900',m:'대학 정보 자료 정리중',due:addD(t,25),c:addD(t,-2),size:'A4',page:'80p',cover:'아트지 250g 무광',inner:'',finish:'무선제본',subs:[]},
+    {id:uid(),cat:'사인물',school:'',n:'스쿨디 사무실 입구 사인',p:'이혜선',s:2,contact:'',tel:'',m:'내부 작업, 디자인 컨펌 대기',due:addD(t,7),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'동막초등학교',n:'졸업기념 문집',p:'이혜선',s:3,contact:'6학년부장',tel:'032-832-7766',m:'납품 완료',due:addD(t,-7),c:addD(t,-25),size:'B5',page:'150p',cover:'',inner:'',finish:'양장제본',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'명함 디자인 5종',p:'이혜선',s:1,contact:'',tel:'',m:'사내 직원 명함 갱신',due:addD(t,3),c:t,size:'90x50',page:'',cover:'스노우 250g',inner:'',finish:'양면',subs:[]},
+
+    {id:uid(),cat:'인쇄',school:'서창고등학교',n:'학교 안내 책자',p:'박진희',s:2,contact:'홍보부장',tel:'032-461-1199',m:'영문 버전 별도 작업 진행',due:addD(t,12),c:addD(t,-7),size:'A4',page:'24p',cover:'아트지 250g 유광',inner:'스노우 120g',finish:'중철제본',subs:[]},
+    {id:uid(),cat:'사인물',school:'송도풍림초등학교',n:'학년별 사물함 라벨',p:'박진희',s:1,contact:'행정실',tel:'032-832-2200',m:'학생 명단 수령 대기',due:addD(t,16),c:addD(t,-1),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'인천교육청',n:'2026년 교육계획서',p:'박진희',s:1,contact:'이담당 장학사',tel:'032-430-0000',m:'500부, 6월 납품 예정. 목차 확정',due:addD(t,40),c:addD(t,-2),size:'A4',page:'200p',cover:'아트지 300g',inner:'모조 100g',finish:'양장제본',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'분기 보고서 디자인',p:'박진희',s:0,contact:'',tel:'',m:'내부 분기 보고서, 자료 수령 대기',due:addD(t,22),c:t,size:'A4',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'서창고등학교',n:'운동장 안내 배너',p:'박진희',s:2,contact:'체육부장',tel:'032-461-1199',m:'시안 컨펌 완료, 출력 진행',due:addD(t,5),c:addD(t,-6),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    {id:uid(),cat:'인쇄',school:'옥련초등학교',n:'독서기록장 제작',p:'이미라',s:2,contact:'도서관담당',tel:'032-832-5577',m:'학년별 4종 디자인 진행',due:addD(t,9),c:addD(t,-5),size:'B5',page:'48p',cover:'아트지 200g',inner:'모조 80g',finish:'중철제본',subs:[]},
+    {id:uid(),cat:'인쇄',school:'논현초등학교',n:'학생 안전수칙 포스터',p:'이미라',s:3,contact:'',tel:'',m:'납품 완료',due:addD(t,-4),c:addD(t,-12),size:'B2',page:'',cover:'아트지 200g',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'당하초등학교',n:'중앙 현관 환영 사인',p:'이미라',s:1,contact:'교감',tel:'032-565-9988',m:'아크릴 + 메탈 컨셉, 시안 작업중',due:addD(t,17),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'스쿨디 카탈로그 갱신',p:'이미라',s:1,contact:'',tel:'',m:'2026 버전, 신규 사례 추가',due:addD(t,28),c:addD(t,-2),size:'A4',page:'32p',cover:'',inner:'',finish:'무선제본',subs:[]},
+
+    {id:uid(),cat:'인쇄',school:'마전중학교',n:'체험학습 안내 리플렛',p:'황선경',s:2,contact:'교무부',tel:'032-565-3322',m:'사진 보정 완료, 본문 작업',due:addD(t,5),c:addD(t,-4),size:'A4',page:'4p',cover:'',inner:'',finish:'3단접지',subs:[]},
+    {id:uid(),cat:'사인물',school:'당산초등학교',n:'급식실 안내판',p:'황선경',s:1,contact:'영양사',tel:'032-832-4411',m:'시안 작업중',due:addD(t,13),c:addD(t,-2),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'사내 환경 미화 인쇄물',p:'황선경',s:0,contact:'',tel:'',m:'사무실 분위기 개선용',due:addD(t,20),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    // ── 디자인2팀 ──
+    {id:uid(),cat:'행사',school:'인천검단호수초등학교',n:'개교 30주년 기념행사',p:'한도결',s:1,contact:'교장',tel:'032-565-1234',m:'전체 기획 진행, 6월 행사',due:addD(t,45),c:addD(t,-7),size:'',page:'',cover:'',inner:'',finish:'',
+      subs:[{id:uid(),n:'기념 책자',s:1,done:false},{id:uid(),n:'무대 백드롭',s:0,done:false},{id:uid(),n:'기념품',s:0,done:false},{id:uid(),n:'초청장',s:1,done:false},{id:uid(),n:'영상',s:0,done:false}]},
+    {id:uid(),cat:'행사',school:'서구청',n:'서구민 한마당',p:'한도결',s:2,contact:'문화진흥과',tel:'032-560-1100',m:'10월 행사, 디자인 시안 작업중',due:addD(t,150),c:addD(t,-10),size:'',page:'',cover:'',inner:'',finish:'',
+      subs:[{id:uid(),n:'포스터',s:2,done:false},{id:uid(),n:'현수막',s:1,done:false},{id:uid(),n:'프로그램북',s:0,done:false}]},
+    {id:uid(),cat:'인쇄',school:'',n:'2팀 작업 일정 정리',p:'한도결',s:0,contact:'',tel:'',m:'팀 내부 관리',due:'',c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'행사',school:'신검단초등학교',n:'학예회',p:'한도결',s:0,contact:'담당교사',tel:'032-574-5678',m:'11월 예정, 사전 미팅 필요',due:addD(t,180),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'부평초등학교',n:'졸업식 식순 책자',p:'한도결',s:3,contact:'교무부',tel:'032-526-2200',m:'납품 완료',due:addD(t,-30),c:addD(t,-50),size:'A5',page:'8p',cover:'',inner:'',finish:'중철제본',subs:[]},
+    {id:uid(),cat:'행사',school:'송도국제고등학교',n:'국제 교류 컨퍼런스',p:'한도결',s:2,contact:'국제교류부',tel:'032-832-9911',m:'영문 자료 포함, 9월 행사',due:addD(t,120),c:addD(t,-5),size:'',page:'',cover:'',inner:'',finish:'',
+      subs:[{id:uid(),n:'영문 프로그램',s:2,done:false},{id:uid(),n:'명찰',s:1,done:false},{id:uid(),n:'배너',s:0,done:false}]},
+    {id:uid(),cat:'사인물',school:'송도국제고등학교',n:'컨퍼런스 안내 사인',p:'한도결',s:1,contact:'국제교류부',tel:'032-832-9911',m:'동선 사인 디자인 작업중',due:addD(t,110),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    {id:uid(),cat:'행사',school:'논현초등학교',n:'운동회',p:'박은주',s:2,contact:'체육부',tel:'032-466-3344',m:'5월 말 행사. 자이언트배너 + 응원 도구',due:addD(t,20),c:addD(t,-7),size:'',page:'',cover:'',inner:'',finish:'',
+      subs:[{id:uid(),n:'자이언트배너',s:2,done:false},{id:uid(),n:'반별 깃발',s:1,done:false},{id:uid(),n:'점수판',s:0,done:false}]},
+    {id:uid(),cat:'인쇄',school:'간석초등학교',n:'학부모회 회보',p:'박은주',s:1,contact:'학부모회장',tel:'010-2233-4455',m:'월간 발행, 5월호 작업',due:addD(t,8),c:addD(t,-2),size:'A4',page:'8p',cover:'',inner:'모조 80g',finish:'중철제본',subs:[]},
+    {id:uid(),cat:'행사',school:'',n:'자체 워크숍',p:'박은주',s:0,contact:'',tel:'',m:'팀 분기 워크숍 기획',due:addD(t,35),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'간석여자고등학교',n:'동아리실 명패',p:'박은주',s:2,contact:'학생부',tel:'032-422-9900',m:'15개 동아리, 디자인 진행',due:addD(t,11),c:addD(t,-4),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'주안남초등학교',n:'학교 연감',p:'박은주',s:1,contact:'교무부장',tel:'032-422-5566',m:'사진 정리중',due:addD(t,32),c:addD(t,-3),size:'A4',page:'60p',cover:'아트지 250g 무광',inner:'',finish:'무선제본',subs:[]},
+
+    {id:uid(),cat:'행사',school:'서창중학교',n:'체육대회',p:'권성순',s:1,contact:'체육교사',tel:'032-461-8899',m:'6월 행사 준비',due:addD(t,40),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',
+      subs:[{id:uid(),n:'배너',s:1,done:false},{id:uid(),n:'시상지',s:0,done:false}]},
+    {id:uid(),cat:'인쇄',school:'옥련여자고등학교',n:'문학동아리 작품집',p:'권성순',s:2,contact:'국어과',tel:'032-832-1199',m:'편집 마무리 단계',due:addD(t,7),c:addD(t,-9),size:'A5',page:'80p',cover:'스노우 250g',inner:'모조 80g',finish:'무선제본',subs:[]},
+    {id:uid(),cat:'사인물',school:'마전초등학교',n:'학년 표시 사인',p:'권성순',s:0,contact:'',tel:'',m:'예산 협의 단계',due:addD(t,30),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'행사',school:'',n:'스쿨디 창립기념일',p:'권성순',s:0,contact:'',tel:'',m:'사내 행사 기획',due:addD(t,60),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    // ── 생산팀 ──
+    {id:uid(),cat:'사인물',school:'인천검단호수초등학교',n:'채널레터 시공 관리',p:'김일환',s:2,contact:'박행복 교감',tel:'032-565-1234',m:'시공 일정 조율, 안전 확인 필요',due:addD(t,14),c:addD(t,-5),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'논현고등학교',n:'아크릴 도어사인 30종 제작',p:'김일환',s:2,contact:'행정실',tel:'032-466-2233',m:'레이저 가공 완료, 후가공 진행',due:addD(t,9),c:addD(t,-4),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'외주 인쇄소 단가표 갱신',p:'김일환',s:1,contact:'',tel:'',m:'5개 업체 비교 진행',due:addD(t,10),c:addD(t,-2),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'송도풍림초등학교',n:'사물함 라벨 출력/부착',p:'김일환',s:1,contact:'행정실',tel:'032-832-2200',m:'디자인 수령 대기',due:addD(t,16),c:addD(t,-1),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'콜롬비아',n:'동판 제작 발주',p:'김일환',s:2,contact:'',tel:'',m:'동판 제작 진행중, 인쇄 대기',due:addD(t,3),c:addD(t,-2),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'사인물',school:'',n:'생산 장비 점검',p:'김일환',s:0,contact:'',tel:'',m:'분기 점검, 5월 셋째주 예정',due:addD(t,18),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    // ── 인테리어사업부 ──
+    {id:uid(),cat:'인테리어',school:'인천검단호수초등학교',n:'도서관 리모델링',p:'최주혜',s:2,contact:'박행복 교감',tel:'032-565-1234',m:'예산 500만원, 3D 시안 2차 전달. 가구 견적 진행',due:addD(t,30),c:addD(t,-12),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'동춘초등학교',n:'본관 1층 라운지',p:'최주혜',s:1,contact:'행정실장',tel:'032-432-5566',m:'현장 실측 완료, 컨셉 시안 작업',due:addD(t,50),c:addD(t,-5),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'간석여자고등학교',n:'진로진학실 환경 개선',p:'최주혜',s:1,contact:'진학부장',tel:'032-422-9900',m:'현장 미팅 완료',due:addD(t,40),c:addD(t,-7),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'송도초등학교',n:'유휴교실 → 메이커스페이스',p:'최주혜',s:2,contact:'정보부장',tel:'032-832-4400',m:'기본 설계 완료, 가구/장비 리스트 작성중',due:addD(t,60),c:addD(t,-15),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'',n:'사업부 분기 영업 보고',p:'최주혜',s:0,contact:'',tel:'',m:'2분기 실적 정리',due:addD(t,25),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'당하초등학교',n:'급식실 인테리어',p:'최주혜',s:0,contact:'영양사',tel:'032-565-9988',m:'견적 의뢰 단계',due:addD(t,70),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'서창고등학교',n:'교실 환경 개선 시범사업',p:'최주혜',s:3,contact:'시설담당',tel:'032-461-1199',m:'시공 완료, 만족도 조사 진행',due:addD(t,-10),c:addD(t,-60),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    {id:uid(),cat:'인테리어',school:'인천검단호수초등학교',n:'도서관 가구 견적/발주',p:'장보람',s:2,contact:'박행복 교감',tel:'032-565-1234',m:'3개 업체 견적 비교, 1차 후보 선정',due:addD(t,14),c:addD(t,-8),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'송도초등학교',n:'메이커스페이스 가구 리스트',p:'장보람',s:2,contact:'정보부장',tel:'032-832-4400',m:'장비별 단가표 작성중',due:addD(t,18),c:addD(t,-6),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'동춘초등학교',n:'라운지 시공 일정 조율',p:'장보람',s:1,contact:'행정실장',tel:'032-432-5566',m:'협력업체 일정 확인중',due:addD(t,28),c:addD(t,-2),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'',n:'협력업체 단가 정리',p:'장보람',s:1,contact:'',tel:'',m:'분기 단가 갱신',due:addD(t,12),c:addD(t,-1),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    {id:uid(),cat:'인테리어',school:'간석여자고등학교',n:'현장 실측/촬영',p:'김은주',s:2,contact:'진학부장',tel:'032-422-9900',m:'실측 완료, 도면 정리중',due:addD(t,7),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'',n:'납품 자재 검수',p:'김은주',s:1,contact:'',tel:'',m:'주간 입고 자재 확인',due:addD(t,2),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인테리어',school:'당하초등학교',n:'견적용 자료 정리',p:'김은주',s:0,contact:'',tel:'',m:'급식실 견적 자료 준비',due:addD(t,5),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    // ── 경영관리팀 ──
+    {id:uid(),cat:'인쇄',school:'인천교육청',n:'2026년 교육계획서 영업관리',p:'이다솔',s:1,contact:'이담당 장학사',tel:'032-430-0000',m:'500부, 계약서 검토중',due:addD(t,42),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'4월 정산 마감',p:'이다솔',s:2,contact:'',tel:'',m:'세금계산서 발행 진행',due:addD(t,3),c:addD(t,-5),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'전사 회의 자료 준비',p:'이다솔',s:1,contact:'',tel:'',m:'월간 전사 회의 5월 둘째주',due:addD(t,9),c:t,size:'A4',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'2분기 사업계획 정리',p:'이다솔',s:0,contact:'',tel:'',m:'팀별 취합 예정',due:addD(t,15),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'직원 채용 공고',p:'이다솔',s:1,contact:'',tel:'',m:'디자인1팀 충원, 공고문 작성중',due:addD(t,5),c:addD(t,-1),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'사무실 비품 발주',p:'이다솔',s:3,contact:'',tel:'',m:'완료',due:addD(t,-2),c:addD(t,-8),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+
+    {id:uid(),cat:'인쇄',school:'',n:'급여 명세서 발송',p:'이미금',s:1,contact:'',tel:'',m:'5월 25일 발송 예정',due:addD(t,21),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'세금계산서 정리',p:'이미금',s:2,contact:'',tel:'',m:'4월분 정리 진행',due:addD(t,4),c:addD(t,-3),size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+    {id:uid(),cat:'인쇄',school:'',n:'직원 경조사 관리',p:'이미금',s:1,contact:'',tel:'',m:'월간 정리',due:addD(t,8),c:t,size:'',page:'',cover:'',inner:'',finish:'',subs:[]},
+  ];
+  save();
+}
+
+// ══ 초기화 ══
+(function(){
+  var now=new Date(); calYear=now.getFullYear(); calMonth=now.getMonth(); calSel=todayStr();
+  buildWfp(); buildDfp();
+  // 로그인 화면 먼저 (enterApp에서 나머지 초기화)
+  initLogin();
+})();
+
+function renderAll(){
+  if(!currentUser) return; // 로그인 전에는 렌더 안함
+  renderKanban();renderList();renderCal();renderDash();renderNotice();updateCnts();initCurrentUser();renderBoard();updateBoardDot();
+}
+
+// ── select 빌드 ──
+function buildWfp(){
+  var s=document.getElementById('wf-p'); if(!s)return; s.innerHTML='';
+  MEMBERS.forEach(function(m){var o=document.createElement('option');o.value=m.n;o.textContent=m.n+' ('+m.r+')';s.appendChild(o);});
+}
+function buildDfp(){
+  var s=document.getElementById('df-p'); if(!s)return; s.innerHTML='';
+  D_PERSONS.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;s.appendChild(o);});
+}
+
+// ── 아바타 바 빌드 ──
+function pfIsAll(){ return personF.length===0; }
+function pfHas(name){ return personF.indexOf(name)!==-1; }
+function pfTogglePerson(name){
+  var idx=personF.indexOf(name);
+  if(idx===-1){
+    // 미선택 → 추가
+    personF.push(name);
+  } else {
+    // 이미 선택됨 → 전체 해제 (선택 초기화)
+    personF=[];
+  }
+  buildPfBar(); renderKanban(); renderList();
+}
+function pfToggleTeam(teamMembers){
+  var allOn = teamMembers.every(function(m){ return pfHas(m.n); });
+  if(allOn){ teamMembers.forEach(function(m){ var i=personF.indexOf(m.n); if(i!==-1)personF.splice(i,1); }); }
+  else { teamMembers.forEach(function(m){ if(!pfHas(m.n))personF.push(m.n); }); }
+  buildPfBar(); renderKanban(); renderList();
+}
+
+function buildPfBar(){
+  var bar=document.getElementById('pf-bar'); if(!bar)return;
+  bar.innerHTML='';
+
+  // 전체 버튼
+  var allBtn=document.createElement('button');
+  allBtn.className='pf-all'+(pfIsAll()?' on':'');
+  allBtn.innerHTML='<div class="pf-all-circle">전</div><div class="pf-all-label">전체</div>';
+  allBtn.onclick=function(){ personF=[]; buildPfBar(); renderKanban(); renderList(); };
+  bar.appendChild(allBtn);
+
+  var tmap={};
+  MEMBERS.forEach(function(m){ if(!tmap[m.t])tmap[m.t]=[]; tmap[m.t].push(m); });
+
+  TEAMS.forEach(function(t,ti){
+    if(!tmap[t])return;
+    var tc=TCOLORS[ti]||'#6b7280';
+    var members=tmap[t];
+    var allTeamOn=members.every(function(m){ return pfHas(m.n); });
+    var someTeamOn=members.some(function(m){ return pfHas(m.n); });
+
+    // 구분선
+    var divEl=document.createElement('div'); divEl.className='pf-div'; bar.appendChild(divEl);
+
+    // 팀 그룹 컨테이너
+    var grp=document.createElement('div');
+    grp.style.cssText='display:flex;align-items:center;gap:3px;flex-shrink:0;position:relative';
+
+    // 팀 네모 뱃지 (좌상단 위치, 클릭시 팀 전체 선택)
+    var shortTeam=t.replace('경영관리팀','경영관').replace('디자인1팀','D1팀').replace('디자인2팀','D2팀').replace('디자인개발팀','개발팀').replace('인테리어사업부','인테리').replace('생산팀','생산').replace('경영','경영');
+    var teamTag=document.createElement('button');
+    teamTag.title=t+' 전체 '+(allTeamOn?'해제':'선택');
+    teamTag.style.cssText=
+      'border:none;font-family:inherit;cursor:pointer;flex-shrink:0;'+
+      'padding:3px 6px;border-radius:5px;font-size:9px;font-weight:700;'+
+      'background:'+(allTeamOn?tc:someTeamOn?tc+'33':tc+'18')+';'+
+      'color:'+(allTeamOn?'#fff':tc)+';'+
+      'border:1.5px solid '+(allTeamOn?tc:someTeamOn?tc+'88':tc+'44')+';'+
+      'align-self:flex-start;margin-top:4px;line-height:1.3;transition:all .15s';
+    teamTag.textContent=shortTeam;
+    teamTag.onclick=(function(mems){ return function(){ pfToggleTeam(mems); }; })(members);
+    grp.appendChild(teamTag);
+
+    // 개인 아바타들
+    members.forEach(function(m){
+      var isOn=pfHas(m.n);
+      var btn=document.createElement('button');
+      btn.className='pf-av-btn'+(isOn?' on':'');
+      btn.title=m.n+' ('+m.r+')';
+      btn.innerHTML='<div class="pf-av-circle" style="background:'+(isOn?tc+'cc':tc+'22')+';color:'+(isOn?'#fff':tc)+';font-size:10px;letter-spacing:-0.5px">'+m.n+'</div>';
+      btn.onclick=(function(name){ return function(){ pfTogglePerson(name); }; })(m.n);
+      grp.appendChild(btn);
+    });
+
+    bar.appendChild(grp);
+  });
+}
+
+// ── 분류 사이드바 ──
+function selCat(el){
+  catF=el.dataset.c;
+  document.querySelectorAll('.csb').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  renderKanban(); renderList(); updateCnts();
+}
+function updateCnts(){
+  if(!works)return;
+  var ccAll=document.getElementById('cc-전체'); if(!ccAll)return;
+  ccAll.textContent=works.length;
+  ['인쇄','인테리어','사인물','행사'].forEach(function(c){
+    var el=document.getElementById('cc-'+c); if(!el)return;
+    el.textContent=works.filter(function(w){return w.cat===c;}).length;
+  });
+}
+
+// ── 칸반 ──
+function getF(){
+  if(!works)return [];
+  return works.filter(function(w){
+    if(personF.length>0 && personF.indexOf(w.p)===-1)return false;
+    if(catF!=='전체'&&w.cat!==catF)return false;
+    return true;
+  });
+}
+
+function renderKanban(){
+  var board=document.getElementById('kanban-board'); if(!board)return; board.innerHTML='';
+  var f=getF();
+  KANBAN_COLS.forEach(function(col){
+    var all=f.filter(function(w){ return col.stages.indexOf(w.s)!==-1; });
+    var colEl=document.createElement('div'); colEl.className='kb-col';
+    // 제작중 컬럼은 특별 헤더 (세부단계 카운트 표시)
+    var cntHtml='<span class="kb-cnt">'+all.length+'</span>';
+    if(col.stages.length>1){
+      var subCnts=col.stages.map(function(si){
+        var n=f.filter(function(w){return w.s===si;}).length;
+        return n?'<span style="font-size:9px;padding:1px 5px;border-radius:8px;background:'+SDOTS[si]+'22;color:'+SDOTS[si]+';font-weight:600">'+MFG_LABELS[si]+' '+n+'</span>':'';
+      }).join('');
+      cntHtml='<div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap">'+subCnts+'</div><span class="kb-cnt">'+all.length+'</span>';
+    }
+    colEl.innerHTML='<div class="kb-head"><div class="kb-dot" style="background:'+col.dot+'"></div><span class="kb-title">'+col.label+'</span>'+cntHtml+'</div>';
+    var body=document.createElement('div'); body.className='kb-body';
+    if(catF==='전체'){
+      var any=false;
+      CAT_LIST.forEach(function(cat){
+        var cc=all.filter(function(w){return w.cat===cat.k;});
+        if(!cc.length)return;
+        var grp=document.createElement('div'); grp.className='cat-grp';
+        grp.innerHTML='<span class="cat-grp-label" style="color:'+cat.c+'">'+cat.i+' '+cat.k+'</span><div class="cat-grp-line" style="background:'+cat.c+'"></div>';
+        body.appendChild(grp);
+        cc.forEach(function(w){body.appendChild(mkCard(w));});
+        any=true;
+      });
+      var nc=all.filter(function(w){return !w.cat;});
+      if(nc.length){if(any){var g2=document.createElement('div');g2.className='cat-grp';g2.innerHTML='<span class="cat-grp-label" style="color:#9ca3af">기타</span><div class="cat-grp-line" style="background:#9ca3af"></div>';body.appendChild(g2);}nc.forEach(function(w){body.appendChild(mkCard(w));});any=true;}
+      if(!any){var em=document.createElement('div');em.style='font-size:11px;color:#c0bfbb;text-align:center;padding:14px 0';em.textContent='없음';body.appendChild(em);}
+    } else {
+      if(!all.length){var em=document.createElement('div');em.style='font-size:11px;color:#c0bfbb;text-align:center;padding:14px 0';em.textContent='없음';body.appendChild(em);}
+      all.forEach(function(w){body.appendChild(mkCard(w));});
+    }
+    colEl.appendChild(body);
+    // + 새 항목: 제작중 그룹은 첫 세부단계(발주)로, 나머지는 해당 단계로
+    var ab=document.createElement('button'); ab.className='kb-add'; ab.textContent='+ 새 항목';
+    ab.onclick=(function(s){return function(){openAddWork(s);};})(col.stages[0]);
+    colEl.appendChild(ab);
+    board.appendChild(colEl);
+  });
+}
+
+function mkCard(w){
+  var card=document.createElement('div'); card.className='kb-card';
+  var d=diff(w.due);
+  var dueHtml='';
+  if(w.due){
+    var bg=d<0?'#fee2e2':d<=2?'#fef3c7':'#d1fae5', tc=d<0?'#991b1b':d<=2?'#b45309':'#065f46';
+    var dl=d<0?'D+'+Math.abs(d)+' 지연':d===0?'오늘':d===1?'내일':'D-'+d;
+    dueHtml='<span class="kb-due" style="background:'+bg+';color:'+tc+'">📅 '+fmtD(w.due)+' '+dl+'</span>';
+  } else dueHtml='<span class="kb-due" style="background:#fef3c7;color:#b45309">배송일 미지정</span>';
+  var subsHtml='';
+  if(w.cat==='행사'&&w.subs&&w.subs.length){
+    subsHtml='<div class="kb-subitems">';
+    w.subs.forEach(function(s){subsHtml+='<span class="kb-sub-chip'+(s.done?' done':'')+'">'+esc(s.n)+'</span>';});
+    subsHtml+='</div>';
+  }
+  // 제작중 세부단계 뱃지
+  var mfgBadge='';
+  if(MFG_LABELS[w.s]){
+    mfgBadge='<span style="display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:'+SDOTS[w.s]+'22;color:'+SDOTS[w.s]+';margin-bottom:4px;border:1px solid '+SDOTS[w.s]+'44">🔧 '+MFG_LABELS[w.s]+'</span>';
+  }
+  // 협력업체 표시
+  var vendorBadge='';
+  if(w.vendor){ vendorBadge='<span style="font-size:10px;color:var(--sub)">🏭 '+esc(w.vendor)+'</span>'; }
+  card.innerHTML='<div class="kb-catbar" style="background:'+catC(w.cat)+'"></div>'
+    +(w.school?'<div class="kb-school">🏫 '+esc(w.school)+'</div>':'')
+    +'<div class="kb-name">'+esc(w.n)+'</div>'
+    +(mfgBadge?'<div>'+mfgBadge+(vendorBadge?' '+vendorBadge:'')+'</div>':'')
+    +subsHtml
+    +(w.m?'<div class="kb-memo">'+esc(w.m)+'</div>':'')
+    +'<div class="kb-foot"><span class="kb-owner '+pc(w.p)+'">'+esc(w.p)+'</span>'+dueHtml+'</div>';
+  card.onclick=(function(wid,isMfg){return function(){if(isMfg)openMfg(wid);else openEditWork(wid);};})(w.id, MFG_LABELS[w.s]!==undefined); return card;
+}
+
+// ── 목록 뷰 ──
+function renderList(){
+  var f=getF(); f.sort(function(a,b){return a.s-b.s;});
+  var body=document.getElementById('list-body'); if(!body)return;
+  if(!f.length){body.innerHTML='<div class="empty">작업이 없습니다.</div>';return;}
+  body.innerHTML='';
+  f.forEach(function(w){
+    var stOpts=STAGES.map(function(s,si){return'<option value="'+si+'"'+(si===w.s?' selected':'')+'>'+s+'</option>';}).join('');
+    var d=diff(w.due), dC=d<0?'#ef4444':d<=2?'#f59e0b':'#10b981';
+    var dL=w.due?(d<0?'⚠ D+'+Math.abs(d)+' 지연':d===0?'🔴 오늘':d===1?'🟡 내일':'D-'+d):'';
+    var subsHtml='';
+    if(w.cat==='행사'&&w.subs&&w.subs.length){subsHtml='<div class="lv-subitems">';w.subs.forEach(function(s){subsHtml+='<span class="kb-sub-chip'+(s.done?' done':'')+'">'+esc(s.n)+'</span>';});subsHtml+='</div>';}
+    var item=document.createElement('div'); item.className='lv-item';
+    item.innerHTML='<div class="lv-bar" style="background:'+catC(w.cat)+'"></div>'
+      +'<div class="lv-body">'
+        +(w.school?'<div class="lv-school">🏫 '+esc(w.school)+'</div>':'')
+        +'<div class="lv-top"><span class="st-chip '+SCLS[w.s]+'">'+STAGES[w.s]+'</span>'
+          +(w.cat?'<span class="cat-badge cb-'+w.cat+'">'+w.cat+'</span>':'')
+          +(w.due?'<span style="font-size:10px;color:'+dC+';font-weight:500">📅 '+fmtD(w.due)+' '+dL+'</span>'
+            :'<span style="font-size:9px;background:#fef3c7;color:#b45309;padding:2px 7px;border-radius:8px;font-weight:500">배송일 미지정</span>')+'</div>'
+        +'<div class="lv-name">'+esc(w.n)+'</div>'
+        +subsHtml
+        +(w.m?'<div class="lv-memo">'+esc(w.m)+'</div>':'')
+        +'<div class="lv-meta"><span class="kb-owner '+pc(w.p)+'">'+esc(w.p)+'</span>'
+          +(w.contact?'<span style="font-size:10px;color:var(--sub)">👤 '+esc(w.contact)+'</span>':'')
+          +(w.tel?'<span style="font-size:10px;color:var(--sub)">📞 '+esc(w.tel)+'</span>':'')+'</div>'
+      +'</div>'
+      +'<div class="lv-right"><select class="st-sel" onchange="chgSt('+w.id+',this.value)">'+stOpts+'</select>'
+        +'<div class="act-row"><button class="btn btn-outline btn-sm" onclick="openEditWork('+w.id+')">사양서</button>'
+        +'<button class="btn btn-danger btn-sm" onclick="delWork('+w.id+')">삭제</button></div></div>';
+    body.appendChild(item);
+  });
+}
+
+function setWV(v,el){
+  workView=v;
+  document.querySelectorAll('.tv').forEach(function(b){b.classList.remove('on');});el.classList.add('on');
+  document.getElementById('kanban-board').style.display=v==='kanban'?'flex':'none';
+  document.getElementById('list-body').style.display=v==='list'?'block':'none';
+}
+function chgSt(id,v){var w=works.find(function(x){return x.id===id;});if(w){w.s=parseInt(v);save();renderKanban();renderList();renderDash();}}
+
+// ── 제작사양서 ──
+function pickCat(el){
+  curCat=el.dataset.cat||'';
+  document.querySelectorAll('.cat-opt').forEach(function(o){o.className='cat-opt';});
+  if(curCat) el.classList.add('sel-'+curCat);
+  document.getElementById('sec-sub').style.display=curCat==='행사'?'block':'none';
+}
+
+function openAddWork(si){
+  editWorkId=null; nowAddStage=si||0;
+  document.getElementById('mw-title').textContent='제작사양서 — 새 작업';
+  document.getElementById('mw-btn').textContent='추가하기';
+  document.getElementById('mw-del').style.display='none';
+  ['wf-school','wf-n','wf-contact','wf-tel','wf-m','wf-due','wf-meet','wf-install','wf-size','wf-page','wf-cover','wf-inner','wf-finish','wf-vendor-custom'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('wf-s').value=nowAddStage;
+  document.querySelectorAll('.cat-opt').forEach(function(o){o.className='cat-opt';});
+  curCat=''; formSubs=[]; renderSubs();
+  document.getElementById('sec-sub').style.display='none';
+  buildVendorSelect('');
+  openModal('modal-work');
+}
+
+function openEditWork(id){
+  var w=works.find(function(x){return x.id===id;}); if(!w)return;
+  editWorkId=id;
+  document.getElementById('mw-title').textContent='제작사양서 — '+esc(w.n);
+  document.getElementById('mw-btn').textContent='저장';
+  document.getElementById('mw-del').style.display='';
+  document.getElementById('wf-school').value=w.school||'';
+  document.getElementById('wf-n').value=w.n||'';
+  document.getElementById('wf-contact').value=w.contact||'';
+  document.getElementById('wf-tel').value=w.tel||'';
+  document.getElementById('wf-m').value=w.m||'';
+  document.getElementById('wf-due').value=w.due||'';
+  document.getElementById('wf-meet').value=w.meet||'';
+  document.getElementById('wf-install').value=w.install||'';
+  document.getElementById('wf-size').value=w.size||'';
+  document.getElementById('wf-page').value=w.page||'';
+  document.getElementById('wf-cover').value=w.cover||'';
+  document.getElementById('wf-inner').value=w.inner||'';
+  document.getElementById('wf-finish').value=w.finish||'';
+  document.getElementById('wf-s').value=w.s;
+  var sp=document.getElementById('wf-p');
+  for(var i=0;i<sp.options.length;i++){if(sp.options[i].value===w.p){sp.selectedIndex=i;break;}}
+  curCat=w.cat||'';
+  document.querySelectorAll('.cat-opt').forEach(function(o){
+    o.className='cat-opt';
+    if(curCat&&o.dataset.cat===curCat) o.classList.add('sel-'+curCat);
+  });
+  formSubs=JSON.parse(JSON.stringify(w.subs||[]));
+  document.getElementById('sec-sub').style.display=curCat==='행사'?'block':'none';
+  renderSubs();
+  buildVendorSelect(w.vendor||'');
+  openModal('modal-work');
+}
+
+function saveWork(){
+  var nm=document.getElementById('wf-n').value.trim();
+  if(!nm){alert('작업명을 입력하세요.');return;}
+  var data={n:nm,cat:curCat,school:document.getElementById('wf-school').value.trim(),
+    p:document.getElementById('wf-p').value,s:parseInt(document.getElementById('wf-s').value),
+    due:document.getElementById('wf-due').value,
+    meet:document.getElementById('wf-meet').value,
+    install:document.getElementById('wf-install').value,
+    contact:document.getElementById('wf-contact').value.trim(),tel:document.getElementById('wf-tel').value.trim(),
+    m:document.getElementById('wf-m').value.trim(),
+    size:document.getElementById('wf-size').value.trim(),page:document.getElementById('wf-page').value.trim(),
+    cover:document.getElementById('wf-cover').value.trim(),inner:document.getElementById('wf-inner').value.trim(),
+    finish:document.getElementById('wf-finish').value.trim(),
+    vendor:(document.getElementById('wf-vendor-custom').value.trim()||document.getElementById('wf-vendor').value||''),
+    subs:JSON.parse(JSON.stringify(formSubs))};
+
+  // ── 신규 등록 시 중복 체크 ──
+  if(!editWorkId){
+    var dups=works.filter(function(w){
+      // 같은 담당자 + (같은 학교 OR 같은 작업명)
+      var sameP = w.p === data.p;
+      var sameSchool = data.school && w.school && w.school===data.school;
+      var sameName = w.n && nm && w.n.replace(/\s/g,'')===nm.replace(/\s/g,'');
+      return sameP && (sameSchool || sameName);
+    });
+    if(dups.length>0){
+      var dupInfo=dups.map(function(w){
+        return '• ['+STAGES[w.s]+'] '+w.n+(w.school?' ('+w.school+')':'');
+      }).join('\n');
+      var go=confirm('⚠️ 유사한 작업이 이미 있습니다!\n\n'+dupInfo+'\n\n그래도 추가하시겠습니까?');
+      if(!go)return;
+    }
+  }
+
+  // 배송일이 과거이고, 현재 상태가 배송완료(5)/서류처리완료(6) 미만이면 자동 이동 제안
+  // STAGES = ['작업접수(0)','톡방개설(1)','디자인초안(2)','디자인수정중(3)','제작완료(4)','배송완료(5)','서류처리완료(6)']
+  if(data.due && data.s < 5){
+    var dueDays = diff(data.due);
+    if(dueDays !== null && dueDays < 0){
+      var msg = '배송 예정일('+fmtD(data.due)+')이 '+(-dueDays)+'일 지났습니다.\n\n현재 단계: '+STAGES[data.s]+'\n\n[배송완료] 단계로 이동하시겠습니까?';
+      if(confirm(msg)){ data.s = 5; }
+    }
+  }
+
+  if(editWorkId){var w=works.find(function(x){return x.id===editWorkId;});if(w)Object.assign(w,data);}
+  else{works.unshift(Object.assign({id:uid(),c:todayStr()},data));}
+  save();closeModal('modal-work');renderAll();
+}
+function delWorkCur(){if(!confirm('삭제할까요?'))return;works=works.filter(function(x){return x.id!==editWorkId;});save();closeModal('modal-work');renderAll();}
+function delWork(id){if(!confirm('삭제할까요?'))return;works=works.filter(function(x){return x.id!==id;});save();renderKanban();renderList();renderDash();}
+
+// ── 하위품목 ──
+function renderSubs(){
+  var list=document.getElementById('sub-list'); list.innerHTML='';
+  formSubs.forEach(function(it,idx){
+    var stOpts=STAGES.map(function(s,si){return'<option value="'+si+'"'+(si===it.s?' selected':'')+'>'+s+'</option>';}).join('');
+    var row=document.createElement('div'); row.className='sub-row';
+    var chk=document.createElement('div'); chk.className='sub-chk'+(it.done?' on':'');
+    if(it.done)chk.innerHTML='<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    chk.onclick=(function(i){return function(){formSubs[i].done=!formSubs[i].done;renderSubs();};})(idx);
+    var nm=document.createElement('span'); nm.className='sub-nm'; nm.textContent=it.n;
+    var st=document.createElement('select'); st.className='sub-st'; st.innerHTML=stOpts;
+    st.onchange=(function(i){return function(){formSubs[i].s=parseInt(this.value);};})(idx);
+    // 📄 사양 버튼
+    var hasSpc=it.size||it.page||it.cover||it.inner||it.finish||it.qty||it.memo;
+    var doc=document.createElement('button'); doc.className='sub-doc'+(hasSpc?' filled':'');
+    doc.title='제작 사양 입력'; doc.textContent='📄';
+    doc.onclick=(function(i){return function(e){e.stopPropagation();openSubSpec(i);};})(idx);
+    var del=document.createElement('button'); del.className='sub-del'; del.textContent='×';
+    del.onclick=(function(i){return function(){formSubs.splice(i,1);renderSubs();};})(idx);
+    row.appendChild(chk); row.appendChild(nm); row.appendChild(st); row.appendChild(doc); row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+function addQ(name){if(formSubs.find(function(i){return i.n===name;}))return;formSubs.push({id:uid(),n:name,s:0,done:false,size:'',page:'',cover:'',inner:'',finish:'',qty:'',memo:''});renderSubs();}
+function addSubInp(){var inp=document.getElementById('sub-inp');var v=inp.value.trim();if(!v)return;formSubs.push({id:uid(),n:v,s:0,done:false,size:'',page:'',cover:'',inner:'',finish:'',qty:'',memo:''});inp.value='';renderSubs();}
+
+// ── 품목 사양 팝업 ──
+var curSubIdx=-1;
+function openSubSpec(idx){
+  curSubIdx=idx;
+  var it=formSubs[idx];
+  document.getElementById('sub-spec-title').textContent='📄 '+it.n+' 사양';
+  document.getElementById('ss-qty').value=it.qty||'';
+  document.getElementById('ss-size').value=it.size||'';
+  document.getElementById('ss-page').value=it.page||'';
+  document.getElementById('ss-cover').value=it.cover||'';
+  document.getElementById('ss-inner').value=it.inner||'';
+  document.getElementById('ss-finish').value=it.finish||'';
+  document.getElementById('ss-memo').value=it.memo||'';
+  document.getElementById('sub-spec-bg').classList.add('on');
+}
+function closeSubSpec(){
+  document.getElementById('sub-spec-bg').classList.remove('on');
+  curSubIdx=-1;
+}
+function saveSubSpec(){
+  if(curSubIdx<0)return;
+  var it=formSubs[curSubIdx];
+  it.qty=document.getElementById('ss-qty').value.trim();
+  it.size=document.getElementById('ss-size').value.trim();
+  it.page=document.getElementById('ss-page').value.trim();
+  it.cover=document.getElementById('ss-cover').value.trim();
+  it.inner=document.getElementById('ss-inner').value.trim();
+  it.finish=document.getElementById('ss-finish').value.trim();
+  it.memo=document.getElementById('ss-memo').value.trim();
+  closeSubSpec();
+  renderSubs(); // 사양 입력 시 아이콘 색상 변경 반영
+}
+
+// ── 캘린더 ──
+function renderCal(){
+  document.getElementById('cal-title').textContent=calYear+'년 '+(calMonth+1)+'월';
+  var hdrs=document.getElementById('cal-hdrs'); hdrs.innerHTML='';
+  ['일','월','화','수','목','금','토'].forEach(function(d,i){var el=document.createElement('div');el.className='cal-dh';el.textContent=d;if(i===0)el.style.color='#ef4444';if(i===6)el.style.color='#3b82f6';hdrs.appendChild(el);});
+  var first=new Date(calYear,calMonth,1), last=new Date(calYear,calMonth+1,0);
+  var cells=document.getElementById('cal-cells'); cells.innerHTML='';
+  var today=todayStr();
+  for(var i=0;i<first.getDay();i++){var el=document.createElement('div');el.className='cal-cell other';var pl=new Date(calYear,calMonth,0);el.innerHTML='<div class="cal-num">'+(pl.getDate()-first.getDay()+1+i)+'</div>';cells.appendChild(el);}
+  for(var d=1;d<=last.getDate();d++){
+    var ds=calYear+'-'+pad(calMonth+1)+'-'+pad(d);
+    var dow=new Date(calYear,calMonth,d).getDay();
+    var cls='cal-cell'+(ds===today?' today':'')+(ds===calSel?' selected':'')+(dow===0?' sunday':dow===6?' saturday':'');
+    var dayW=works?works.filter(function(w){return w.due===ds;}):[];
+    var dayD=delivery.filter(function(x){return x.date===ds;});
+    // 연차 (승인된 것만)
+    var dayLeave=leaveRequests.filter(function(r){
+      if(r.status!=='승인')return false;
+      return ds>=r.start && ds<=(r.end||r.start);
+    });
+    // 미팅
+    var dayMeet=works?works.filter(function(w){return w.meet===ds;}):[];
+    // 시공
+    var dayInstall=works?works.filter(function(w){return w.install===ds;}):[];
+    var el=document.createElement('div'); el.className=cls; el.dataset.ds=ds;
+    var inner='<div class="cal-num">'+d+'</div>';
+    // 연차 칩 (보라)
+    dayLeave.forEach(function(r){
+      inner+='<div class="cal-chip cal-chip-leave">🌴 '+esc(r.person)+'</div>';
+    });
+    // 미팅 칩 (노랑)
+    dayMeet.forEach(function(w){
+      inner+='<div class="cal-chip cal-chip-meet">📅 '+esc(w.p)+' '+esc(w.school||w.n)+'</div>';
+    });
+    // 시공 칩 (주황)
+    dayInstall.forEach(function(w){
+      inner+='<div class="cal-chip cal-chip-install">🔨 '+esc(w.p)+' '+esc(w.school||w.n)+'</div>';
+    });
+    // 배송 작업 칩 (분류 색상) - 전부 표시
+    dayW.forEach(function(w){inner+='<div class="cal-chip" style="background:'+catBg(w.cat)+';color:'+catC(w.cat)+'">'+(w.school?w.school+' ':'')+w.n+'</div>';});
+    // 배송 일정 칩 (파랑) - 전부 표시
+    dayD.forEach(function(it){inner+='<div class="cal-chip cal-chip-delivery">🚗 '+esc(it.client)+'</div>';});
+    el.innerHTML=inner;
+    el.onclick=function(){calSel=this.dataset.ds;renderCal();renderCalDay();renderNotice();};
+    cells.appendChild(el);
+  }
+  var rem=(7-((first.getDay()+last.getDate())%7))%7;
+  for(var i=0;i<rem&&rem<7;i++){var el=document.createElement('div');el.className='cal-cell other';el.innerHTML='<div class="cal-num">'+(i+1)+'</div>';cells.appendChild(el);}
+  renderCalDay();
+}
+
+function renderCalDay(){
+  var cd=document.getElementById('cal-detail'); cd.innerHTML='';
+  var dayW=works?works.filter(function(w){return w.due===calSel;}):[];
+  var dayD=delivery.filter(function(x){return x.date===calSel;});
+  var hdr=document.createElement('div'); hdr.className='cal-detail-hdr';
+  hdr.innerHTML='<span class="cal-detail-title">'+fmtD(calSel)+'</span>';
+  var ab=document.createElement('button'); ab.className='btn btn-primary btn-sm'; ab.textContent='+ 배송 추가';
+  ab.onclick=function(){document.getElementById('md-title').textContent='배송 추가 — '+fmtD(calSel);['df-c','df-i','df-q','df-t','df-m'].forEach(function(id){document.getElementById(id).value='';});openModal('modal-del');};
+  hdr.appendChild(ab); cd.appendChild(hdr);
+  if(dayW.length){
+    var lb=document.createElement('div'); lb.className='slabel'; lb.textContent='📋 배송 예정 작업 ('+dayW.length+'건)'; cd.appendChild(lb);
+    dayW.forEach(function(w){
+      var div=document.createElement('div'); div.className='cal-work-item'; div.style.borderLeftColor=catC(w.cat);
+      var subsHtml='';
+      if(w.cat==='행사'&&w.subs&&w.subs.length){subsHtml='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">';w.subs.forEach(function(s){subsHtml+='<span class="kb-sub-chip'+(s.done?' done':'')+'">'+esc(s.n)+'</span>';});subsHtml+='</div>';}
+      div.innerHTML=(w.school?'<div class="cwi-school">🏫 '+esc(w.school)+'</div>':'')
+        +'<div class="cwi-name">'+esc(w.n)+'</div>'
+        +subsHtml
+        +'<div class="cwi-foot" style="margin-top:4px"><span class="kb-owner '+pc(w.p)+'">'+esc(w.p)+'</span>'
+          +(w.cat?'<span class="cat-badge cb-'+w.cat+'">'+w.cat+'</span>':'')
+          +'<span class="st-chip '+SCLS[w.s]+'">'+STAGES[w.s]+'</span>'
+          +(w.tel?'<span style="font-size:10px;color:var(--sub)">📞 '+esc(w.tel)+'</span>':'')+'</div>';
+      div.onclick=function(){openEditWork(w.id);}; cd.appendChild(div);
+    });
+  }
+  if(dayD.length){
+    var lb2=document.createElement('div'); lb2.className='slabel'; lb2.textContent='🚗 배송 일정 ('+dayD.length+'건)'; cd.appendChild(lb2);
+    dayD.forEach(function(it){
+      var div=document.createElement('div'); div.className='di'+(it.done?' done':'');
+      var chk=it.done?'<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';
+      var det=[]; if(it.qty)det.push(it.qty); if(it.tel)det.push('📞 '+it.tel); if(it.memo)det.push('📝 '+it.memo);
+      div.innerHTML='<div class="dchk'+(it.done?' on':'')+'" onclick="toggleD('+it.id+')">'+chk+'</div>'
+        +'<div class="dbody"><div class="dtop"><span class="dperson '+pc(it.person)+'">'+esc(it.person)+'</span><span class="dname">#'+esc(it.client)+'_'+esc(it.item)+'</span></div>'
+        +(det.length?'<div class="ddetail">'+det.map(esc).join('　')+'</div>':'')+'</div>'
+        +'<button class="ddel" onclick="delD('+it.id+')">삭제</button>';
+      cd.appendChild(div);
+    });
+  }
+  if(!dayW.length&&!dayD.length){var em=document.createElement('div');em.className='empty';em.style='padding:16px';em.textContent='이 날 배송 일정이 없습니다.';cd.appendChild(em);}
+  // 연차 섹션
+  var dayLeave=leaveRequests.filter(function(r){return r.status==='승인'&&calSel>=r.start&&calSel<=(r.end||r.start);});
+  if(dayLeave.length){
+    var lb3=document.createElement('div'); lb3.className='slabel'; lb3.textContent='🌴 연차 ('+dayLeave.length+'명)'; cd.appendChild(lb3);
+    dayLeave.forEach(function(r){
+      var div=document.createElement('div'); div.style='padding:8px 12px;background:#ede9fe;border-radius:8px;margin-bottom:5px;font-size:12px;color:#7c3aed;font-weight:500';
+      div.textContent=r.person+' — '+r.type+(r.reason?' ('+r.reason+')':'');
+      cd.appendChild(div);
+    });
+  }
+  // 미팅 섹션
+  var dayMeet=works?works.filter(function(w){return w.meet===calSel;}):[];
+  if(dayMeet.length){
+    var lb4=document.createElement('div'); lb4.className='slabel'; lb4.textContent='📅 미팅 ('+dayMeet.length+'건)'; cd.appendChild(lb4);
+    dayMeet.forEach(function(w){
+      var div=document.createElement('div'); div.style='padding:8px 12px;background:#fef3c7;border-radius:8px;margin-bottom:5px;font-size:12px;color:#92400e;cursor:pointer';
+      div.textContent=w.p+' — '+(w.school||'')+(w.school&&w.n?' / ':'')+w.n;
+      div.onclick=function(){openEditWork(w.id);}; cd.appendChild(div);
+    });
+  }
+  // 시공 섹션
+  var dayInstall=works?works.filter(function(w){return w.install===calSel;}):[];
+  if(dayInstall.length){
+    var lb5=document.createElement('div'); lb5.className='slabel'; lb5.textContent='🔨 시공 ('+dayInstall.length+'건)'; cd.appendChild(lb5);
+    dayInstall.forEach(function(w){
+      var div=document.createElement('div'); div.style='padding:8px 12px;background:#ffedd5;border-radius:8px;margin-bottom:5px;font-size:12px;color:#c2410c;cursor:pointer';
+      div.textContent=w.p+' — '+(w.school||'')+(w.school&&w.n?' / ':'')+w.n;
+      div.onclick=function(){openEditWork(w.id);}; cd.appendChild(div);
+    });
+  }
+}
+
+function moveMonth(dir){calMonth+=dir;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}renderCal();}
+
+function addDelivery(){
+  var c=document.getElementById('df-c').value.trim(), i=document.getElementById('df-i').value.trim();
+  if(!c||!i){alert('거래처명과 품목은 필수입니다.');return;}
+  delivery.push({id:uid(),date:calSel,client:c,item:i,qty:document.getElementById('df-q').value.trim(),tel:document.getElementById('df-t').value.trim(),person:document.getElementById('df-p').value,memo:document.getElementById('df-m').value.trim(),done:false});
+  save(); closeModal('modal-del'); renderCal(); renderDash(); renderNotice();
+}
+function toggleD(id){var it=delivery.find(function(x){return x.id===id;});if(it){it.done=!it.done;save();renderCalDay();renderDash();}}
+function delD(id){if(!confirm('삭제할까요?'))return;delivery=delivery.filter(function(x){return x.id!==id;});save();renderCal();renderDash();renderNotice();}
+
+// ── 대시보드 ──
+function renderDash(){
+  if(!works)return;
+  var dTotal=document.getElementById('d-total'); if(!dTotal)return;
+  dTotal.textContent=works.length;
+  document.getElementById('d-ing').textContent=works.filter(function(w){return w.s>0&&w.s<4;}).length;
+  document.getElementById('d-done').textContent=works.filter(function(w){return w.s>=4;}).length;
+  var tp=document.getElementById('team-prog'); if(!tp)return; tp.innerHTML='';
+  TEAMS.forEach(function(team){
+    var ms=MEMBERS.filter(function(m){return m.t===team;}).map(function(m){return m.n;});
+    var tw=works.filter(function(w){return ms.indexOf(w.p)>=0;});
+    if(!tw.length)return;
+    var done=tw.filter(function(w){return w.s>=4;}).length;
+    var pct=Math.round(done/tw.length*100);
+    var row=document.createElement('div'); row.className='prog-wrap';
+    row.innerHTML='<div class="prog-label"><span>'+team+'</span><span>'+done+'/'+tw.length+'건</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%"></div></div>';
+    tp.appendChild(row);
+  });
+  var dd=document.getElementById('dash-del');
+  var td=delivery.filter(function(d){return d.date===todayStr()&&!d.done;});
+  dd.innerHTML=!td.length?'<div class="empty" style="padding:10px">오늘 배송 없음</div>':'';
+  td.forEach(function(it){var div=document.createElement('div');div.className='dash-mini';div.innerHTML='<div class="dash-mini-top"><span class="dperson '+pc(it.person)+'">'+esc(it.person)+'</span><span style="font-size:12px;font-weight:600">#'+esc(it.client)+'_'+esc(it.item)+'</span></div>';dd.appendChild(div);});
+  var du=document.getElementById('dash-unsched');
+  var us=works.filter(function(w){return !w.due&&w.s<5;});
+  du.innerHTML=!us.length?'<div class="empty" style="padding:10px">✅ 미지정 없음</div>':'';
+  us.forEach(function(w){
+    var div=document.createElement('div');div.className='dash-mini';div.style='border-left:3px solid #f59e0b';
+    div.innerHTML='<div class="dash-mini-top">'+(w.cat?'<span class="cat-badge cb-'+w.cat+'">'+w.cat+'</span>':'')+'<span class="kb-owner '+pc(w.p)+'">'+esc(w.p)+'</span><span style="font-size:12px;font-weight:600">'+(w.school?'['+esc(w.school)+'] ':'')+esc(w.n)+'</span></div>';
+    div.onclick=function(){openEditWork(w.id);}; du.appendChild(div);
+  });
+}
+
+// ── 공지문 ──
+function renderNotice(){
+  var noticeTitle=document.getElementById('notice-title'); if(!noticeTitle)return;
+  var items=delivery.filter(function(d){return d.date===calSel&&!d.done;});
+  var ds=fmtD(calSel); noticeTitle.textContent=ds+' 배송 공지문';
+  if(!items.length){document.getElementById('notice-box').textContent='✅ '+ds+' 배송 일정 없음';return;}
+  var byP={};
+  items.forEach(function(it){if(!byP[it.person])byP[it.person]=[];byP[it.person].push(it);});
+  var lines=[ds+' 배송 일정 공지\n'];
+  Object.keys(byP).forEach(function(p){
+    lines.push('── '+p+' 동선 ──');
+    byP[p].forEach(function(it){var line='#'+it.client+'_'+it.item;if(it.qty)line+=' '+it.qty;if(it.tel)line+='\n'+it.tel;if(it.memo)line+='\n'+it.memo;lines.push(line);});
+    lines.push('');
+  });
+  document.getElementById('notice-box').textContent=lines.join('\n');
+}
+function copyNotice(){
+  var text=document.getElementById('notice-box').textContent;
+  var btn=document.getElementById('copy-btn');
+  var ok=function(){btn.textContent='✓ 복사됨';btn.classList.add('done');setTimeout(function(){btn.textContent='복사';btn.classList.remove('done');},2000);};
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(ok).catch(function(){ok();});}else ok();
+}
+
+
+// ══ 거래처 & 상담기록 ══
+var clients = [];
+var consults = [];
+try { clients = JSON.parse(_store.get('sd7_clients')) || []; } catch(e) {}
+try { consults = JSON.parse(_store.get('sd7_consults')) || []; } catch(e) {}
+
+function saveClients() {
+  try { _store.set('sd7_clients', JSON.stringify(clients)); _store.set('sd7_consults', JSON.stringify(consults)); } catch(e) {}
+}
+
+var editClientId = null;
+var TYPE_COLORS = {'초등학교':'#1a5fa8','중학교':'#059669','고등학교':'#7c3aed','유치원':'#d97706','교육청':'#dc2626','기관':'#0891b2','기타':'#9ca3af'};
+var TYPE_BG = {'초등학교':'#e8f2fc','중학교':'#d1fae5','고등학교':'#ede9fe','유치원':'#fef3c7','교육청':'#fee2e2','기관':'#cffafe','기타':'#f3f4f6'};
+
+// 샘플 거래처
+if (!clients.length) {
+  clients = [
+    {id:uid(), name:'인천검단호수초등학교', contact:'박행복 교감', tel:'032-565-1234', email:'', addr:'인천광역시 서구', type:'초등학교', memo:'도서관 인테리어 관심. 개교 30주년 행사 진행중', c:todayStr()},
+    {id:uid(), name:'신검단초등학교', contact:'김성실 주무관', tel:'032-574-5678', email:'', addr:'인천광역시 서구', type:'초등학교', memo:'어린이날 행사 단골', c:todayStr()},
+    {id:uid(), name:'검단호수초등학교', contact:'교무부장', tel:'032-555-1234', email:'', addr:'인천광역시 서구', type:'초등학교', memo:'교표 리뉴얼 진행중', c:addD(todayStr(),-10)},
+    {id:uid(), name:'인천교육청', contact:'이담당 장학사', tel:'032-430-0000', email:'', addr:'인천광역시 남동구', type:'교육청', memo:'연간 계획서 정기 발주', c:todayStr()},
+    {id:uid(), name:'동춘초등학교', contact:'행정실장', tel:'032-432-5566', email:'', addr:'인천광역시 연수구', type:'초등학교', memo:'본관 라운지 인테리어 진행중', c:addD(todayStr(),-15)},
+    {id:uid(), name:'송도초등학교', contact:'정보부장', tel:'032-832-4400', email:'', addr:'인천광역시 연수구', type:'초등학교', memo:'메이커스페이스 사업 진행', c:addD(todayStr(),-20)},
+    {id:uid(), name:'송도풍림초등학교', contact:'행정실', tel:'032-832-2200', email:'', addr:'인천광역시 연수구', type:'초등학교', memo:'', c:addD(todayStr(),-5)},
+    {id:uid(), name:'송도국제고등학교', contact:'국제교류부', tel:'032-832-9911', email:'', addr:'인천광역시 연수구', type:'고등학교', memo:'국제 교류 컨퍼런스 정기 진행', c:addD(todayStr(),-18)},
+    {id:uid(), name:'청라중학교', contact:'교무부장', tel:'032-577-1100', email:'', addr:'인천광역시 서구', type:'중학교', memo:'졸업앨범 신규', c:addD(todayStr(),-7)},
+    {id:uid(), name:'간석초등학교', contact:'김교사', tel:'032-422-3344', email:'', addr:'인천광역시 남동구', type:'초등학교', memo:'학부모회 회보 월간 발행', c:addD(todayStr(),-25)},
+    {id:uid(), name:'간석여자고등학교', contact:'진학부장', tel:'032-422-9900', email:'', addr:'인천광역시 남동구', type:'고등학교', memo:'진로진학실 환경 개선 사업', c:addD(todayStr(),-12)},
+    {id:uid(), name:'서창중학교', contact:'생활부장', tel:'032-461-8899', email:'', addr:'인천광역시 남동구', type:'중학교', memo:'', c:addD(todayStr(),-9)},
+    {id:uid(), name:'서창고등학교', contact:'시설담당', tel:'032-461-1199', email:'', addr:'인천광역시 남동구', type:'고등학교', memo:'교실 환경개선 시범사업 완료', c:addD(todayStr(),-30)},
+    {id:uid(), name:'논현고등학교', contact:'행정실', tel:'032-466-2233', email:'', addr:'인천광역시 남동구', type:'고등학교', memo:'급식실 메뉴판 + 도어사인 진행', c:addD(todayStr(),-14)},
+    {id:uid(), name:'논현초등학교', contact:'체육부', tel:'032-466-3344', email:'', addr:'인천광역시 남동구', type:'초등학교', memo:'운동회 단골', c:addD(todayStr(),-8)},
+    {id:uid(), name:'부평여자중학교', contact:'홍보담당', tel:'032-526-7700', email:'', addr:'인천광역시 부평구', type:'중학교', memo:'', c:addD(todayStr(),-6)},
+    {id:uid(), name:'서구청', contact:'문화진흥과', tel:'032-560-1100', email:'', addr:'인천광역시 서구', type:'기관', memo:'서구민 한마당 10월 행사', c:addD(todayStr(),-11)},
+    {id:uid(), name:'서구청소년수련관', contact:'담당주임', tel:'032-560-5500', email:'', addr:'인천광역시 서구', type:'기관', memo:'', c:addD(todayStr(),-22)},
+    {id:uid(), name:'당하초등학교', contact:'교감', tel:'032-565-9988', email:'', addr:'인천광역시 서구', type:'초등학교', memo:'급식실 인테리어 견적 단계', c:addD(todayStr(),-3)},
+    {id:uid(), name:'마전중학교', contact:'교무부', tel:'032-565-3322', email:'', addr:'인천광역시 서구', type:'중학교', memo:'', c:addD(todayStr(),-4)},
+    {id:uid(), name:'콜롬비아', contact:'', tel:'', email:'', addr:'', type:'기관', memo:'수료증 정기 발주', c:addD(todayStr(),-15)},
+  ];
+  consults = [
+    {id:uid(), clientId:clients[0].id, date:todayStr(), content:'도서관 인테리어 견적 문의. 3D 시안 요청함. 예산 500만원 내외.', person:'강인걸', tags:['인테리어'], assignedWorkId:null, c:todayStr()},
+    {id:uid(), clientId:clients[0].id, date:addD(todayStr(),-3), content:'개교 30주년 기념행사 전체 기획 의뢰. 6월 행사 예정.', person:'한도결', tags:['행사'], assignedWorkId:null, c:addD(todayStr(),-3)},
+    {id:uid(), clientId:clients[2].id, date:addD(todayStr(),-10), content:'교표 제작 문의. 기존 교표 리뉴얼 원함. 시안 2안 요청.', person:'김철수', tags:['인쇄'], assignedWorkId:null, c:addD(todayStr(),-10)},
+    {id:uid(), clientId:clients[3].id, date:addD(todayStr(),-1), content:'2026년 교육계획서 발주 예정. 물량 500부. 6월 납품.', person:'이다솔', tags:['인쇄'], assignedWorkId:null, c:addD(todayStr(),-1)},
+    {id:uid(), clientId:clients[4].id, date:addD(todayStr(),-5), content:'본관 1층 유휴공간을 학생 라운지로 만들고 싶음. 현장 미팅 완료.', person:'최주혜', tags:['인테리어'], assignedWorkId:null, c:addD(todayStr(),-5)},
+    {id:uid(), clientId:clients[5].id, date:addD(todayStr(),-15), content:'유휴교실을 메이커스페이스로 전환. 장비 포함 토탈 견적 요청.', person:'최주혜', tags:['인테리어'], assignedWorkId:null, c:addD(todayStr(),-15)},
+    {id:uid(), clientId:clients[7].id, date:addD(todayStr(),-7), content:'9월 국제 교류 컨퍼런스. 영문 자료 + 사인물 + 명찰 일괄 진행 희망.', person:'한도결', tags:['행사','사인물'], assignedWorkId:null, c:addD(todayStr(),-7)},
+    {id:uid(), clientId:clients[10].id, date:addD(todayStr(),-12), content:'진로진학실 환경 개선 사업. 예산 협의중.', person:'최주혜', tags:['인테리어'], assignedWorkId:null, c:addD(todayStr(),-12)},
+    {id:uid(), clientId:clients[13].id, date:addD(todayStr(),-14), content:'급식실 주간 교체형 메뉴판 + 특별실 도어사인 일괄 진행.', person:'박재성', tags:['사인물'], assignedWorkId:null, c:addD(todayStr(),-14)},
+    {id:uid(), clientId:clients[16].id, date:addD(todayStr(),-11), content:'서구민 한마당 행사 디자인. 포스터/현수막/프로그램북.', person:'한도결', tags:['행사'], assignedWorkId:null, c:addD(todayStr(),-11)},
+  ];
+  saveClients();
+}
+
+// ── 거래처 목록 렌더 ──
+function renderCrm() {
+  var q = (document.getElementById('crm-search').value || '').toLowerCase();
+  var list = document.getElementById('crm-list'); list.innerHTML = '';
+  var filtered = clients.filter(function(c) {
+    return !q || c.name.toLowerCase().includes(q) || (c.contact||'').toLowerCase().includes(q);
+  });
+  if (!filtered.length) { list.innerHTML = '<div class="empty">거래처가 없습니다.<br>+ 거래처 버튼으로 추가하세요.</div>'; return; }
+
+  filtered.forEach(function(cl) {
+    var clConsults = consults.filter(function(c) { return c.clientId === cl.id; });
+    var lastC = clConsults.sort(function(a,b){return b.date.localeCompare(a.date);})[0];
+    var assigned = clConsults.filter(function(c){return c.assignedWorkId;}).length;
+
+    var card = document.createElement('div'); card.className = 'client-card';
+    var tc = TYPE_COLORS[cl.type] || '#9ca3af';
+    var tbg = TYPE_BG[cl.type] || '#f3f4f6';
+    card.innerHTML =
+      '<div class="client-head">'
+        +'<div class="client-avatar" style="background:'+tbg+';color:'+tc+'">'+cl.name.slice(0,1)+'</div>'
+        +'<div class="client-info">'
+          +'<div class="client-name">'+esc(cl.name)+'</div>'
+          +'<div class="client-meta">'+(cl.contact?'👤 '+esc(cl.contact)+'　':'')+(cl.tel?'📞 '+esc(cl.tel):'')+'</div>'
+          +'<div class="client-badges">'
+            +(cl.type?'<span class="client-badge" style="background:'+tbg+';color:'+tc+'">'+cl.type+'</span>':'')
+            +(clConsults.length?'<span class="client-badge" style="background:#f3f4f6;color:#6b7280">상담 '+clConsults.length+'건</span>':'')
+            +(assigned?'<span class="client-badge" style="background:var(--green-lt);color:var(--green)">✅ 작업배정 '+assigned+'건</span>':'')
+          +'</div>'
+        +'</div>'
+        +'<div class="client-actions">'
+          +'<button class="btn btn-outline btn-sm" onclick="openClientDetail(\''+cl.id+'\');event.stopPropagation()">상세</button>'
+          +'<button class="btn btn-primary btn-sm" onclick="openAddConsult(\''+cl.id+'\');event.stopPropagation()">+ 상담</button>'
+        +'</div>'
+      +'</div>'
+      +(lastC?'<div style="padding:0 14px 10px;font-size:11px;color:var(--sub);border-top:1px solid var(--border);padding-top:8px">최근 상담 '+esc(fmtD(lastC.date))+' — '+esc(lastC.content.slice(0,40))+(lastC.content.length>40?'…':'')+'</div>':'');
+    card.onclick = function() { openClientDetail(cl.id); };
+    list.appendChild(card);
+  });
+}
+
+// ── 거래처 상세 모달 ──
+function openClientDetail(cid) {
+  var cl = clients.find(function(c){return c.id===cid;}); if(!cl)return;
+  document.getElementById('cd-title').textContent = cl.name;
+  var body = document.getElementById('cd-body'); body.innerHTML = '';
+  var tc = TYPE_COLORS[cl.type]||'#9ca3af', tbg = TYPE_BG[cl.type]||'#f3f4f6';
+
+  // 거래처 정보 헤더
+  var info = document.createElement('div');
+  info.style = 'display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);margin-bottom:0';
+  info.innerHTML =
+    '<div class="client-detail-avatar" style="background:'+tbg+';color:'+tc+'">'+cl.name.slice(0,1)+'</div>'
+    +'<div style="flex:1">'
+      +'<div style="font-size:15px;font-weight:700;margin-bottom:3px">'+esc(cl.name)+'</div>'
+      +'<div style="font-size:12px;color:var(--sub)">'+(cl.contact?'👤 '+esc(cl.contact)+'　':'')+(cl.tel?'📞 '+esc(cl.tel):'')+'</div>'
+      +(cl.addr?'<div style="font-size:11px;color:var(--sub);margin-top:2px">📍 '+esc(cl.addr)+'</div>':'')
+    +'</div>'
+    +'<button class="btn btn-outline btn-sm" onclick="openEditClient(\''+cid+'\')">수정</button>';
+  body.appendChild(info);
+
+  // 빠른 상담 입력
+  var qform = document.createElement('div');
+  qform.className = 'consult-quick';
+  qform.style = 'margin-top:12px';
+  qform.innerHTML =
+    '<div class="consult-quick-title">📝 새 상담 기록</div>'
+    +'<textarea class="consult-quick-input" id="cq-content" rows="2" placeholder="상담 내용을 입력하세요..."></textarea>'
+    +'<div class="consult-quick-foot">'
+      +'<select id="cq-person" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--white);outline:none;flex:1">'
+        + MEMBERS.map(function(m){return '<option value="'+m.n+'">'+m.n+'</option>';}).join('')
+      +'</select>'
+      +'<button class="btn btn-primary btn-sm" onclick="saveConsult(\''+cid+'\')">기록 저장</button>'
+    +'</div>';
+  body.appendChild(qform);
+
+  // 상담 기록 목록
+  var clConsults = consults.filter(function(c){return c.clientId===cid;}).sort(function(a,b){return b.date.localeCompare(a.date);});
+  var slbl = document.createElement('div');
+  slbl.style = 'font-size:11px;color:var(--sub);font-weight:600;letter-spacing:.5px;margin:14px 0 8px';
+  slbl.textContent = '상담 이력 ('+clConsults.length+'건)';
+  body.appendChild(slbl);
+
+  if (!clConsults.length) {
+    var em = document.createElement('div'); em.className='empty'; em.style='padding:16px';
+    em.textContent='상담 기록이 없습니다.'; body.appendChild(em);
+  } else {
+    clConsults.forEach(function(c) {
+      var w = c.assignedWorkId ? works.find(function(x){return x.id===c.assignedWorkId;}) : null;
+      var item = document.createElement('div'); item.className='consult-item';
+      item.innerHTML =
+        '<div class="consult-date">'+esc(fmtD(c.date))+'<br><span style="font-size:9px">'+esc(c.person)+'</span></div>'
+        +'<div class="consult-body">'
+          +'<div class="consult-content">'+esc(c.content)+'</div>'
+          +'<div class="consult-tags">'
+            +(c.tags||[]).map(function(t){return '<span class="consult-tag">'+esc(t)+'</span>';}).join('')
+            +(w?'<span class="consult-tag assigned">✅ '+esc(w.n)+'</span>':'')
+          +'</div>'
+        +'</div>'
+        +'<div class="consult-actions">'
+          +(!w?'<button class="assign-btn" onclick="assignWork(\''+c.id+'\',\''+cid+'\')">→ 작업배정</button>':'')
+          +'<button class="btn btn-danger btn-sm" style="font-size:10px;padding:4px 7px" onclick="delConsult(\''+c.id+'\')">삭제</button>'
+        +'</div>';
+      body.appendChild(item);
+    });
+  }
+  openModal('modal-crm-detail');
+}
+
+// ── 상담 저장 ──
+function saveConsult(cid) {
+  var content = document.getElementById('cq-content').value.trim();
+  if (!content) { alert('상담 내용을 입력하세요.'); return; }
+  var person = document.getElementById('cq-person').value;
+  consults.unshift({id:uid(), clientId:cid, date:todayStr(), content:content, person:person, tags:[], assignedWorkId:null, c:todayStr()});
+  saveClients();
+  document.getElementById('cq-content').value = '';
+  openClientDetail(cid); // 새로고침
+}
+function delConsult(cid) {
+  if (!confirm('상담 기록을 삭제할까요?')) return;
+  consults = consults.filter(function(c){return c.id!==cid;});
+  saveClients(); closeModal('modal-crm-detail'); renderCrm();
+}
+
+// ── 빠른 상담 입력 (목록에서) ──
+function openAddConsult(cid) {
+  openClientDetail(cid);
+  setTimeout(function(){var el=document.getElementById('cq-content');if(el)el.focus();}, 300);
+}
+
+// ── 작업 배정 ──
+function assignWork(consultId, clientId) {
+  var cl = clients.find(function(c){return c.id===clientId;});
+  if (!cl) return;
+  var consult = consults.find(function(c){return c.id===consultId;});
+  if (!consult) return;
+
+  // 제작사양서 모달 열기 (거래처 정보 자동 입력)
+  openAddWork(0);
+  setTimeout(function() {
+    document.getElementById('wf-school').value = cl.name;
+    document.getElementById('wf-contact').value = cl.contact || '';
+    document.getElementById('wf-tel').value = cl.tel || '';
+    // 상담 내용을 메모에 자동 입력
+    document.getElementById('wf-m').value = '[상담기록] ' + consult.content;
+    document.getElementById('mw-title').textContent = '제작사양서 — 작업배정 (' + cl.name + ')';
+    // 저장 후 상담기록에 연결
+    var origSave = window._origSaveWork;
+    window._pendingAssign = {consultId: consultId, clientId: clientId};
+  }, 100);
+
+  closeModal('modal-crm-detail');
+}
+
+// saveWork 후 상담기록 연결 처리
+var _origSaveWork = null;
+(function patchSaveWork() {
+  var orig = window.saveWork;
+  window.saveWork = function() {
+    orig();
+    if (window._pendingAssign) {
+      var pa = window._pendingAssign;
+      var c = consults.find(function(x){return x.id===pa.consultId;});
+      if (c && works.length > 0) {
+        c.assignedWorkId = works[0].id; // 방금 추가된 작업
+        saveClients();
+      }
+      window._pendingAssign = null;
+    }
+  };
+})();
+
+// ── 거래처 추가/수정 ──
+function openAddClient() {
+  editClientId = null;
+  document.getElementById('mc-title').textContent = '거래처 추가';
+  document.getElementById('mc-btn').textContent = '추가하기';
+  document.getElementById('mc-del').style.display = 'none';
+  ['cf-name','cf-contact','cf-tel','cf-email','cf-addr','cf-memo'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('cf-type').value = '';
+  openModal('modal-client');
+}
+function openEditClient(cid) {
+  var cl = clients.find(function(c){return c.id===cid;}); if(!cl)return;
+  editClientId = cid;
+  document.getElementById('mc-title').textContent = '거래처 수정';
+  document.getElementById('mc-btn').textContent = '저장';
+  document.getElementById('mc-del').style.display = '';
+  document.getElementById('cf-name').value = cl.name||'';
+  document.getElementById('cf-contact').value = cl.contact||'';
+  document.getElementById('cf-tel').value = cl.tel||'';
+  document.getElementById('cf-email').value = cl.email||'';
+  document.getElementById('cf-addr').value = cl.addr||'';
+  document.getElementById('cf-memo').value = cl.memo||'';
+  document.getElementById('cf-type').value = cl.type||'';
+  closeModal('modal-crm-detail');
+  openModal('modal-client');
+}
+function saveClient() {
+  var name = document.getElementById('cf-name').value.trim();
+  if (!name) { alert('거래처명을 입력하세요.'); return; }
+  var data = {name:name, contact:document.getElementById('cf-contact').value.trim(),
+    tel:document.getElementById('cf-tel').value.trim(), email:document.getElementById('cf-email').value.trim(),
+    addr:document.getElementById('cf-addr').value.trim(), type:document.getElementById('cf-type').value,
+    memo:document.getElementById('cf-memo').value.trim()};
+  if (editClientId) {
+    var cl = clients.find(function(c){return c.id===editClientId;}); if(cl) Object.assign(cl, data);
+  } else {
+    clients.unshift(Object.assign({id:uid(), c:todayStr()}, data));
+  }
+  saveClients(); closeModal('modal-client'); renderCrm();
+}
+function delClientCur() {
+  if (!confirm('거래처를 삭제할까요? 상담기록도 모두 삭제됩니다.')) return;
+  clients = clients.filter(function(c){return c.id!==editClientId;});
+  consults = consults.filter(function(c){return c.clientId!==editClientId;});
+  saveClients(); closeModal('modal-client'); renderCrm();
+}
+
+// ── 뷰 전환 ──
+function sw(id,el){
+  curTab=id;
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');v.style.display='none';});
+  document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
+  var v=document.getElementById('v-'+id); v.classList.add('on'); v.style.display='flex';
+  if(el)el.classList.add('on');
+  var tvw=document.querySelector('.tv-wrap'); if(tvw)tvw.style.display=id==='kanban'?'flex':'none';
+  if(id==='cal')renderCal();
+  if(id==='crm'){renderCrm();}
+  if(id==='vendor')renderVendors();
+  if(id==='dash')renderDash();
+  if(id==='notice')renderNotice();
+  if(id==='board')renderBoard();
+  if(id==='leave')renderLeave();
+}
+
+function openModal(id){document.getElementById(id).classList.add('on');}
+function closeModal(id){document.getElementById(id).classList.remove('on');}
+document.querySelectorAll('.modal-bg').forEach(function(bg){bg.addEventListener('click',function(e){if(e.target===this)this.classList.remove('on');});});
+
+// ════════════════════════════════════════════════════════════════
+// ══ 공지사항 (Board) ══
+// ════════════════════════════════════════════════════════════════
+
+// ── 로그인 시스템 ──
+function initLogin(){
+  // 로그인 select 채우기
+  var sel=document.getElementById('login-name'); if(!sel)return;
+  sel.innerHTML='<option value="">이름을 선택하세요</option>';
+  MEMBERS.forEach(function(m){
+    var o=document.createElement('option');
+    o.value=m.n; o.textContent=m.n+' ('+m.t+' '+m.r+')';
+    sel.appendChild(o);
+  });
+  // localStorage에 로그인 정보 있으면 자동 로그인
+  var saved=_store.get('sd7_login');
+  if(saved){
+    try{
+      var info=JSON.parse(saved);
+      if(info.name && MEMBERS.find(function(m){return m.n===info.name;})){
+        currentUser=info.name;
+        enterApp();
+        return;
+      }
+    }catch(e){}
+  }
+  // 로그인 화면 표시
+  document.getElementById('login-screen').classList.remove('hidden');
+}
+
+function doLogin(){
+  var name=document.getElementById('login-name').value;
+  var pw=document.getElementById('login-pw').value;
+  var err=document.getElementById('login-err');
+  if(!name){err.textContent='이름을 선택하세요'; return;}
+  if(!pw){err.textContent='비밀번호를 입력하세요'; return;}
+  // 비밀번호 확인 (없으면 초기값 1234)
+  var stored=memberPws[name]||'1234';
+  if(pw!==stored){err.textContent='비밀번호가 일치하지 않습니다'; return;}
+  // 로그인 성공
+  currentUser=name;
+  _store.set('sd7_login',JSON.stringify({name:name}));
+  err.textContent='';
+  enterApp();
+}
+
+function enterApp(){
+  document.getElementById('login-screen').classList.add('hidden');
+  updateTopbarUser();
+  initCurrentUser();
+  initLeaveBalances();
+  buildPfBar();
+  buildVendorSelect('');
+  updateBoardDot();
+  renderAll();
+}
+
+function doLogout(){
+  _store.remove('sd7_login');
+  currentUser='';
+  isAdmin=false;
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-pw').value='';
+  document.getElementById('login-err').textContent='';
+  document.getElementById('login-name').value='';
+}
+
+function updateTopbarUser(){
+  var av=document.getElementById('topbar-av');
+  var nm=document.getElementById('topbar-name');
+  if(av) av.textContent=currentUser?currentUser.slice(0,1):'?';
+  if(nm) nm.textContent=currentUser||'-';
+}
+
+function initCurrentUser(){
+  if(!currentUser) return;
+  // 공지 작성 버튼은 최기수만
+  var addBtn=document.getElementById('bd-add-btn');
+  if(addBtn) addBtn.style.display=(currentUser==='최기수')?'block':'none';
+  // 연차 탭 사용자 표시
+  var lvLabel=document.getElementById('lv-current-user-label');
+  if(lvLabel) lvLabel.textContent=currentUser;
+  updateTopbarUser();
+}
+
+function setBdFilter(el){
+  document.querySelectorAll('.bd-tab').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  boardFilter = el.getAttribute('data-bf');
+  renderBoard();
+}
+
+function renderBoard(){
+  initCurrentUser();
+  var addBtn=document.getElementById('bd-add-btn');
+  if(addBtn) addBtn.style.display = (currentUser==='최기수') ? 'block' : 'none';
+  
+  var list=document.getElementById('bd-list'); if(!list)return;
+  var filtered = boardPosts.filter(function(p){
+    if(boardFilter==='전체')return true;
+    return p.cat===boardFilter;
+  });
+  // 핀 + 최신순
+  filtered.sort(function(a,b){
+    if(a.pinned!==b.pinned) return a.pinned?-1:1;
+    return b.c.localeCompare(a.c);
+  });
+  
+  if(!filtered.length){
+    list.innerHTML='<div class="empty" style="text-align:center;padding:40px 20px;color:var(--sub)">공지사항이 없습니다.<br>'+(currentUser==='최기수'?'+ 공지 버튼으로 작성하세요.':'관리자가 공지를 등록하면 여기에 표시됩니다.')+'</div>';
+    return;
+  }
+  
+  list.innerHTML='';
+  filtered.forEach(function(p){
+    var reads = p.reads||{};
+    var amRead = !!reads[currentUser];
+    var totalUsers = MEMBERS.length;
+    var readCount = Object.keys(reads).length;
+    var ddays = p.deadline ? diff(p.deadline) : null;
+    var dlOver = ddays!==null && ddays<0;
+    
+    var card=document.createElement('div');
+    card.className='bd-card'+(p.pinned?' pinned':'');
+    var html='';
+    html+='<div class="bd-card-head">';
+    html+='<span class="bd-cat '+p.cat+'">'+p.cat+'</span>';
+    if(p.cat==='팀별' && p.team) html+='<span class="bd-cat" style="background:var(--bg);color:var(--sub)">'+esc(p.team)+'</span>';
+    html+='<span class="bd-title">'+esc(p.title)+'</span>';
+    html+='</div>';
+    html+='<div class="bd-meta">'+esc(p.author)+' · '+fmtD(p.c)+'</div>';
+    if(p.deadline){
+      html+='<div class="bd-deadline'+(dlOver?' over':'')+'">📅 '+(dlOver?'기한 지남: ':'확인 기한: ')+fmtD(p.deadline)+'</div>';
+    }
+    html+='<div class="bd-content">'+esc(p.content)+'</div>';
+    if(p.image){
+      html+='<img class="bd-image" src="'+p.image+'" onclick="window.open(this.src)">';
+    }
+    html+='<div class="bd-foot">';
+    html+='<button class="bd-readbtn'+(amRead?' read':'')+'" onclick="toggleRead('+p.id+')">'+(amRead?'✓ 확인함':'확인')+'</button>';
+    html+='<span class="bd-readstats">'+readCount+'/'+totalUsers+' 명 확인</span>';
+    html+='<div class="bd-actions">';
+    html+='<button class="bd-act-btn" onclick="showReadList('+p.id+')">읽음현황</button>';
+    if(currentUser==='최기수'){
+      html+='<button class="bd-act-btn" onclick="togglePin('+p.id+')">'+(p.pinned?'고정해제':'고정')+'</button>';
+      html+='<button class="bd-act-btn" onclick="deleteBoardPost('+p.id+')">삭제</button>';
+    }
+    html+='</div></div>';
+    card.innerHTML=html;
+    list.appendChild(card);
+  });
+}
+
+function updateBoardDot(){
+  var dot=document.getElementById('board-dot'); if(!dot)return;
+  var hasUnread = boardPosts.some(function(p){
+    var reads=p.reads||{}; return !reads[currentUser];
+  });
+  dot.style.display = hasUnread?'block':'none';
+}
+
+function openAddBoard(){
+  if(currentUser!=='최기수'){ alert('공지사항은 관리자만 작성할 수 있습니다.'); return; }
+  document.getElementById('bdf-title-i').value='';
+  document.getElementById('bdf-content').value='';
+  document.getElementById('bdf-cat').value='전사';
+  document.getElementById('bdf-pin').checked=false;
+  document.getElementById('bdf-deadline').value='';
+  document.getElementById('bdf-image').value='';
+  document.getElementById('bdf-image-preview').innerHTML='';
+  boardImageData='';
+  // 팀 select 채우기
+  var ts=document.getElementById('bdf-team');
+  ts.innerHTML='<option value="">선택</option>'+TEAMS.map(function(t){return '<option value="'+t+'">'+t+'</option>';}).join('');
+  openModal('modal-board');
+}
+
+function bdfImagePreview(input){
+  var f=input.files[0]; if(!f)return;
+  if(f.size>2*1024*1024){alert('이미지는 2MB 이하만 가능합니다');input.value='';return;}
+  var r=new FileReader();
+  r.onload=function(e){
+    boardImageData=e.target.result;
+    document.getElementById('bdf-image-preview').innerHTML='<img src="'+e.target.result+'" style="max-width:100%;border-radius:8px">';
+  };
+  r.readAsDataURL(f);
+}
+
+function saveBoardPost(){
+  var title=document.getElementById('bdf-title-i').value.trim();
+  var content=document.getElementById('bdf-content').value.trim();
+  if(!title || !content){alert('제목과 내용을 입력하세요');return;}
+  var cat=document.getElementById('bdf-cat').value;
+  var team=document.getElementById('bdf-team').value;
+  var pinned=document.getElementById('bdf-pin').checked;
+  var deadline=document.getElementById('bdf-deadline').value;
+  
+  var post={
+    id:Date.now(),
+    title:title, content:content, cat:cat, team:team||null,
+    pinned:pinned, deadline:deadline||null,
+    image:boardImageData||null,
+    author:currentUser, c:todayStr(),
+    reads:{}
+  };
+  boardPosts.push(post);
+  saveBoard();
+  closeModal('modal-board');
+  renderBoard();
+  updateBoardDot();
+  boardImageData='';
+}
+
+function toggleRead(postId){
+  var p=boardPosts.find(function(x){return x.id===postId;}); if(!p)return;
+  if(!p.reads) p.reads={};
+  if(p.reads[currentUser]){
+    delete p.reads[currentUser];
+  } else {
+    p.reads[currentUser] = todayStr();
+  }
+  saveBoard(); renderBoard(); updateBoardDot();
+}
+
+function togglePin(postId){
+  var p=boardPosts.find(function(x){return x.id===postId;}); if(!p)return;
+  p.pinned=!p.pinned;
+  saveBoard(); renderBoard();
+}
+
+function deleteBoardPost(postId){
+  if(!confirm('이 공지를 삭제하시겠습니까?'))return;
+  boardPosts = boardPosts.filter(function(x){return x.id!==postId;});
+  saveBoard(); renderBoard(); updateBoardDot();
+}
+
+function showReadList(postId){
+  var p=boardPosts.find(function(x){return x.id===postId;}); if(!p)return;
+  var reads=p.reads||{};
+  var body=document.getElementById('bd-reads-body');
+  
+  // 팀별 그룹핑
+  var byTeam={};
+  MEMBERS.forEach(function(m){
+    if(!byTeam[m.t])byTeam[m.t]=[];
+    byTeam[m.t].push(m);
+  });
+  
+  var html='<div style="font-size:13px;font-weight:600;margin-bottom:12px">'+esc(p.title)+'</div>';
+  Object.keys(byTeam).forEach(function(team){
+    var members=byTeam[team];
+    var readCount=members.filter(function(m){return reads[m.n];}).length;
+    html+='<div style="margin-bottom:14px">';
+    html+='<div style="font-size:11px;font-weight:600;color:var(--sub);margin-bottom:6px">'+team+' ('+readCount+'/'+members.length+')</div>';
+    html+='<div>';
+    members.forEach(function(m){
+      var isRead=!!reads[m.n];
+      html+='<span class="bd-readname '+(isRead?'read':'unread')+'">'+(isRead?'✓ ':'')+m.n+'</span>';
+    });
+    html+='</div></div>';
+  });
+  body.innerHTML=html;
+  openModal('modal-board-reads');
+}
+
+// ════════════════════════════════════════════════════════════════
+// ══ 연차 (Leave) ══
+// ════════════════════════════════════════════════════════════════
+
+// 부서장 매핑
+function getApprover(memberName){
+  var m=MEMBERS.find(function(x){return x.n===memberName;}); if(!m)return null;
+  // 경영진은 대표 승인 (대표는 자동 승인)
+  if(m.r==='대표')return null; // 대표는 자체 승인
+  if(m.t==='경영')return '최기수'; // 부사장/전무 → 대표
+  // 각 팀의 팀장 찾기
+  var leader = MEMBERS.find(function(x){return x.t===m.t && x.r==='팀장';});
+  if(leader && leader.n!==memberName)return leader.n;
+  // 본인이 팀장이면 → 대표 승인
+  return '최기수';
+}
+
+function initLeaveBalances(){
+  MEMBERS.forEach(function(m){
+    if(typeof leaveBalances[m.n]==='undefined'){
+      leaveBalances[m.n]=15;
+    }
+  });
+  saveLeaves();
+}
+
+function calcLeaveDays(type, start, end){
+  if(type==='오전반차' || type==='오후반차') return 0.5;
+  if(!end || end===start) return 1;
+  var d1=new Date(start), d2=new Date(end);
+  var days=Math.floor((d2-d1)/(864e5))+1;
+  // 주말 제외
+  var count=0;
+  for(var i=0;i<days;i++){
+    var d=new Date(d1.getTime()+i*864e5);
+    if(d.getDay()!==0 && d.getDay()!==6)count++;
+  }
+  return count;
+}
+
+function getUsedDays(person){
+  var used=0;
+  leaveRequests.forEach(function(r){
+    if(r.person===person && r.status==='승인'){
+      used += r.days;
+    }
+  });
+  return used;
+}
+
+function renderLeave(){
+  initCurrentUser();
+  if(typeof lvYear==='undefined' || !lvYear){
+    var n=new Date(); lvYear=n.getFullYear(); lvMonth=n.getMonth();
+  }
+  
+  // 요약
+  var balance = leaveBalances[currentUser]||15;
+  var used = getUsedDays(currentUser);
+  var pending = leaveRequests.filter(function(r){return r.person===currentUser && r.status==='대기';})
+    .reduce(function(s,r){return s+r.days;},0);
+  var left = balance - used;
+  
+  document.getElementById('lv-summary').innerHTML=
+    '<div class="lv-stat"><div class="lv-stat-v">'+balance+'</div><div class="lv-stat-l">총 연차</div></div>'+
+    '<div class="lv-stat used"><div class="lv-stat-v">'+used+'</div><div class="lv-stat-l">사용</div></div>'+
+    '<div class="lv-stat left"><div class="lv-stat-v">'+left+'</div><div class="lv-stat-l">잔여'+(pending?' (신청중 '+pending+'일)':'')+'</div></div>';
+  
+  renderLeaveCal();
+  renderLeaveList();
+}
+
+function lvMonth(delta){
+  lvMonth+=delta;
+  if(lvMonth<0){lvMonth=11;lvYear--;}
+  if(lvMonth>11){lvMonth=0;lvYear++;}
+  renderLeaveCal();
+}
+
+function renderLeaveCal(){
+  document.getElementById('lv-title').textContent=lvYear+'년 '+(lvMonth+1)+'월';
+  var grid=document.getElementById('lv-cal-grid'); grid.innerHTML='';
+  var dows=['일','월','화','수','목','금','토'];
+  dows.forEach(function(d,i){
+    var c=document.createElement('div');
+    c.className='lv-cal-dow'+(i===0?' sun':i===6?' sat':'');
+    c.textContent=d;
+    grid.appendChild(c);
+  });
+  var first=new Date(lvYear,lvMonth,1);
+  var last=new Date(lvYear,lvMonth+1,0).getDate();
+  var startDow=first.getDay();
+  var todayS=todayStr();
+  
+  for(var i=0;i<startDow;i++){
+    var c=document.createElement('div'); c.className='lv-cal-cell empty'; grid.appendChild(c);
+  }
+  for(var d=1;d<=last;d++){
+    var ds=lvYear+'-'+pad(lvMonth+1)+'-'+pad(d);
+    var dow=new Date(lvYear,lvMonth,d).getDay();
+    var c=document.createElement('div');
+    var cls='lv-cal-cell';
+    if(dow===0)cls+=' sun';
+    if(dow===6)cls+=' sat';
+    if(ds===todayS)cls+=' today';
+    c.className=cls;
+    var html='<div class="lv-cal-cell-date">'+d+'</div>';
+    
+    // 이 날짜에 해당하는 연차 찾기
+    var onDay = leaveRequests.filter(function(r){
+      if(r.status==='반려')return false;
+      var s=r.start, e=r.end||r.start;
+      return ds>=s && ds<=e;
+    });
+    onDay.slice(0,2).forEach(function(r){
+      var pcls = r.status==='승인'?'approved':r.status==='대기'?'pending':'rejected';
+      html+='<div class="lv-cal-pill '+pcls+'" title="'+r.person+' '+r.type+'">'+r.person.slice(0,3)+'</div>';
+    });
+    if(onDay.length>2) html+='<div style="font-size:8px;color:var(--sub);margin-top:1px">+'+(onDay.length-2)+'</div>';
+    
+    c.innerHTML=html;
+    grid.appendChild(c);
+  }
+}
+
+function setLvFilter(el){
+  document.querySelectorAll('.lv-tab').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  lvFilter=el.getAttribute('data-lf');
+  renderLeaveList();
+}
+
+function renderLeaveList(){
+  var list=document.getElementById('lv-list'); if(!list)return;
+  var filtered=leaveRequests.slice();
+  if(lvFilter==='내신청'){
+    filtered=filtered.filter(function(r){return r.person===currentUser;});
+  } else if(lvFilter==='결재대기'){
+    // 전체 대기 중인 신청 표시 (currentUser 무관)
+    filtered=filtered.filter(function(r){return r.status==='대기';});
+  }
+  filtered.sort(function(a,b){return b.c.localeCompare(a.c);});
+
+  // 결재 대기 탭: 내가 결재할 수 있는 건 상단에 표시
+  if(lvFilter==='결재대기'){
+    filtered.sort(function(a,b){
+      var aMe = (a.approver===currentUser || (!a.approver && currentUser==='최기수')) ? 0 : 1;
+      var bMe = (b.approver===currentUser || (!b.approver && currentUser==='최기수')) ? 0 : 1;
+      return aMe - bMe;
+    });
+  }
+
+  if(!filtered.length){
+    list.innerHTML='<div class="lv-empty">'+(lvFilter==='내신청'?'신청한 연차가 없습니다':lvFilter==='결재대기'?'결재 대기 중인 신청이 없습니다':'신청 내역이 없습니다')+'</div>';
+    return;
+  }
+  list.innerHTML='';
+  filtered.forEach(function(r){
+    var div=document.createElement('div'); div.className='lv-item';
+    var dateRange = r.end && r.end!==r.start ? fmtD(r.start)+' ~ '+fmtD(r.end) : fmtD(r.start);
+    var statusCls = r.status==='승인'?'approved':r.status==='반려'?'rejected':'pending';
+    var canApprove = r.status==='대기' && (
+      r.approver===currentUser ||
+      (!r.approver && currentUser==='최기수') // approver 미지정 건은 대표가 결재
+    );
+    var canCancel = r.person===currentUser && r.status==='대기';
+    var isMyTurn = r.status==='대기' && r.approver && r.approver!==currentUser && !canApprove;
+
+    var html='<div class="lv-item-info">';
+    html+='<div class="lv-item-row1">';
+    html+='<span class="lv-name">'+esc(r.person)+'</span>';
+    html+='<span class="lv-type">'+r.type+' '+r.days+'일</span>';
+    html+='<span class="lv-status '+statusCls+'">'+r.status+'</span>';
+    if(canApprove) html+='<span style="font-size:9px;padding:2px 6px;border-radius:6px;background:#fef3c7;color:#92400e;font-weight:600">결재 필요</span>';
+    html+='</div>';
+    html+='<div class="lv-date">📅 '+dateRange;
+    if(r.approver) html+=' · 결재자: <b>'+esc(r.approver)+'</b>';
+    html+='</div>';
+    if(r.reason)html+='<div class="lv-reason">"'+esc(r.reason)+'"</div>';
+    if(isMyTurn) html+='<div style="font-size:10px;color:var(--amber);margin-top:3px">⚠ 상단에서 <b>'+esc(r.approver)+'</b> 선택 후 결재 가능</div>';
+    html+='</div>';
+
+    html+='<div class="lv-item-actions">';
+    if(canApprove){
+      html+='<button class="btn btn-primary btn-sm" onclick="approveLeave('+r.id+')">승인</button>';
+      html+='<button class="btn btn-outline btn-sm" onclick="rejectLeave('+r.id+')">반려</button>';
+    }
+    if(canCancel){
+      html+='<button class="btn btn-outline btn-sm" onclick="cancelLeave('+r.id+')">취소</button>';
+    }
+    html+='</div>';
+
+    div.innerHTML=html;
+    if(canApprove) div.style.borderLeft='3px solid #f59e0b';
+    list.appendChild(div);
+  });
+}
+
+function openAddLeave(){
+  document.getElementById('lvf-person').value=currentUser;
+  document.getElementById('lvf-type').value='연차';
+  document.getElementById('lvf-start').value=todayStr();
+  document.getElementById('lvf-end').value='';
+  document.getElementById('lvf-reason').value='';
+  updateLeaveSummary();
+  // 변경 이벤트 등록
+  ['lvf-type','lvf-start','lvf-end'].forEach(function(id){
+    var el=document.getElementById(id);
+    el.onchange=updateLeaveSummary;
+  });
+  openModal('modal-leave');
+}
+
+function updateLeaveSummary(){
+  var type=document.getElementById('lvf-type').value;
+  var start=document.getElementById('lvf-start').value;
+  var end=document.getElementById('lvf-end').value;
+  var endInput=document.getElementById('lvf-end');
+  if(type==='오전반차'||type==='오후반차'){
+    endInput.disabled=true; endInput.value=''; end='';
+  } else {
+    endInput.disabled=false;
+  }
+  if(!start){
+    document.getElementById('lvf-summary').textContent='시작일을 선택하세요';
+    return;
+  }
+  var days = calcLeaveDays(type, start, end||start);
+  var approver = getApprover(currentUser);
+  var balance = leaveBalances[currentUser]||15;
+  var used = getUsedDays(currentUser);
+  var left = balance - used;
+  document.getElementById('lvf-summary').textContent=
+    '신청일수: '+days+'일 · 결재자: '+(approver||'자체승인')+' · 잔여: '+left+'일';
+}
+
+function saveLeave(){
+  var type=document.getElementById('lvf-type').value;
+  var start=document.getElementById('lvf-start').value;
+  var end=document.getElementById('lvf-end').value;
+  var reason=document.getElementById('lvf-reason').value.trim();
+  if(!start){alert('시작일을 입력하세요');return;}
+  if(end && end<start){alert('종료일이 시작일보다 빠릅니다');return;}
+  
+  var days=calcLeaveDays(type, start, end||start);
+  if(days===0){alert('주말만 선택되었습니다. 평일을 선택해주세요.');return;}
+  
+  var balance = leaveBalances[currentUser]||15;
+  var used = getUsedDays(currentUser);
+  var pending = leaveRequests.filter(function(r){return r.person===currentUser && r.status==='대기';})
+    .reduce(function(s,r){return s+r.days;},0);
+  if(used + pending + days > balance){
+    if(!confirm('잔여 연차('+(balance-used-pending)+'일)를 초과합니다. 그래도 신청하시겠습니까?'))return;
+  }
+  
+  var approver = getApprover(currentUser);
+  var status = approver ? '대기' : '승인'; // 대표는 자체 승인
+  
+  var req={
+    id:Date.now(),
+    person:currentUser, type:type,
+    start:start, end:end||start,
+    days:days, reason:reason,
+    approver:approver, status:status,
+    c:todayStr()
+  };
+  leaveRequests.push(req);
+  saveLeaves();
+  closeModal('modal-leave');
+  renderLeave();
+  alert(status==='승인'?'자체 승인되었습니다':'신청되었습니다. 결재자: '+approver);
+}
+
+function approveLeave(id){
+  var r=leaveRequests.find(function(x){return x.id===id;}); if(!r)return;
+  r.status='승인'; r.approvedAt=todayStr();
+  saveLeaves(); renderLeave();
+  alert(r.person+' 님의 '+r.type+' 승인되었습니다.');
+}
+
+function rejectLeave(id){
+  var r=leaveRequests.find(function(x){return x.id===id;}); if(!r)return;
+  r.status='반려'; r.rejectedAt=todayStr();
+  saveLeaves(); renderLeave();
+}
+
+function cancelLeave(id){
+  leaveRequests = leaveRequests.filter(function(x){return x.id!==id;});
+  saveLeaves(); renderLeave();
+}
+
+// ════════════════════════════════════════════════════════════════
+// ══ 관리자 모드 ══
+// ════════════════════════════════════════════════════════════════
+
+function openAdminGate(){
+  if(isAdmin){ openAdmin(); return; }
+  document.getElementById('adm-pw').value='';
+  document.getElementById('adm-pw-err').textContent='';
+  openModal('modal-adm-gate');
+  setTimeout(function(){document.getElementById('adm-pw').focus();},100);
+}
+
+function tryAdminLogin(){
+  var pw=document.getElementById('adm-pw').value;
+  if(pw===adminPw){
+    isAdmin=true;
+    closeModal('modal-adm-gate');
+    openAdmin();
+  } else {
+    document.getElementById('adm-pw-err').textContent='비밀번호가 일치하지 않습니다';
+    document.getElementById('adm-pw').value='';
+  }
+}
+
+function openAdmin(){
+  // 통계
+  var stats=document.getElementById('adm-stats');
+  var pending = leaveRequests.filter(function(r){return r.status==='대기';}).length;
+  stats.innerHTML=
+    '👥 직원 수: <b>'+MEMBERS.length+'명</b> ('+TEAMS.length+'팀)<br>'+
+    '📋 작업: <b>'+works.length+'건</b><br>'+
+    '🤝 거래처: <b>'+clients.length+'곳</b> (상담 '+consults.length+'건)<br>'+
+    '📌 공지사항: <b>'+boardPosts.length+'건</b><br>'+
+    '🌴 연차 신청: <b>'+leaveRequests.length+'건</b> (대기 '+pending+'건)<br>'+
+    '<button class="btn btn-outline btn-sm" onclick="doLogout()" style="margin-top:8px;color:var(--red);border-color:#fca5a5">🚪 로그아웃</button>';
+
+  // 직원 비밀번호 목록
+  var pl=document.getElementById('adm-pw-list'); if(pl){ pl.innerHTML='';
+  MEMBERS.forEach(function(m){
+    var curPw=memberPws[m.n]||'1234';
+    var div=document.createElement('div');
+    div.style='display:grid;grid-template-columns:1fr 100px 60px;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px';
+    div.innerHTML=
+      '<div>'+m.n+' <span style="color:var(--sub);font-size:10px">('+m.r+')</span></div>'+
+      '<input style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:12px;outline:none" type="text" placeholder="새 비밀번호" id="pw-inp-'+m.n.replace(/\s/g,'_')+'"  value="">'+
+      '<button class="btn btn-outline btn-sm" onclick="setMemberPw(\''+m.n+'\')">변경</button>';
+    pl.appendChild(div);
+  });}
+
+  // 직원 연차 리스트
+  var ll=document.getElementById('adm-leave-list'); ll.innerHTML='';
+  MEMBERS.forEach(function(m){
+    var balance = leaveBalances[m.n]||15;
+    var used = getUsedDays(m.n);
+    var div=document.createElement('div'); div.className='adm-leave-grid';
+    div.innerHTML=
+      '<div>'+m.n+' <span style="color:var(--sub);font-size:10px">('+m.t.replace('팀','').replace('사업부','').replace('관리','')+' '+m.r+')</span></div>'+
+      '<div style="text-align:center;color:var(--amber)">'+used+'</div>'+
+      '<input class="adm-leave-input" type="number" step="0.5" value="'+balance+'" onchange="updateLeaveBalance(\''+m.n+'\',this.value)">';
+    ll.appendChild(div);
+  });
+
+  openModal('modal-admin');
+}
+
+function setMemberPw(name){
+  var inp=document.getElementById('pw-inp-'+name.replace(/\s/g,'_'));
+  if(!inp)return;
+  var pw=inp.value.trim();
+  if(!pw){alert('새 비밀번호를 입력하세요');return;}
+  memberPws[name]=pw;
+  savePws();
+  inp.value='';
+  alert(name+' 비밀번호가 변경되었습니다');
+}
+
+function closeAdmin(){
+  closeModal('modal-admin');
+  // 관리자 모드는 모달 닫아도 유지(같은 세션 동안)
+}
+
+function updateLeaveBalance(name, val){
+  var v=parseFloat(val);
+  if(isNaN(v) || v<0){alert('올바른 숫자를 입력하세요');return;}
+  leaveBalances[name]=v;
+  saveLeaves();
+}
+
+function changeAdminPw(){
+  var npw=document.getElementById('adm-newpw').value;
+  if(!/^\d{4}$/.test(npw)){alert('4자리 숫자를 입력하세요');return;}
+  adminPw=npw;
+  try{_store.set('sd7_admpw',adminPw);}catch(e){}
+  document.getElementById('adm-newpw').value='';
+  alert('비밀번호가 변경되었습니다');
+}
+
+function downloadBackup(){
+  var data={
+    works:works, delivery:delivery,
+    clients:clients, consults:consults,
+    boardPosts:boardPosts, leaveRequests:leaveRequests,
+    leaveBalances:leaveBalances,
+    exportedAt:new Date().toISOString()
+  };
+  var blob=new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='스쿨디_백업_'+todayStr()+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function restoreBackup(input){
+  var f=input.files[0]; if(!f)return;
+  if(!confirm('현재 모든 데이터를 백업 파일로 덮어씁니다. 계속하시겠습니까?')){input.value='';return;}
+  var r=new FileReader();
+  r.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      if(data.works)works=data.works;
+      if(data.delivery)delivery=data.delivery;
+      if(data.clients)clients=data.clients;
+      if(data.consults)consults=data.consults;
+      if(data.boardPosts)boardPosts=data.boardPosts;
+      if(data.leaveRequests)leaveRequests=data.leaveRequests;
+      if(data.leaveBalances)leaveBalances=data.leaveBalances;
+      save(); saveClients(); saveBoard(); saveLeaves();
+      alert('복원되었습니다. 페이지를 새로고침합니다.');
+      location.reload();
+    }catch(err){
+      alert('파일을 읽을 수 없습니다: '+err.message);
+    }
+  };
+  r.readAsText(f);
+  input.value='';
+}
+
+function resetAllData(){
+  if(!confirm('정말로 모든 데이터를 삭제하시겠습니까?\n\n작업 / 거래처 / 공지 / 연차 모두 초기 샘플 상태로 되돌아갑니다.\n복원할 수 없습니다.'))return;
+  if(!confirm('마지막 확인입니다. 정말 초기화하시겠습니까?'))return;
+  ['sd7_works','sd7_del','sd7_clients','sd7_consults','sd7_board','sd7_leaves','sd7_lvbal'].forEach(function(k){
+    try{_store.remove(k);}catch(e){}
+  });
+  alert('초기화되었습니다. 페이지를 새로고침합니다.');
+  location.reload();
+}
+
+// ════════════════════════════════════════════════════════════════
+// ══ 협력업체 ══
+// ════════════════════════════════════════════════════════════════
+var editVendorId=null;
+var VENDOR_TYPE_COLOR={'지류':'#92400e','판출력':'#7c3aed','인쇄소':'#1a5fa8','후가공':'#059669','제본':'#d97706','배송':'#6b7280','사인물':'#dc2626','인테리어':'#0891b2','기타':'#9ca3af'};
+var curMfgId=null;
+
+// ── 제작중 슬라이드업 패널 ──
+function openMfg(workId){
+  curMfgId=workId;
+  var w=works.find(function(x){return x.id===workId;}); if(!w)return;
+  renderMfg(w);
+  document.getElementById('mfg-overlay').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function exitMfg(){
+  document.getElementById('mfg-overlay').classList.remove('on');
+  document.body.style.overflow='';
+  curMfgId=null;
+}
+
+function renderMfg(w){
+  document.getElementById('mfg-work-title').textContent=w.n+(w.school?' — '+w.school:'');
+
+  // ── 칸반 단계 트래커 (5~8) ──
+  var row=document.getElementById('mfg-stage-row'); row.innerHTML='';
+  var mfgStages=[5,6,7,8];
+  mfgStages.forEach(function(si,idx){
+    var isDone=w.s>si, isActive=w.s===si;
+    var color=SDOTS[si];
+    var step=document.createElement('div'); step.className='mfg-step';
+    var circle=document.createElement('div');
+    circle.className='mfg-step-circle '+(isDone?'done':isActive?'active':'idle');
+    if(isDone||isActive) circle.style.background=color;
+    if(isActive) circle.style.borderColor=color;
+    circle.textContent=isDone?'✓':(idx+1);
+    circle.title=MFG_LABELS[si]+' 단계로 이동';
+    circle.onclick=(function(s){return function(){setMfgStage(s);};})(si);
+    var lbl=document.createElement('div');
+    lbl.className='mfg-step-label'+(isActive?' active':'');
+    lbl.textContent=MFG_LABELS[si];
+    step.appendChild(circle); step.appendChild(lbl);
+    row.appendChild(step);
+    if(idx<mfgStages.length-1){
+      var line=document.createElement('div'); line.className='mfg-step-line';
+      line.style.background=isDone?color:'#e5e7eb';
+      row.appendChild(line);
+    }
+  });
+
+  // ── 분류별 공정 흐름 ──
+  var body=document.getElementById('mfg-panel-body');
+  // 기존 공정 섹션 제거 후 재생성
+  var oldProc=document.getElementById('mfg-process-section');
+  if(oldProc) oldProc.remove();
+
+  var proc=MFG_PROCESS[w.cat];
+  if(proc){
+    var procSec=document.createElement('div');
+    procSec.id='mfg-process-section';
+    procSec.className='mfg-section';
+    procSec.style.marginBottom='10px';
+
+    var title=document.createElement('div');
+    title.className='mfg-section-title';
+    title.textContent='🏭 공정별 협력업체 ('+(w.cat||'')+'  '+proc.length+'단계)';
+    procSec.appendChild(title);
+
+    proc.forEach(function(step, idx){
+      var stepDiv=document.createElement('div');
+      stepDiv.style.cssText='margin-bottom:8px;padding:8px 10px;background:var(--white);border-radius:8px;border:1px solid var(--border)';
+
+      // 공정명 + 선택된 업체
+      var savedKey='mfg_proc_'+w.id+'_'+step.key;
+      var savedVendor='';
+      try{savedVendor=_store.get(savedKey)||'';}catch(e){}
+
+      var hdr=document.createElement('div');
+      hdr.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:6px';
+      hdr.innerHTML=
+        '<span style="width:18px;height:18px;border-radius:50%;background:var(--blue-lt);color:var(--blue);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(idx+1)+'</span>'+
+        '<span style="font-size:12px;font-weight:600;color:var(--text)">'+step.label+'</span>'+
+        (step.optional?'<span style="font-size:9px;color:var(--sub);padding:1px 5px;border-radius:4px;background:var(--bg)">선택</span>':'')+
+        (savedVendor?'<span style="font-size:10px;color:var(--green);margin-left:auto">✓ '+esc(savedVendor)+'</span>':'');
+      stepDiv.appendChild(hdr);
+
+      // 해당 공정 업체 버튼들
+      var btnWrap=document.createElement('div');
+      btnWrap.style.cssText='display:flex;flex-wrap:wrap;gap:5px';
+      var procVendors=vendors.filter(function(v){
+        return step.vendors.indexOf(v.name)!==-1;
+      });
+      // 목록에 없어도 step.vendors에 있는 이름은 표시
+      var shownNames=[];
+      procVendors.forEach(function(v){shownNames.push(v.name);});
+      step.vendors.forEach(function(vn){if(shownNames.indexOf(vn)===-1)shownNames.push(vn);});
+
+      shownNames.forEach(function(vname){
+        var btn=document.createElement('button');
+        var isSelected=savedVendor===vname;
+        btn.style.cssText=
+          'padding:4px 10px;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;transition:all .15s;'+
+          'background:'+(isSelected?'var(--blue)':'var(--bg)')+';'+
+          'color:'+(isSelected?'#fff':'var(--text)')+';'+
+          'border:1px solid '+(isSelected?'var(--blue)':'var(--border)');
+        btn.textContent=vname;
+        btn.onclick=(function(key,name,wd){return function(){
+          try{
+            var cur=_store.get('mfg_proc_'+wd.id+'_'+key)||'';
+            if(cur===name){ _store.remove('mfg_proc_'+wd.id+'_'+key); }
+            else { _store.set('mfg_proc_'+wd.id+'_'+key, name); }
+          }catch(e){}
+          renderMfg(wd);
+        };})(step.key, vname, w);
+        btnWrap.appendChild(btn);
+      });
+
+      if(shownNames.length===0){
+        btnWrap.innerHTML='<span style="font-size:11px;color:var(--sub);font-style:italic">업체 직접 입력</span>';
+      }
+      stepDiv.appendChild(btnWrap);
+      procSec.appendChild(stepDiv);
+    });
+
+    // 공정 섹션을 협력업체 섹션 앞에 삽입
+    var vendorSec=body.querySelector('.mfg-section:nth-child(2)');
+    if(vendorSec) body.insertBefore(procSec, vendorSec);
+    else body.appendChild(procSec);
+  }
+
+  // ── 협력업체 (기존) ──
+  buildMfgVendorSelect(w.vendor||'');
+
+  // ── 작업 정보 ──
+  var grid=document.getElementById('mfg-info-grid'); grid.innerHTML='';
+  var infos=[
+    {l:'분류',v:w.cat||'-'},{l:'담당자',v:w.p||'-'},
+    {l:'배송예정일',v:w.due?fmtD(w.due):'-'},{l:'거래처',v:w.school||'-'},
+    {l:'사이즈',v:w.size||'-'},{l:'후가공',v:w.finish||'-'}
+  ];
+  infos.forEach(function(info){
+    var div=document.createElement('div'); div.className='mfg-info-item';
+    div.innerHTML='<div class="mfg-info-label">'+info.l+'</div><div class="mfg-info-value">'+esc(info.v)+'</div>';
+    grid.appendChild(div);
+  });
+
+  // ── 이전/다음 버튼 ──
+  document.getElementById('mfg-btn-prev').textContent='← '+(w.s>5?MFG_LABELS[w.s-1]:'디자인컨펌');
+  document.getElementById('mfg-btn-next').textContent=(w.s<8?MFG_LABELS[w.s+1]:'제작완료')+' →';
+}
+
+function buildMfgVendorSelect(currentVal){
+  var sel=document.getElementById('mfg-vendor'); if(!sel)return;
+  sel.innerHTML='<option value="">선택 안함</option>';
+  vendors.forEach(function(v){
+    var o=document.createElement('option');
+    o.value=v.name; o.textContent=v.name+' ('+v.type+')';
+    if(v.name===currentVal)o.selected=true;
+    sel.appendChild(o);
+  });
+  var customEl=document.getElementById('mfg-vendor-custom');
+  var inList=vendors.some(function(v){return v.name===currentVal;});
+  if(customEl) customEl.value = (currentVal && !inList) ? currentVal : '';
+  if(inList && sel) sel.value=currentVal;
+}
+
+function saveMfgVendor(val){
+  var w=works.find(function(x){return x.id===curMfgId;}); if(!w)return;
+  if(val) document.getElementById('mfg-vendor-custom').value='';
+  w.vendor=val; save();
+}
+function saveMfgVendorCustom(val){
+  var w=works.find(function(x){return x.id===curMfgId;}); if(!w)return;
+  if(val) document.getElementById('mfg-vendor').value='';
+  w.vendor=val; save();
+}
+
+function setMfgStage(si){
+  var w=works.find(function(x){return x.id===curMfgId;}); if(!w)return;
+  w.s=si; save();
+  renderMfg(w); renderKanban(); renderList();
+}
+
+function moveMfgStage(dir){
+  var w=works.find(function(x){return x.id===curMfgId;}); if(!w)return;
+  var ns=w.s+dir;
+  if(ns<4||ns>9)return;
+  if(ns===9&&!confirm('제작완료로 이동하시겠습니까?'))return;
+  if(ns===4&&!confirm('디자인컨펌으로 되돌리시겠습니까?'))return;
+  w.s=ns; save();
+  if(ns<5||ns>8){
+    exitMfg();
+  } else {
+    renderMfg(w);
+  }
+  renderKanban(); renderList();
+}
+
+function renderVendors(){
+  var q=(document.getElementById('vendor-search').value||'').toLowerCase();
+  var list=document.getElementById('vendor-list'); list.innerHTML='';
+  var filtered=vendors.filter(function(v){
+    return !q||v.name.toLowerCase().includes(q)||(v.contact||'').toLowerCase().includes(q);
+  });
+  if(!filtered.length){
+    list.innerHTML='<div style="text-align:center;padding:32px 12px;color:var(--sub);font-size:12px">협력업체가 없습니다.<br>+ 협력업체 버튼으로 추가하세요.</div>';
+    return;
+  }
+  // 업종별 그룹
+  var groups={};
+  filtered.forEach(function(v){
+    var t=v.type||'기타';
+    if(!groups[t])groups[t]=[];
+    groups[t].push(v);
+  });
+  Object.keys(groups).forEach(function(type){
+    var tc=VENDOR_TYPE_COLOR[type]||'#9ca3af';
+    var lbl=document.createElement('div');
+    lbl.className='vendor-type-label'; lbl.style.color=tc;
+    lbl.textContent=type.toUpperCase();
+    list.appendChild(lbl);
+    groups[type].forEach(function(v){
+      var usingWorks=works?works.filter(function(w){return w.vendor===v.name;}).length:0;
+      var card=document.createElement('div'); card.className='vendor-card';
+      card.innerHTML=
+        '<div class="vendor-avatar" style="background:'+tc+'18;color:'+tc+'">'+v.name.slice(0,1)+'</div>'+
+        '<div class="vendor-info">'+
+          '<div class="vendor-name">'+esc(v.name)+'</div>'+
+          '<div class="vendor-meta">'+(v.contact?'👤 '+esc(v.contact)+'　':'')+(v.tel?'📞 '+esc(v.tel):'')+'</div>'+
+          (v.email?'<div style="font-size:10px;color:var(--sub);margin-top:1px">✉ '+esc(v.email)+'</div>':'')+
+          (v.bizno?'<div style="font-size:9px;color:#c0bfbb;margin-top:1px">사업자 '+esc(v.bizno)+'</div>':'')+
+          (usingWorks?'<div class="vendor-using">🔧 진행중 작업 '+usingWorks+'건</div>':'')+
+          (v.memo?'<div class="vendor-memo">'+esc(v.memo)+'</div>':'')+
+        '</div>'+
+        '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openEditVendor(\''+v.id+'\')">수정</button>';
+      list.appendChild(card);
+    });
+  });
+}
+
+function openAddVendor(){
+  editVendorId=null;
+  document.getElementById('vdf-title').textContent='협력업체 추가';
+  ['vdf-name','vdf-contact','vdf-tel','vdf-email','vdf-bizno','vdf-addr','vdf-memo'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('vdf-type').value='인쇄소';
+  document.getElementById('vdf-del').style.display='none';
+  openModal('modal-vendor');
+}
+
+function openEditVendor(id){
+  var v=vendors.find(function(x){return x.id===id;}); if(!v)return;
+  editVendorId=id;
+  document.getElementById('vdf-title').textContent='협력업체 수정';
+  document.getElementById('vdf-name').value=v.name||'';
+  document.getElementById('vdf-type').value=v.type||'기타';
+  document.getElementById('vdf-contact').value=v.contact||'';
+  document.getElementById('vdf-tel').value=v.tel||'';
+  document.getElementById('vdf-email').value=v.email||'';
+  document.getElementById('vdf-bizno').value=v.bizno||'';
+  document.getElementById('vdf-addr').value=v.addr||'';
+  document.getElementById('vdf-memo').value=v.memo||'';
+  document.getElementById('vdf-del').style.display='';
+  openModal('modal-vendor');
+}
+
+function saveVendorForm(){
+  var nm=document.getElementById('vdf-name').value.trim();
+  if(!nm){alert('업체명을 입력하세요');return;}
+  var data={name:nm, type:document.getElementById('vdf-type').value,
+    contact:document.getElementById('vdf-contact').value.trim(),
+    tel:document.getElementById('vdf-tel').value.trim(),
+    email:document.getElementById('vdf-email').value.trim(),
+    bizno:document.getElementById('vdf-bizno').value.trim(),
+    addr:document.getElementById('vdf-addr').value.trim(),
+    memo:document.getElementById('vdf-memo').value.trim()};
+  if(editVendorId){
+    var v=vendors.find(function(x){return x.id===editVendorId;});
+    if(v)Object.assign(v,data);
+  } else {
+    vendors.push(Object.assign({id:'v'+Date.now()},data));
+  }
+  saveVendors();
+  closeModal('modal-vendor');
+  renderVendors();
+  buildVendorSelect('');
+}
+
+function deleteVendor(){
+  if(!editVendorId)return;
+  if(!confirm('이 협력업체를 삭제하시겠습니까?'))return;
+  vendors=vendors.filter(function(x){return x.id!==editVendorId;});
+  saveVendors(); closeModal('modal-vendor'); renderVendors(); buildVendorSelect('');
+}
+
+// 작업 폼용 협력업체 select 빌드
+function buildVendorSelect(currentVal){
+  var sel=document.getElementById('wf-vendor'); if(!sel)return;
+  sel.innerHTML='<option value="">선택 안함</option>';
+  vendors.forEach(function(v){
+    var o=document.createElement('option');
+    o.value=v.name; o.textContent=v.name+' ('+v.type+')';
+    if(v.name===currentVal)o.selected=true;
+    sel.appendChild(o);
+  });
+  var customEl=document.getElementById('wf-vendor-custom');
+  if(customEl){
+    // 목록에 없는 값이면 직접입력에 표시
+    var inList=vendors.some(function(v){return v.name===currentVal;});
+    customEl.value = (currentVal && !inList) ? currentVal : '';
+    if(inList) sel.value=currentVal;
+  }
+}
+function syncVendorInput(sel){
+  var customEl=document.getElementById('wf-vendor-custom');
+  if(sel.value && customEl) customEl.value='';
+}
+function syncVendorSelect(inp){
+  var sel=document.getElementById('wf-vendor');
+  if(inp.value && sel) sel.value='';
+}
+
+</script>
+
+
+</body></html>
